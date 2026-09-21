@@ -158,7 +158,8 @@ export function VietnamMap({
     const land = () => {
       animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 700);
       setOnboardPhase('done');
-      onOnboardDone?.();
+      // Hint chỉ tắt sau khi camera hạ cánh xong (không biến mất giữa chừng).
+      setTimeout(() => onOnboardDone?.(), 750);
     };
     if (reduced || !path) return land();
     setOnboardPhase('draw');
@@ -317,7 +318,7 @@ export function VietnamMap({
         {/* Đường hành trình */}
         <path class="vmap__journey vmap__journey--all" d={journeyAll} />
         {journeyDone && (
-          <path ref={donePathRef} class="vmap__journey vmap__journey--done" d={journeyDone} pathLength={1} />
+          <path ref={donePathRef} class="vmap__journey vmap__journey--done" d={journeyDone} pathLength={1} stroke-dasharray={1} />
         )}
         {journeyNext && <path class="vmap__journey vmap__journey--next" d={journeyNext} />}
         {onboard && (

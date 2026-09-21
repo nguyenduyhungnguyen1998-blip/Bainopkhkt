@@ -102,6 +102,7 @@
   transform-origin: 0 0;
   cursor: pointer;
   outline: none;
+  transition: opacity var(--dur-base) var(--ease-out);
 }
 .vnode:focus-visible .vnode__body {
   stroke: var(--color-text);
@@ -215,6 +216,95 @@
   pointer-events: none;
 }
 
+/* Onboarding: đường hành trình tự vẽ rồi mờ dần sau khi xong */
+.vmap__journey--onboard {
+  stroke: var(--color-accent-secondary);
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 5px rgb(255 213 106 / 0.7));
+  transition: opacity 500ms var(--ease-out);
+}
+.vmap__journey--out {
+  opacity: 0;
+}
+
+/* Làm mờ node ngoài vùng đang lọc */
+.vnode--dim {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Sóng lan ăn mừng khi mở khóa */
+.vnode__ripple-g {
+  pointer-events: none;
+}
+.vnode__ripple {
+  fill: none;
+  stroke: var(--color-accent-tertiary);
+  stroke-width: 3;
+  transform-origin: 0 0;
+  animation: vnode-ripple 1.1s var(--ease-out) forwards;
+}
+.vnode__ripple--2 {
+  stroke: var(--color-accent-secondary);
+  animation-delay: 0.15s;
+}
+@keyframes vnode-ripple {
+  from {
+    transform: scale(0.6);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(4.2);
+    opacity: 0;
+  }
+}
+
+/* D9 Map Inspector overlay */
+.vmap__inspector {
+  pointer-events: none;
+}
+.vmap__grid {
+  stroke: var(--color-accent-primary-text);
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+  vector-effect: non-scaling-stroke;
+}
+.vmap__grid-label {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--color-accent-primary-text);
+  paint-order: stroke;
+  stroke: var(--color-bg);
+  stroke-width: 3px;
+}
+.vmap__hitring {
+  fill: none;
+  stroke: var(--color-accent-primary-text);
+  stroke-opacity: 0.45;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+.vmap__tapmark {
+  fill: none;
+  stroke: var(--color-danger);
+  stroke-width: 2;
+}
+
+/* Sơ đồ cấp 2 */
+.smap__walls {
+  fill: var(--color-land);
+  stroke: var(--color-accent-secondary);
+  stroke-opacity: 0.7;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.smap__gate rect {
+  fill: var(--color-accent-secondary);
+  stroke: var(--color-bg);
+  stroke-width: 1.5;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .vnode__pulse,
   .vmap__journey--next {
@@ -222,5 +312,8 @@
   }
   .vnode__pulse {
     opacity: 0.6;
+  }
+  .vnode__ripple {
+    animation-duration: 0.01ms;
   }
 }

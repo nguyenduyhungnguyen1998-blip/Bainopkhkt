@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "entityId": "dinh-doc-lap",
+  "name": { "vi": "Dinh Độc Lập", "en": "Independence Palace" },
+  "province": { "vi": "TP. Hồ Chí Minh", "en": "Ho Chi Minh City" },
+  "region": "nam",
+  "themeContext": "lich-su",
+  "coords": [106.6953, 10.777],
+  "journeyOrder": 5,
+  "heroImage": "/img/dinh-doc-lap/hero.svg",
+  "summary": {
+    "vi": "Chứng nhân của ngày 30/4/1975 – nơi kết thúc chiến tranh và thống nhất đất nước.",
+    "en": "Witness to 30 April 1975 – where the war ended and the country was reunified."
+  },
+  "gamificationConfig": {
+    "badge": { "id": "thong-nhat", "name": { "vi": "Ngày thống nhất", "en": "Reunification Day" }, "icon": "flag" },
+    "completionBonusXp": 100
+  },
+  "spots": [
+    {
+      "spotId": "cong-chinh",
+      "name": { "vi": "Cổng chính & bãi cỏ", "en": "Main gate and lawn" },
+      "xp": 40,
+      "layoutSchema": [
+        { "type": "hero", "size": "lg", "image": "/img/dinh-doc-lap/hero.svg" },
+        { "type": "aspects", "size": "lg", "aspects": [
+          { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Tòa dinh hiện nay do kiến trúc sư Ngô Viết Thụ thiết kế, khánh thành năm 1966. Trưa 30/4/1975, xe tăng Quân Giải phóng tiến qua cổng chính, kết thúc chiến tranh.", "en": "Designed by architect Ngo Viet Thu and completed in 1966. At noon on 30 April 1975 liberation tanks drove through this gate, ending the war." } },
+          { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Công trình kết hợp kiến trúc hiện đại với triết lý phương Đông: mặt bằng tạo chữ CÁT (tốt lành), rèm hoa đá hình đốt trúc che nắng mặt tiền.", "en": "Modern architecture fused with Eastern philosophy: the floor plan forms the character for \"good fortune\", and a bamboo-shaped stone screen shades the facade." } }
+        ] },
+        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Dinh Độc Lập", "en": "Narrated clip: Independence Palace" } },
+        { "type": "audio", "size": "md", "ambient": "garden", "script": {
+          "vi": ["Bạn đang đứng trước cổng Dinh Độc Lập, nơi lịch sử Việt Nam sang trang ngày 30 tháng 4 năm 1975.", "Phía trước là tòa dinh do kiến trúc sư Ngô Viết Thụ thiết kế."],
+          "en": ["You stand before the gate of the Independence Palace, where Vietnam's history turned a page on 30 April 1975.", "Ahead is the palace designed by architect Ngo Viet Thu."]
+        } }
+      ],
+      "sources": [ { "title": "Hội trường Thống Nhất – Giới thiệu di tích", "url": "https://dinhdoclap.gov.vn", "reviewed": false } ]
+    }
+  ]
+}

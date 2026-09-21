@@ -1,0 +1,211 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://modauviet.vn/schema/site.schema.json",
+  "title": "Mở Dấu Việt – Site",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "entityId",
+    "name",
+    "province",
+    "region",
+    "themeContext",
+    "coords",
+    "journeyOrder",
+    "heroImage",
+    "summary",
+    "gamificationConfig",
+    "spots"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "entityId": { "$ref": "#/definitions/slug" },
+    "name": { "$ref": "#/definitions/localized" },
+    "province": { "$ref": "#/definitions/localized" },
+    "region": { "enum": ["bac", "trung", "nam"] },
+    "themeContext": { "enum": ["lich-su", "tu-nhien", "tam-linh"] },
+    "coords": { "$ref": "#/definitions/coords" },
+    "journeyOrder": { "type": "integer", "minimum": 1 },
+    "heroImage": { "$ref": "#/definitions/assetPath" },
+    "summary": { "$ref": "#/definitions/localized" },
+    "gamificationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["badge", "completionBonusXp"],
+      "properties": {
+        "badge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name", "icon"],
+          "properties": {
+            "id": { "$ref": "#/definitions/slug" },
+            "name": { "$ref": "#/definitions/localized" },
+            "icon": { "type": "string", "minLength": 1 }
+          }
+        },
+        "completionBonusXp": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "spots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/spot" }
+    }
+  },
+  "definitions": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "assetPath": { "type": "string", "pattern": "^/(img|media)/.+\\.(webp|jpg|jpeg|png|svg|mp4|webm)$" },
+    "localized": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["vi", "en"],
+      "properties": {
+        "vi": { "type": "string", "minLength": 1 },
+        "en": { "type": "string", "minLength": 1 }
+      }
+    },
+    "coords": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        { "type": "number", "minimum": 102, "maximum": 117.5 },
+        { "type": "number", "minimum": 8, "maximum": 23.5 }
+      ]
+    },
+    "size": { "enum": ["lg", "md", "sm"] },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "reviewed"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "url": { "type": "string", "format": "uri" },
+        "reviewed": { "type": "boolean" }
+      }
+    },
+    "spot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spotId", "name", "xp", "layoutSchema", "sources"],
+      "properties": {
+        "spotId": { "$ref": "#/definitions/slug" },
+        "name": { "$ref": "#/definitions/localized" },
+        "coords": { "$ref": "#/definitions/coords" },
+        "xp": { "type": "integer", "minimum": 1, "maximum": 500 },
+        "layoutSchema": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/card" }
+        },
+        "sources": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/source" } },
+        "quiz": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["q", "options", "answer"],
+            "properties": {
+              "q": { "$ref": "#/definitions/localized" },
+              "options": { "type": "array", "minItems": 2, "maxItems": 4, "items": { "$ref": "#/definitions/localized" } },
+              "answer": { "type": "integer", "minimum": 0, "maximum": 3 }
+            }
+          }
+        }
+      }
+    },
+    "card": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "image"],
+          "properties": {
+            "type": { "const": "hero" },
+            "size": { "$ref": "#/definitions/size" },
+            "image": { "$ref": "#/definitions/assetPath" },
+            "caption": { "$ref": "#/definitions/localized" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "aspects"],
+          "properties": {
+            "type": { "const": "aspects" },
+            "size": { "$ref": "#/definitions/size" },
+            "aspects": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "title", "body"],
+                "properties": {
+                  "id": { "$ref": "#/definitions/slug" },
+                  "title": { "$ref": "#/definitions/localized" },
+                  "body": { "$ref": "#/definitions/localized" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "title"],
+          "properties": {
+            "type": { "const": "video" },
+            "size": { "$ref": "#/definitions/size" },
+            "src": { "type": "string", "format": "uri" },
+            "poster": { "$ref": "#/definitions/assetPath" },
+            "title": { "$ref": "#/definitions/localized" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "script"],
+          "properties": {
+            "type": { "const": "audio" },
+            "size": { "$ref": "#/definitions/size" },
+            "script": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["vi", "en"],
+              "properties": {
+                "vi": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "en": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+              }
+            },
+            "ambient": { "enum": ["wind-water", "temple-bell", "garden"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "text"],
+          "properties": {
+            "type": { "const": "fact" },
+            "size": { "$ref": "#/definitions/size" },
+            "icon": { "type": "string" },
+            "text": { "$ref": "#/definitions/localized" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "size", "image"],
+          "properties": {
+            "type": { "const": "image" },
+            "size": { "$ref": "#/definitions/size" },
+            "image": { "$ref": "#/definitions/assetPath" },
+            "caption": { "$ref": "#/definitions/localized" }
+          }
+        }
+      ]
+    }
+  }
+}

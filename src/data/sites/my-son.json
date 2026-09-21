@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "entityId": "my-son",
+  "name": { "vi": "Thánh địa Mỹ Sơn", "en": "My Son Sanctuary" },
+  "province": { "vi": "Quảng Nam", "en": "Quang Nam" },
+  "region": "trung",
+  "themeContext": "tam-linh",
+  "coords": [108.124, 15.764],
+  "journeyOrder": 4,
+  "heroImage": "/img/my-son/hero.svg",
+  "summary": {
+    "vi": "Quần thể đền tháp Chăm Pa xây từ thế kỷ IV đến XIII, Di sản văn hóa thế giới từ năm 1999.",
+    "en": "A complex of Champa temple-towers built from the 4th to 13th century, World Heritage since 1999."
+  },
+  "gamificationConfig": {
+    "badge": { "id": "thap-cham", "name": { "vi": "Người giữ tháp Chăm", "en": "Keeper of the Cham Towers" }, "icon": "tower" },
+    "completionBonusXp": 100
+  },
+  "spots": [
+    {
+      "spotId": "nhom-thap-b",
+      "name": { "vi": "Nhóm tháp B–C–D", "en": "Tower groups B–C–D" },
+      "xp": 40,
+      "layoutSchema": [
+        { "type": "hero", "size": "lg", "image": "/img/my-son/hero.svg" },
+        { "type": "aspects", "size": "lg", "aspects": [
+          { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc Chăm Pa trong gần một nghìn năm, thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.", "en": "My Son was the religious centre of the Champa kingdom for nearly a millennium, dedicated to Shiva as Bhadresvara, protector of the Cham kings." } },
+          { "id": "kien-truc", "title": { "vi": "Kỹ thuật", "en": "Technique" }, "body": { "vi": "Các tháp xây bằng gạch nung không thấy mạch vữa – kỹ thuật kết dính của người Chăm đến nay vẫn là đề tài nghiên cứu.", "en": "The towers are built of fired brick with no visible mortar joints – a Cham bonding technique still studied today." } }
+        ] },
+        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Mỹ Sơn", "en": "Narrated clip: My Son" } },
+        { "type": "audio", "size": "md", "ambient": "wind-water", "script": {
+          "vi": ["Bạn đang ở giữa thung lũng Mỹ Sơn, thánh địa của vương quốc Chăm Pa.", "Những viên gạch quanh bạn đã đứng vững hơn một nghìn năm mà không thấy mạch vữa."],
+          "en": ["You are in the My Son valley, sanctuary of the Champa kingdom.", "The bricks around you have stood for over a thousand years with no visible mortar."]
+        } }
+      ],
+      "sources": [ { "title": "UNESCO World Heritage Centre – My Son Sanctuary", "url": "https://whc.unesco.org/en/list/949", "reviewed": false } ]
+    }
+  ]
+}

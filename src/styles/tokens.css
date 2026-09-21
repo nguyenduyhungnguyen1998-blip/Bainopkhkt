@@ -1,0 +1,120 @@
+/*
+  Design tokens "Mở Dấu Việt"
+  Hai chế độ: Nguyệt Quang (tối, mặc định) và Thái Dương (sáng).
+  Mọi cặp màu chữ/nền ở đây đã kiểm tra WCAG 2.1 AA (>= 4.5:1 cho chữ thường).
+  Lưu ý: ở chế độ sáng, vàng lúa chín và xanh ngọc chỉ dùng làm NỀN (fill) với chữ tối,
+  hoặc dùng biến *-text tối hơn khi làm màu chữ. Không dùng #E5A93B / #00A86B làm chữ trên giấy dó.
+*/
+
+:root {
+  /* Kích thước, nhịp */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+  --tap-min: 44px;
+
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.6rem;
+  --text-2xl: 2.1rem;
+  --leading-body: 1.6;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 600ms;
+
+  --shadow-card: 0 8px 24px rgb(0 0 0 / 0.28);
+  --glass-blur: 10px;
+  --glass-alpha: 0.72;
+}
+
+/* Nguyệt Quang – tối */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: #07111f; /* Trầm tích đêm */
+  --color-bg-2: #0c1930;
+  --color-surface: rgb(16 30 54 / var(--glass-alpha));
+  --color-surface-solid: #12223d;
+  --color-border: rgb(255 255 255 / 0.08);
+  --color-text: #f4f1ea; /* 15.5:1 */
+  --color-text-muted: #b8c0d0; /* 10.4:1 */
+  --color-text-faint: #7f8aa3;
+
+  --color-accent-primary: #c84b31; /* Đỏ gạch nung – nền nút, chữ trắng 4.66:1 */
+  --color-accent-primary-text: #e8735a; /* 6.3:1 khi làm chữ trên nền tối */
+  --color-on-primary: #ffffff;
+
+  --color-accent-secondary: #ffd56a; /* Vàng lúa chín – 13.5:1 */
+  --color-accent-secondary-text: #ffd56a;
+  --color-on-secondary: #07111f;
+
+  --color-accent-tertiary: #7cf0c5; /* Xanh ngọc bích – 13.6:1 */
+  --color-accent-tertiary-text: #7cf0c5;
+  --color-on-tertiary: #07111f;
+
+  --color-locked: #56607a;
+  --color-sea: #0a1a33;
+  --color-land: #16284a;
+  --color-land-neighbour: #0e1c36;
+  --color-border-land: #2c4270;
+
+  --color-danger: #ff6b6b;
+  --shadow-glow-secondary: 0 0 24px rgb(255 213 106 / 0.55);
+  --shadow-glow-tertiary: 0 0 20px rgb(124 240 197 / 0.5);
+}
+
+/* Thái Dương – sáng */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: #f4f1ea; /* Trắng ngà giấy dó */
+  --color-bg-2: #ebe6da;
+  --color-surface: rgb(255 255 255 / 0.78);
+  --color-surface-solid: #fffdf8;
+  --color-border: rgb(27 27 31 / 0.1);
+  --color-text: #1b1b1f; /* 15.2:1 */
+  --color-text-muted: #5b5f6b; /* 5.65:1 */
+  --color-text-faint: #8a8f9c;
+
+  --color-accent-primary: #b22222; /* 5.9:1 */
+  --color-accent-primary-text: #b22222;
+  --color-on-primary: #ffffff; /* 6.7:1 */
+
+  --color-accent-secondary: #e5a93b; /* chỉ làm nền */
+  --color-accent-secondary-text: #7a5000; /* 6.3:1 */
+  --color-on-secondary: #3d2a05; /* 6.6:1 trên #E5A93B */
+
+  --color-accent-tertiary: #00a86b; /* chỉ làm nền */
+  --color-accent-tertiary-text: #006b44; /* 5.8:1 */
+  --color-on-tertiary: #ffffff; /* 3.1:1 – chỉ dùng cho icon/chữ lớn */
+
+  --color-locked: #a9a49a;
+  --color-sea: #dbe8ee;
+  --color-land: #efe4cc;
+  --color-land-neighbour: #e6e0d3;
+  --color-border-land: #b9a77f;
+
+  --color-danger: #c62828;
+  --shadow-card: 0 8px 24px rgb(60 40 10 / 0.12);
+  --shadow-glow-secondary: 0 0 20px rgb(229 169 59 / 0.6);
+  --shadow-glow-tertiary: 0 0 18px rgb(0 168 107 / 0.45);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-blur: 0px;
+    --glass-alpha: 1;
+  }
+}

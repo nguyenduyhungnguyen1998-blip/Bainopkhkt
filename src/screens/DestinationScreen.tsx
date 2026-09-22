@@ -37,6 +37,10 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
   const next = site.spots[idx + 1];
   const unlocked = isSpotUnlocked(site.entityId, spot.spotId);
   const sig = query?.get('s');
+  const curRef = useRef<HTMLAnchorElement>(null);
+  useEffect(() => {
+    curRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, [spot.spotId]);
 
   return (
     <main class="mdv-screen dest">
@@ -44,10 +48,10 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.back, lang)}>
           <Icon name="back" />
         </a>
-        <div class="dest__crumb">
+        <a class="dest__crumb dest__crumb--link" href={routeHref.destination(site.entityId)} title={t(UI.backToSite, lang)}>
           <span class="mdv-eyebrow">{t(site.name, lang)}</span>
           <h1>{t(spot.name, lang)}</h1>
-        </div>
+        </a>
         <span class={`mdv-badge ${unlocked ? 'mdv-badge--unlocked' : 'mdv-badge--locked'}`}>
           {unlocked ? `+${spot.xp} XP` : t(UI.locked, lang)}
         </span>
@@ -60,6 +64,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         {site.spots.map((s, i) => (
           <a
             key={s.spotId}
+            ref={s.spotId === spot.spotId ? curRef : undefined}
             href={routeHref.destination(site.entityId, s.spotId)}
             class={`dest__spot ${s.spotId === spot.spotId ? 'is-current' : ''} ${isSpotUnlocked(site.entityId, s.spotId) ? 'is-unlocked' : ''}`}
             aria-current={s.spotId === spot.spotId ? 'page' : undefined}
@@ -120,7 +125,15 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
       <div class="dscan dscan--bad" role="alert">
         <Icon name="warn" size={18} />
         <span>{t(UI.scanInvalid, lang)}</span>
-        <button class="dscan__x" onClick={() => setDismissed(true)} aria-label="close">
+        <button
+          class="dscan__x"
+          onClick={() => {
+            setDismissed(true);
+            // Bỏ chữ ký xấu khỏi URL để reload không hồi sinh cảnh báo.
+            navigate(`d/${site.entityId}/${spot.spotId}`, true);
+          }}
+          aria-label="close"
+        >
           ✕
         </button>
       </div>
@@ -290,12 +303,15 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
       {card.src && online ? (
         <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       ) : (
-        <div class="dcard__video-ph" style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}>
+        <div
+          class={`dcard__video-ph${online ? '' : ' dcard__video-ph--off'}`}
+          style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}
+        >
           <span class="dcard__play">
             <Icon name="play" size={28} />
           </span>
           <b>{t(card.title, lang)}</b>
-          <small>{card.src && !online ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}</small>
+          <small>{online ? t(UI.videoSoon, lang) : t(UI.videoOffline, lang)}</small>
           <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
         </div>
       )}

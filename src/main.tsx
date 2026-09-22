@@ -5,8 +5,10 @@ import './styles/base.css';
 import { App } from './app';
 import { installErrorLog } from './debug/errorlog';
 import { initProgress } from './lib/progress';
+import { registerSw } from './lib/sw';
 
 installErrorLog();
+registerSw();
 // IndexedDB là nguồn chuẩn (P3): hydrate xong mới render để mọi màn đọc tiến độ đồng bộ.
 void initProgress().finally(() => {
   render(<App />, document.getElementById('app')!);

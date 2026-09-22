@@ -2,6 +2,7 @@
  * D1 – Debug HUD. Chỉ được tải khi có ?debug=1 (hoặc localStorage mdv.debug=1),
  * nằm trong chunk riêng để không lọt vào đường tải chính của production.
  */
+import { Fragment } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { useOnline, useTheme } from '../lib/theme';
 import { useProgress, resetProgress, unlockSpot, computeStatuses } from '../lib/progress';
@@ -13,6 +14,7 @@ import { exportPassportJson, importPassportJson } from '../lib/progress';
 import { signSpot } from '../lib/qr';
 import { SpeechPlayer, listVoices, speechSupported } from '../lib/speech';
 import { ambientState, startAmbient, stopAmbient, type AmbientPreset } from '../lib/ambient';
+import { applySwUpdate, clearSwCaches, useSwStatus } from '../lib/sw';
 import { navigate } from '../lib/router';
 import './hud.css';
 
@@ -195,6 +197,54 @@ function AudioPanel() {
   );
 }
 
+/** D5 – SW/Cache Inspector: trạng thái registration, danh sách cache + số entry, nút update/clear. */
+function SwPanel() {
+  const { status, hasUpdate } = useSwStatus();
+  const [cachesList, setCachesList] = useState<{ name: string; size: number }[]>([]);
+  const refresh = async () => {
+    if (!('caches' in window)) return;
+    const ks = await caches.keys();
+    const out = [];
+    for (const k of ks) out.push({ name: k, size: (await (await caches.open(k)).keys()).length });
+    setCachesList(out);
+  };
+  useEffect(() => {
+    void refresh();
+    const id = setInterval(refresh, 4000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div class="hud__inspector">
+      <b class="hud__sectitle">D5 SW/Cache</b>
+      <div class="hud__grid">
+        <span>sw</span>
+        <b class={status === 'active' ? 'ok' : status === 'unsupported' ? 'warn' : ''}>
+          {status}
+          {hasUpdate ? ' +update' : ''}
+        </b>
+        {cachesList.map((c) => (
+          <Fragment key={c.name}>
+            <span class="hud__mono">{c.name}</span>
+            <b>{c.size} entries</b>
+          </Fragment>
+        ))}
+      </div>
+      <div class="hud__actions">
+        <button onClick={applySwUpdate} disabled={!hasUpdate}>
+          Áp dụng update
+        </button>
+        <button
+          onClick={() => {
+            void clearSwCaches().then(refresh);
+          }}
+        >
+          Xóa cache
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** D6 – Journey Simulator: giả lập quét URL ký thật, sửa chữ ký, tua trạng thái, xuất/nhập hộ chiếu. */
 function JourneyPanel() {
   const progress = useProgress();
@@ -355,6 +405,7 @@ export function DebugHud() {
             <button onClick={() => navigate('/map')}>→ map</button>
           </div>
           <InspectorPanel />
+          <SwPanel />
           <JourneyPanel />
           <SpeechPanel />
           <AudioPanel />

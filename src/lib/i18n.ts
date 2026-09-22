@@ -64,6 +64,7 @@ export const UI = {
   spots: { vi: 'điểm', en: 'spots' },
   back: { vi: 'Quay lại', en: 'Back' },
   videoSoon: { vi: 'Clip thuyết minh sẽ được cập nhật', en: 'Narrated clip coming soon' },
+  videoOffline: { vi: 'Video cần mạng – nghe audio bên dưới nhé', en: 'Video needs network – try the audio below' },
   listen: { vi: 'Nghe thuyết minh', en: 'Listen' },
   theme: { vi: 'Giao diện', en: 'Theme' },
   dark: { vi: 'Nguyệt Quang (tối)', en: 'Moonlight (dark)' },

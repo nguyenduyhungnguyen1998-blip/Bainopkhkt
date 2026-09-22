@@ -30,5 +30,11 @@ Chrome headful min width ~500px — for 390px mobile use CDP emulation:
 - Transient anims (onboarding draw ~1.6s, unlock ripple ~1.4s, toast ~2.4s): screenshot latency of the computer tool may miss them — use `Page.captureScreenshot` at timed offsets instead.
 - Journey "draw-in" uses `pathLength={1}` + `stroke-dasharray`/`strokeDashoffset` (path-space units, not px). To verify it live: sample `getComputedStyle(p).strokeDashoffset` right after an unlock via `p.getAnimations()[0].currentTime` — mid-animation values ≠0 prove the draw is rendering (screenshots alone can be ambiguous at low zoom).
 
-## Evidence
-- Console stays clean (vite HMR logs only). HUD polls at 4Hz; inspector toggles add `.vmap__grid`/`.vmap__hitring`/`.vmap__tapmark` elements — assert via DOM counts + screenshot.
+## Debug HUD & P3 tools
+- Expanded Debug HUD OVERLAYS the right ~65% of the page and covers page controls — hit-test with `elementFromPoint` before clicking, collapse via `.hud__toggle` first. HUD also overflows past 844px viewport (no max-height/overflow) — D3/D4 buttons below fold need a taller `setDeviceMetricsOverride` (e.g. 390x1400) to click with real input.
+- Hidden `<input type=file>` (passport import): drive via CDP `DOM.enable` → `DOM.getDocument` → `DOM.querySelector` → `DOM.setFileInputFiles` — fires the real change handler.
+- Downloads (passport export): enable via `Browser.setDownloadBehavior` on the BROWSER websocket (`/json/version` → webSocketDebuggerUrl) with `downloadPath` — `Page.setDownloadBehavior` alone may not capture.
+- lang change needs a REAL `Page.reload` (module-level cache) — hash navigation won't re-init; localStorage.setItem('mdv.lang','en') + reload.
+- `?debug=1` needs query BEFORE hash: `?debug=1#/map`. Signed scan URLs: `#/d/<site>/<spot>?s=<sig>` — generate via `node scripts/sign-qr.mjs`.
+- This box has 0 TTS voices → utterances error instantly → cards/probe hit the fallback path; to verify real playback you'd need espeak voices.
+- Errorlog introspection: `await import('/src/debug/errorlog.ts').then(m=>m.getErrors())` in Runtime.evaluate (vite serves source modules).

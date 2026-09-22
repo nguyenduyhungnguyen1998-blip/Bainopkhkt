@@ -352,7 +352,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
         <button
           class="mdv-chip"
           onClick={() => {
-            const r = rate >= 1.2 ? 0.8 : rate + 0.2;
+            const r = rate >= 1.4 ? 0.8 : rate + 0.2;
             setRate(r);
             playerRef.current?.setRate(r);
           }}

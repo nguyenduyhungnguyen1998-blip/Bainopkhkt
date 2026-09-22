@@ -28,6 +28,11 @@
 }
 .hud__body {
   padding: 4px 10px 10px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 .hud__grid {
   display: grid;

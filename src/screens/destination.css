@@ -166,6 +166,14 @@ a.dest__crumb--link:active {
 .dcard__video-ph small {
   color: var(--color-text-muted);
 }
+/* Offline: toàn thẻ đi mờ, hint "cần mạng" nổi thay poster */
+.dcard__video-ph--off {
+  filter: saturate(0.35) brightness(0.92);
+}
+.dcard__video-ph--off small {
+  color: var(--color-accent-secondary-text);
+  font-weight: 600;
+}
 .dcard--audio {
   display: flex;
   flex-direction: column;

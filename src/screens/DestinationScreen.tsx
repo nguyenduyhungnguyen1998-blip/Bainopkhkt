@@ -303,12 +303,15 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
       {card.src && online ? (
         <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       ) : (
-        <div class="dcard__video-ph" style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}>
+        <div
+          class={`dcard__video-ph${online ? '' : ' dcard__video-ph--off'}`}
+          style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}
+        >
           <span class="dcard__play">
             <Icon name="play" size={28} />
           </span>
           <b>{t(card.title, lang)}</b>
-          <small>{card.src && !online ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}</small>
+          <small>{online ? t(UI.videoSoon, lang) : t(UI.videoOffline, lang)}</small>
           <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
         </div>
       )}

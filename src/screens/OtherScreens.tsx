@@ -1,7 +1,8 @@
 /** Hộ chiếu, Thử tài, Cài đặt – P0 dựng khung; P3/P6 hoàn thiện. */
 import { SITES } from '../data/content';
 import { UI, t, useLang } from '../lib/i18n';
-import { siteUnlockedCount, useProgress, resetProgress } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress } from '../lib/progress';
+import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
 import { routeHref } from '../lib/router';
@@ -9,6 +10,11 @@ import { routeHref } from '../lib/router';
 export function PassportScreen() {
   const [lang] = useLang();
   const p = useProgress();
+  const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
+  const doneSpots = Object.keys(p.unlocked).length;
+  const pct = totalSpots ? doneSpots / totalSpots : 0;
+  const RING_R = 56;
+  const RING_C = 2 * Math.PI * RING_R;
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -20,7 +26,49 @@ export function PassportScreen() {
           {p.xp} XP
         </div>
       </header>
-      <div style="display:grid;gap:var(--space-3)">
+      <section class="mdv-card ppass__ringcard" aria-label={t(UI.yourJourney, lang)}>
+        <div class="ppass__ring" role="img" aria-label={`${doneSpots}/${totalSpots}`}>
+          <svg width="132" height="132" viewBox="0 0 132 132">
+            <circle class="ppass__ringbg" cx="66" cy="66" r={RING_R} />
+            <circle
+              class="ppass__ringval"
+              cx="66"
+              cy="66"
+              r={RING_R}
+              stroke-dasharray={RING_C}
+              stroke-dashoffset={RING_C * (1 - pct)}
+            />
+          </svg>
+          <div class="ppass__ringtext">
+            <b>
+              {doneSpots}/{totalSpots}
+            </b>
+            <small>{t(UI.spots, lang)}</small>
+          </div>
+        </div>
+        <div>
+          <span class="mdv-eyebrow">{t(UI.yourJourney, lang)}</span>
+          <div class="ppass__pct">{Math.round(pct * 100)}%</div>
+          <div class="ppass__pctlabel">{t(UI.unlocked, lang)}</div>
+          <div class="ppass__xp">{p.xp} XP</div>
+        </div>
+      </section>
+
+      <section class="mdv-card ppass__quote">“{t(UI.journeyQuote, lang)}”</section>
+
+      <section>
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
+        <div class="ppass__badges">
+          {computeAchievements(p).map((a) => (
+            <div key={a.id} class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`}>
+              <Icon name={a.icon} size={26} />
+              <b>{t(a.name, lang)}</b>
+              <small>{a.unlocked ? t(UI.earned, lang) : t(UI.badgeLocked, lang)}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div class="ppass__sitelist">
         {SITES.map((s) => {
           const n = siteUnlockedCount(s, p);
           const done = n === s.spots.length;

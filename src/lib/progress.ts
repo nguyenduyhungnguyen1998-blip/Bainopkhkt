@@ -82,7 +82,10 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
     newBadge = site.gamificationConfig.badge;
   }
   commit({ ...state, unlocked, xp: state.xp + gained, badges });
-  return { alreadyUnlocked: false, gainedXp: gained, newBadge, siteCompleted: completed };
+  const result: UnlockResult = { alreadyUnlocked: false, gainedXp: gained, newBadge, siteCompleted: completed };
+  // Chuỗi ăn mừng (sóng lan, vẽ đường, toast) lắng nghe sự kiện này — phát ra dù mở từ QR, HUD hay demo.
+  window.dispatchEvent(new CustomEvent<UnlockResult & { siteId: string; spotId: string }>('mdv:unlock', { detail: { ...result, siteId, spotId } }));
+  return result;
 }
 
 export function resetProgress() {
@@ -110,6 +113,24 @@ export function computeStatuses(p: Progress = state): Map<string, NodeStatus> {
   const anyLocked = after ?? SITES.find((s) => out.get(s.entityId) === 'locked');
   if (anyLocked) out.set(anyLocked.entityId, 'next');
   return out;
+}
+
+export interface Achievement {
+  id: string;
+  icon: string;
+  name: { vi: string; en: string };
+  unlocked: boolean;
+}
+
+/** Huy hiệu thành tích độc lập với huy hiệu từng khu (demo P3 mở rộng thêm). */
+export function computeAchievements(p: Progress = state): Achievement[] {
+  const touchedSites = SITES.filter((s) => siteUnlockedCount(s, p) > 0).length;
+  const doneSites = SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length;
+  return [
+    { id: 'khoi-hanh', icon: 'flag', name: { vi: 'Khởi hành', en: 'First steps' }, unlocked: Object.keys(p.unlocked).length >= 1 },
+    { id: 'tham-hiem', icon: 'compass', name: { vi: 'Thám hiểm', en: 'Explorer' }, unlocked: touchedSites >= 3 },
+    { id: 'hoc-gia', icon: 'book', name: { vi: 'Học giả', en: 'Scholar' }, unlocked: doneSites === SITES.length },
+  ];
 }
 
 export function useProgress(): Progress {

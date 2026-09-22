@@ -74,3 +74,39 @@
   opacity: 0.4;
   cursor: default;
 }
+
+/* D9 Map Inspector */
+.hud__inspector {
+  border-top: 1px solid #2e2e2e;
+  margin-top: 8px;
+  padding-top: 6px;
+}
+.hud__inspector .hud__actions {
+  margin-top: 4px;
+}
+.hud__actions button[aria-pressed='true'] {
+  border-color: #ffd56a;
+  color: #ffd56a;
+}
+.hud__forcelist {
+  display: grid;
+  gap: 3px;
+  margin-top: 6px;
+}
+.hud__forcerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.hud__forcerow span {
+  color: #9ca3af;
+}
+.hud__forcerow select {
+  font: inherit;
+  background: #1a1c22;
+  color: #e5e7eb;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 2px 4px;
+}

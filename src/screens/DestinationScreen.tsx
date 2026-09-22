@@ -2,10 +2,10 @@
  * Trang điểm đến – P0 dựng khung renderer JSON tối giản (P2 hoàn thiện đầy đủ card, TTS, âm thanh).
  */
 import { useState } from 'preact/hooks';
-import { getSpot } from '../data/content';
-import type { Card } from '../data/types';
+import { getSpot, getSite } from '../data/content';
+import type { Card, Site } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { routeHref } from '../lib/router';
+import { navigate, routeHref } from '../lib/router';
 import { isSpotUnlocked, useProgress } from '../lib/progress';
 import { Icon } from '../components/Icon';
 import './destination.css';
@@ -13,7 +13,9 @@ import './destination.css';
 export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?: string }) {
   const [lang] = useLang();
   useProgress(); // re-render khi mở khóa
-  const found = getSpot(siteId, spotId);
+  const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
+  const found = siteOnly ? undefined : getSpot(siteId, spotId);
+  if (siteOnly) return <SiteIntro site={siteOnly} />;
   if (!found) {
     return (
       <main class="mdv-screen">
@@ -45,7 +47,7 @@ export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?:
         </span>
       </header>
 
-      {/* Dải điểm QR trong khu – sơ đồ cấp 2 (P1 thay bằng bản đồ nội khu) */}
+      {/* Dải điểm QR trong khu – điều hướng nhanh giữa các điểm */}
       <nav class="dest__spots" aria-label="Các điểm trong khu">
         {site.spots.map((s, i) => (
           <a
@@ -79,6 +81,90 @@ export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?:
             {t(next.name, lang)} <Icon name="back" size={18} class="flip" />
           </a>
         )}
+      </div>
+    </main>
+  );
+}
+
+type ExploreMode = 'audio' | 'text';
+const MODE_KEY = 'mdv.exploreMode';
+
+function getExploreMode(): ExploreMode {
+  try {
+    return localStorage.getItem(MODE_KEY) === 'text' ? 'text' : 'audio';
+  } catch {
+    return 'audio';
+  }
+}
+
+/**
+ * Màn giới thiệu khu di sản sau khi quét QR (mockup dự tính):
+ * hero 40%, chọn ngôn ngữ, chọn hình thức khám phá, CTA đỏ bắt đầu.
+ */
+function SiteIntro({ site }: { site: Site }) {
+  const [lang, setLang] = useLang();
+  const [mode, setMode] = useState<ExploreMode>(getExploreMode);
+  const pick = (m: ExploreMode) => {
+    setMode(m);
+    try {
+      localStorage.setItem(MODE_KEY, m);
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+  };
+  const first = site.spots[0];
+  return (
+    <main class="mdv-screen dest dintro">
+      <header class="dintro__top">
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.back, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      <figure class="dintro__hero">
+        <img src={site.heroImage} alt={t(site.name, lang)} />
+      </figure>
+      <div class="dintro__body">
+        <span class="mdv-eyebrow">{t(site.province, lang)}</span>
+        <h1>{t(site.name, lang)}</h1>
+        <p class="mdv-muted">{t(site.summary, lang)}</p>
+
+        <h2 class="dintro__h">{t(UI.chooseLang, lang)}</h2>
+        <div class="dintro__langs">
+          <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
+            Tiếng Việt
+          </button>
+          <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+            English
+          </button>
+        </div>
+
+        <h2 class="dintro__h">{t(UI.exploreMode, lang)}</h2>
+        <div class="dintro__modes" role="radiogroup">
+          <button
+            class={`dintro__mode ${mode === 'audio' ? 'dintro__mode--on' : ''}`}
+            role="radio"
+            aria-checked={mode === 'audio'}
+            onClick={() => pick('audio')}
+          >
+            <Icon name="headphones" size={26} />
+            <b>{t(UI.modeAudio, lang)}</b>
+            <small>{t(UI.modeAudioDesc, lang)}</small>
+          </button>
+          <button
+            class={`dintro__mode ${mode === 'text' ? 'dintro__mode--on' : ''}`}
+            role="radio"
+            aria-checked={mode === 'text'}
+            onClick={() => pick('text')}
+          >
+            <Icon name="book" size={26} />
+            <b>{t(UI.modeText, lang)}</b>
+            <small>{t(UI.modeTextDesc, lang)}</small>
+          </button>
+        </div>
+
+        <button class="mdv-btn mdv-btn--primary dintro__cta" onClick={() => first && navigate(`d/${site.entityId}/${first.spotId}`)}>
+          {t(UI.startExploring, lang)}
+        </button>
       </div>
     </main>
   );

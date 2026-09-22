@@ -7,6 +7,8 @@ import { useOnline, useTheme } from '../lib/theme';
 import { useProgress, resetProgress, unlockSpot, computeStatuses } from '../lib/progress';
 import { SITES } from '../data/content';
 import { clearErrors, exportErrorsJson, getErrors, onErrorsChange, logError } from './errorlog';
+import { inspector, useInspector } from './inspector';
+import type { NodeStatus } from '../lib/progress';
 import { navigate } from '../lib/router';
 import './hud.css';
 
@@ -47,6 +49,67 @@ function useErrorCount(): number {
   const [n, set] = useState(getErrors().length);
   useEffect(() => onErrorsChange(() => set(getErrors().length)), []);
   return n;
+}
+
+const FORCE_STATUSES: (NodeStatus | '')[] = ['', 'locked', 'next', 'active', 'done'];
+
+/** D9 – Map Inspector: lưới kinh/vĩ, vùng chạm, điểm chạm, ép trạng thái node. */
+function InspectorPanel() {
+  const insp = useInspector();
+  // Poll transform (non-reactive) 4Hz khi inspector đang bật.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!insp.on) return;
+    const id = setInterval(() => setTick((n) => n + 1), 250);
+    return () => clearInterval(id);
+  }, [insp.on]);
+  return (
+    <div class="hud__inspector">
+      <div class="hud__actions">
+        <button aria-pressed={insp.on} onClick={() => inspector.toggle()}>
+          Inspector {insp.on ? 'on' : 'off'}
+        </button>
+        <button aria-pressed={insp.showGrid} disabled={!insp.on} onClick={() => inspector.setGrid(!insp.showGrid)}>
+          Lưới lon/lat
+        </button>
+        <button aria-pressed={insp.showHitRings} disabled={!insp.on} onClick={() => inspector.setHitRings(!insp.showHitRings)}>
+          Vùng chạm 44px
+        </button>
+        <button disabled={!insp.on || insp.statusOverrides.size === 0} onClick={() => inspector.clearOverrides()}>
+          Bỏ ép trạng thái
+        </button>
+      </div>
+      {insp.on && (
+        <>
+          <div class="hud__grid">
+            <span>zoom</span>
+            <b>{insp.transform.k.toFixed(2)}×</b>
+            <span>tap</span>
+            <b class="hud__mono">
+              {insp.lastTap ? `${insp.lastTap.x.toFixed(4)}, ${insp.lastTap.y.toFixed(4)}` : '–'}
+            </b>
+          </div>
+          <div class="hud__forcelist">
+            {SITES.map((s) => (
+              <label key={s.entityId} class="hud__forcerow">
+                <span>{s.entityId}</span>
+                <select
+                  value={insp.statusOverrides.get(s.entityId) ?? ''}
+                  onChange={(e) => inspector.forceStatus(s.entityId, (e.target as HTMLSelectElement).value as NodeStatus | '' || null)}
+                >
+                  {FORCE_STATUSES.map((st) => (
+                    <option key={st} value={st}>
+                      {st || 'auto'}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export function DebugHud() {
@@ -117,6 +180,7 @@ export function DebugHud() {
             </button>
             <button onClick={() => navigate('/map')}>→ map</button>
           </div>
+          <InspectorPanel />
         </div>
       )}
     </aside>

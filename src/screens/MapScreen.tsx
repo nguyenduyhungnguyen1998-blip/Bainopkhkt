@@ -97,6 +97,21 @@ export function MapScreen() {
     return () => window.removeEventListener('mdv:unlock', onUnlock);
   }, []);
 
+  // Esc đóng sheet / thoát sơ đồ khu – thói quen của người dùng bàn phím.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (selectedId) {
+        setExpanded(false);
+        setSelectedId(null);
+      } else if (siteLevel) {
+        setSiteLevel(null);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedId, siteLevel]);
+
   // Phát hiện node "kế tiếp" ra khỏi khung nhìn -> hiện nút Về hành trình;
   // zoom rất sâu vào khu có nhiều điểm -> mở sơ đồ cấp 2.
   const offscreenRef = useRef(false);
@@ -172,7 +187,7 @@ export function MapScreen() {
   };
 
   return (
-    <div class="mscreen">
+    <main class="mscreen">
       <header class="mscreen__top">
         <div class="mscreen__title">
           <span class="mdv-eyebrow">Mở Dấu Việt</span>
@@ -185,14 +200,12 @@ export function MapScreen() {
         </div>
       </header>
 
-      <div class="mscreen__filters" role="tablist" aria-label={lang === 'vi' ? 'Lọc vùng' : 'Filter region'}>
+      <div class="mscreen__filters" role="group" aria-label={t(UI.regionFilter, lang)}>
         {FILTERS.map((f) => (
           <button
             key={f.id}
             class="mdv-chip"
-            role="tab"
             aria-pressed={focus === f.id}
-            aria-selected={focus === f.id}
             onClick={() => {
               setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
               setSiteLevel(null);
@@ -235,7 +248,7 @@ export function MapScreen() {
           {unlockedSpots}/{totalSpots} {t(UI.spots, lang)}
         </div>
         {!levelSite && (
-          <div class="mscreen__zoomctl" role="group" aria-label="zoom">
+          <div class="mscreen__zoomctl" role="group" aria-label={t(UI.zoomControls, lang)}>
             <button class="mscreen__zoombtn" onClick={() => setZoomSignal({ d: 1.5, n: Date.now() })} aria-label={t(UI.zoomIn, lang)}>
               <Icon name="zoomIn" size={18} />
             </button>
@@ -268,7 +281,7 @@ export function MapScreen() {
         <div class="mhint" role="status">
           <Icon name="compass" size={18} />
           <span>{t(UI.hintTap, lang)}</span>
-          <button class="mhint__x" aria-label={t(UI.back, lang)} onClick={dismissHint}>
+          <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
             <Icon name="close" size={16} />
           </button>
         </div>
@@ -350,6 +363,6 @@ export function MapScreen() {
           </>
         )}
       </section>
-    </div>
+    </main>
   );
 }

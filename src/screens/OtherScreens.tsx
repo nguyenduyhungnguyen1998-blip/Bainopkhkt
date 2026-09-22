@@ -1,5 +1,5 @@
 /** Hộ chiếu, Thử tài, Cài đặt – P3: quiz engine + xuất/nhập hộ chiếu. */
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
@@ -139,7 +139,7 @@ function PassportTools({ lang }: { lang: Lang }) {
       <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
         {t(UI.importPassport, lang)}
       </button>
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => void doImport((e.target as HTMLInputElement).files?.[0])} />
+      <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doImport((e.target as HTMLInputElement).files?.[0])} />
       {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
     </section>
   );
@@ -202,6 +202,13 @@ export function QuizScreen() {
 /** Chơi quiz một điểm: chọn đáp án -> hiện đúng/sai -> câu tiếp -> kết quả + XP (phần vượt best). */
 function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: Lang; onExit: () => void }) {
   const quiz = spot.quiz!;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onExit();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onExit]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [correct, setCorrect] = useState(0);
@@ -293,7 +300,7 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
         )}
         {picked !== null && (
           <button class="mdv-btn mdv-btn--primary" style="width:100%;margin-top:12px" onClick={nextQ}>
-            {t(UI.quizNext, lang)}
+            {t(idx + 1 >= quiz.length ? UI.quizResult : UI.quizNext, lang)}
           </button>
         )}
       </div>

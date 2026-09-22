@@ -450,43 +450,47 @@ function MapNodeView({
     <g
       class={`vnode vnode--${status} ${selected ? 'vnode--selected' : ''} ${dimmed ? 'vnode--dim' : ''}`}
       style={{ transform: `translate(${x}px, ${y}px) scale(calc(1 / var(--k, 1)))` }}
-      role="button"
-      tabIndex={0}
-      aria-label={`${t(site.name, lang)} – ${status}`}
-      aria-pressed={selected}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(site.entityId);
-        }
-      }}
     >
-      {/* vùng chạm 44px (ẩn) */}
-      <circle class="vnode__hit" r={HIT_R} />
-      {status === 'next' && <circle class="vnode__pulse" r={NODE_R + 4} />}
-      {status === 'next' && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
-      {selected && <circle class="vnode__ring" r={NODE_R + 7} />}
-      {status === 'active' && (
-        <circle
-          class="vnode__progress"
-          r={NODE_R + 5}
-          stroke-dasharray={`${C * progress} ${C}`}
-          transform="rotate(-90)"
-        />
-      )}
-      <circle class="vnode__body" r={NODE_R} />
-      {status === 'done' ? (
-        <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
-      ) : status === 'locked' ? (
-        <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
-      ) : (
-        <text class="vnode__num" text-anchor="middle" dominant-baseline="central">
+      <g
+        role="button"
+        tabIndex={0}
+        aria-label={`${t(site.name, lang)} – ${status}`}
+        aria-pressed={selected}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onSelect(site.entityId);
+          }
+        }}
+      >
+        {/* vùng chạm 44px (ẩn) */}
+        <circle class="vnode__hit" r={HIT_R} />
+        {status === 'next' && <circle class="vnode__pulse" r={NODE_R + 4} />}
+        {status === 'next' && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
+        {selected && <circle class="vnode__ring" r={NODE_R + 7} />}
+        {status === 'active' && (
+          <circle
+            class="vnode__progress"
+            r={NODE_R + 5}
+            stroke-dasharray={`${C * progress} ${C}`}
+            transform="rotate(-90)"
+          />
+        )}
+        <circle class="vnode__body" r={NODE_R} />
+        {status === 'done' ? (
+          <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
+        ) : status === 'locked' ? (
+          <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
+        ) : null}
+        <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
+          {t(site.name, lang)}
+        </text>
+      </g>
+      {(status === 'next' || status === 'active') && (
+        <text class="vnode__num" text-anchor="middle" dominant-baseline="central" aria-hidden="true" pointer-events="none">
           {index}
         </text>
       )}
-      <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
-        {t(site.name, lang)}
-      </text>
     </g>
   );
 }

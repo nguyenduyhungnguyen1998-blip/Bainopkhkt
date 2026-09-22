@@ -86,7 +86,7 @@
   --color-border: rgb(27 27 31 / 0.1);
   --color-text: #1b1b1f; /* 15.2:1 */
   --color-text-muted: #5b5f6b; /* 5.65:1 */
-  --color-text-faint: #8a8f9c;
+  --color-text-faint: #6e6a63; /* 4.8:1 trên giấy dó – đạt AA cho chữ nhỏ */
 
   --color-accent-primary: #b22222; /* 5.9:1 */
   --color-accent-primary-text: #b22222;
@@ -98,9 +98,9 @@
 
   --color-accent-tertiary: #00a86b; /* chỉ làm nền */
   --color-accent-tertiary-text: #006b44; /* 5.8:1 */
-  --color-on-tertiary: #ffffff; /* 3.1:1 – chỉ dùng cho icon/chữ lớn */
+  --color-on-tertiary: #0a2818; /* 5.1:1 trên ngọc – đạt AA cho chữ nhỏ */
 
-  --color-locked: #a9a49a;
+  --color-locked: #75706a; /* chữ trắng 4.9:1 – đạt AA cho huy hiệu */
   --color-sea: #dbe8ee;
   --color-land: #efe4cc;
   --color-land-neighbour: #e6e0d3;

@@ -2,13 +2,17 @@
  * D1 – Debug HUD. Chỉ được tải khi có ?debug=1 (hoặc localStorage mdv.debug=1),
  * nằm trong chunk riêng để không lọt vào đường tải chính của production.
  */
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { useOnline, useTheme } from '../lib/theme';
 import { useProgress, resetProgress, unlockSpot, computeStatuses } from '../lib/progress';
 import { SITES } from '../data/content';
 import { clearErrors, exportErrorsJson, getErrors, onErrorsChange, logError } from './errorlog';
 import { inspector, useInspector } from './inspector';
 import type { NodeStatus } from '../lib/progress';
+import { exportPassportJson, importPassportJson } from '../lib/progress';
+import { signSpot } from '../lib/qr';
+import { SpeechPlayer, listVoices, speechSupported } from '../lib/speech';
+import { ambientState, startAmbient, stopAmbient, type AmbientPreset } from '../lib/ambient';
 import { navigate } from '../lib/router';
 import './hud.css';
 
@@ -112,6 +116,176 @@ function InspectorPanel() {
   );
 }
 
+/** D3 – Speech Probe: liệt kê giọng, phát thử, đo thời gian đến onstart. */
+function SpeechPanel() {
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [probe, setProbe] = useState<string>('–');
+  const playerRef = useRef<SpeechPlayer | null>(null);
+  useEffect(() => {
+    setVoices(listVoices());
+    const id = setInterval(() => setVoices(listVoices()), 1500);
+    return () => {
+      clearInterval(id);
+      playerRef.current?.stop();
+    };
+  }, []);
+  const test = () => {
+    if (!speechSupported()) return setProbe('unsupported');
+    if (!playerRef.current) playerRef.current = new SpeechPlayer();
+    const t0 = performance.now();
+    setProbe('đang phát…');
+    playerRef.current.play(['Kinh nghiệm du lịch di sản Việt Nam.'], 'vi', {
+      onSentence: () => setProbe(`onstart ${Math.round(performance.now() - t0)}ms`),
+      onStatus: (s) => {
+        if (s === 'failed') setProbe('FAILED – fallback text');
+        if (s === 'done') setProbe((v) => `${v} · done`);
+      },
+    });
+  };
+  return (
+    <div class="hud__inspector">
+      <b class="hud__sectitle">D3 Speech</b>
+      <div class="hud__grid">
+        <span>support</span>
+        <b>{speechSupported() ? 'yes' : 'no'}</b>
+        <span>voices</span>
+        <b>{voices.length}</b>
+        <span>vi</span>
+        <b>{voices.filter((v) => v.lang.toLowerCase().replace('_', '-').startsWith('vi')).map((v) => v.name).join(', ') || 'none'}</b>
+        <span>probe</span>
+        <b>{probe}</b>
+      </div>
+      <div class="hud__actions">
+        <button onClick={test} disabled={!speechSupported()}>
+          Phát thử vi-VN
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** D4 – Audio Graph Inspector: trạng thái AudioContext + preset ambient đang chạy. */
+function AudioPanel() {
+  const [st, setSt] = useState(ambientState());
+  useEffect(() => {
+    const id = setInterval(() => setSt(ambientState()), 500);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div class="hud__inspector">
+      <b class="hud__sectitle">D4 Audio</b>
+      <div class="hud__grid">
+        <span>ctx</span>
+        <b>{st.ctxState}</b>
+        <span>preset</span>
+        <b>{st.preset ?? 'off'}</b>
+        <span>gain</span>
+        <b>{st.gain}</b>
+        <span>nodes</span>
+        <b class="hud__mono">{st.nodes.join(' · ') || '–'}</b>
+      </div>
+      <div class="hud__actions">
+        {(['wind-water', 'temple-bell', 'garden'] as AmbientPreset[]).map((p) => (
+          <button key={p} aria-pressed={st.preset === p} onClick={() => (st.preset === p ? stopAmbient() : startAmbient(p))}>
+            {p}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** D6 – Journey Simulator: giả lập quét URL ký thật, sửa chữ ký, tua trạng thái, xuất/nhập hộ chiếu. */
+function JourneyPanel() {
+  const progress = useProgress();
+  const [site, setSite] = useState(SITES[0].entityId);
+  const siteObj = SITES.find((s) => s.entityId === site)!;
+  const [spot, setSpot] = useState(siteObj.spots[0].spotId);
+  const [log, setLog] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const simulate = async (tamper = false) => {
+    let sig = await signSpot(site, spot);
+    if (tamper) sig = 'f'.repeat(16);
+    navigate(`d/${site}/${spot}?s=${sig}`);
+  };
+  const skipTo = () => {
+    // Tua trạng thái: mở hết điểm của các khu trước khu đang chọn + điểm đầu của khu đó.
+    const idx = SITES.indexOf(siteObj);
+    for (const s of SITES.slice(0, idx)) for (const sp of s.spots) unlockSpot(s.entityId, sp.spotId);
+    unlockSpot(site, siteObj.spots[0].spotId);
+  };
+  const doExport = () => {
+    const blob = new Blob([exportPassportJson()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mdv-passport-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  return (
+    <div class="hud__inspector">
+      <b class="hud__sectitle">D6 Journey Simulator</b>
+      <div class="hud__forcelist">
+        <label class="hud__forcerow">
+          <span>khu</span>
+          <select
+            value={site}
+            onChange={(e) => {
+              const v = (e.target as HTMLSelectElement).value;
+              setSite(v);
+              setSpot(SITES.find((s) => s.entityId === v)!.spots[0].spotId);
+            }}
+          >
+            {SITES.map((s) => (
+              <option key={s.entityId} value={s.entityId}>
+                {s.entityId}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label class="hud__forcerow">
+          <span>điểm</span>
+          <select value={spot} onChange={(e) => setSpot((e.target as HTMLSelectElement).value)}>
+            {siteObj.spots.map((sp) => (
+              <option key={sp.spotId} value={sp.spotId}>
+                {sp.spotId}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div class="hud__actions">
+        <button onClick={() => void simulate(false)}>Giả lập quét (ký thật)</button>
+        <button onClick={() => void simulate(true)}>Sửa chữ ký</button>
+        <button onClick={skipTo}>Tua tới khu này</button>
+        <button onClick={() => resetProgress()}>Reset</button>
+        <button onClick={doExport}>Xuất hộ chiếu</button>
+        <button onClick={() => fileRef.current?.click()}>Nhập hộ chiếu</button>
+      </div>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json,.json"
+        hidden
+        onChange={async (e) => {
+          const f = (e.target as HTMLInputElement).files?.[0];
+          if (f) setLog(importPassportJson(await f.text()) ? 'nhập ok' : 'file lạ');
+          if (fileRef.current) fileRef.current.value = '';
+        }}
+      />
+      <div class="hud__grid">
+        <span>unlocked</span>
+        <b>{Object.keys(progress.unlocked).length}</b>
+        <span>quizDone</span>
+        <b>{Object.keys(progress.quizDone).length}</b>
+        <span>log</span>
+        <b>{log || '–'}</b>
+      </div>
+    </div>
+  );
+}
+
 export function DebugHud() {
   const [open, setOpen] = useState(true);
   const online = useOnline();
@@ -181,6 +355,9 @@ export function DebugHud() {
             <button onClick={() => navigate('/map')}>→ map</button>
           </div>
           <InspectorPanel />
+          <JourneyPanel />
+          <SpeechPanel />
+          <AudioPanel />
         </div>
       )}
     </aside>

@@ -33,7 +33,12 @@
           "en": ["You are standing before the Noon Gate, the main entrance of the Hue Imperial City.", "Above you is the Five Phoenix Pavilion with yellow tiles reserved for the emperor."]
         } }
       ],
-      "sources": [ { "title": "Trung tâm Bảo tồn Di tích Cố đô Huế", "url": "https://hueworldheritage.org.vn", "reviewed": false } ]
+      "sources": [ { "title": "Trung tâm Bảo tồn Di tích Cố đô Huế", "url": "https://hueworldheritage.org.vn", "reviewed": false } ],
+      "quiz": [
+        { "q": { "vi": "Ngọ Môn được xây năm nào, dưới triều vua nào?", "en": "When was Ngo Mon built, under which king?" }, "options": [{ "vi": "1802 – Gia Long", "en": "1802 – Gia Long" }, { "vi": "1833 – Minh Mạng", "en": "1833 – Minh Mang" }, { "vi": "1945 – Bảo Đại", "en": "1945 – Bao Dai" }, { "vi": "1070 – Lý Thánh Tông", "en": "1070 – Ly Thanh Tong" }], "answer": 1 },
+        { "q": { "vi": "Sự kiện nào diễn ra tại Ngọ Môn ngày 30/8/1945?", "en": "What happened at Ngo Mon on 30 August 1945?" }, "options": [{ "vi": "Vua Bảo Đại đọc chiếu thoái vị", "en": "King Bao Dai read the abdication edict" }, { "vi": "Khánh thành Ngọ Môn", "en": "Inauguration of Ngo Mon" }, { "vi": "Lễ mở hội", "en": "A festival" }, { "vi": "Đăng quang vua mới", "en": "A coronation" }], "answer": 0 },
+        { "q": { "vi": "Lầu Ngũ Phụng trên Ngọ Môn có bao nhiêu cột?", "en": "How many columns does the Five Phoenix Pavilion have?" }, "options": [{ "vi": "50", "en": "50" }, { "vi": "82", "en": "82" }, { "vi": "100", "en": "100" }, { "vi": "120", "en": "120" }], "answer": 2 }
+      ]
     }
   ]
 }

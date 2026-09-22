@@ -33,7 +33,12 @@
           "en": ["You stand before the gate of the Independence Palace, where Vietnam's history turned a page on 30 April 1975.", "Ahead is the palace designed by architect Ngo Viet Thu."]
         } }
       ],
-      "sources": [ { "title": "Hội trường Thống Nhất – Giới thiệu di tích", "url": "https://dinhdoclap.gov.vn", "reviewed": false } ]
+      "sources": [ { "title": "Hội trường Thống Nhất – Giới thiệu di tích", "url": "https://dinhdoclap.gov.vn", "reviewed": false } ],
+      "quiz": [
+        { "q": { "vi": "Dinh Độc Lập hiện nay do kiến trúc sư nào thiết kế?", "en": "Who designed the current Independence Palace?" }, "options": [{ "vi": "Ngô Viết Thụ", "en": "Ngo Viet Thu" }, { "vi": "Võ Trọng Nghĩa", "en": "Vo Trong Nghia" }, { "vi": "Ernest Hébrard", "en": "Ernest Hebrard" }, { "vi": "Nguyễn Cao Luyện", "en": "Nguyen Cao Luyen" }], "answer": 0 },
+        { "q": { "vi": "Dinh khánh thành năm nào?", "en": "When was the palace inaugurated?" }, "options": [{ "vi": "1954", "en": "1954" }, { "vi": "1966", "en": "1966" }, { "vi": "1975", "en": "1975" }, { "vi": "1945", "en": "1945" }], "answer": 1 },
+        { "q": { "vi": "Trưa 30/4/1975, điều gì xảy ra tại cổng chính?", "en": "What happened at the main gate at noon on 30 April 1975?" }, "options": [{ "vi": "Xe tăng Quân Giải phóng tiến qua", "en": "Liberation Army tanks crashed through" }, { "vi": "Lễ khánh thành", "en": "An inauguration" }, { "vi": "Cuộc diễu hành", "en": "A parade" }, { "vi": "Mít tinh", "en": "A rally" }], "answer": 0 }
+      ]
     }
   ]
 }

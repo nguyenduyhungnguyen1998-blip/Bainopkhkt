@@ -337,7 +337,8 @@ function JourneyPanel() {
 }
 
 export function DebugHud() {
-  const [open, setOpen] = useState(true);
+  // Mặc định thu: panel mở che ~60% viewport và bắt nhầm tap (nút zoom…); người debug tự mở.
+  const [open, setOpen] = useState(false);
   // Tự thu nhỏ khi đổi trang – panel mở che mất ~60% viewport 390px và bắt nhầm tap.
   useEffect(() => {
     const onNav = () => setOpen(false);

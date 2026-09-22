@@ -168,6 +168,7 @@ html[data-no-blur='1'] .mdv-card {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
+  min-height: var(--tap-min);
   padding: 0 var(--space-5);
   border-radius: var(--radius-pill);
   font-weight: 600;
@@ -188,6 +189,7 @@ html[data-no-blur='1'] .mdv-card {
 }
 .mdv-btn--icon {
   width: var(--tap-min);
+  min-width: var(--tap-min);
   padding: 0;
   border-radius: 50%;
 }
@@ -197,7 +199,7 @@ html[data-no-blur='1'] .mdv-card {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  min-height: 36px;
+  min-height: var(--tap-min);
   padding: 0 var(--space-3);
   border-radius: var(--radius-pill);
   border: 1px solid var(--color-border);
@@ -211,6 +213,32 @@ html[data-no-blur='1'] .mdv-card {
   background: var(--color-accent-secondary);
   color: var(--color-on-secondary);
   border-color: transparent;
+}
+
+/* Phản hồi chạm cho mọi bề mặt bấm được (chip/dòng list/option) */
+.mdv-chip:active,
+.quiz__opt:active,
+.quiz__row:active,
+.dest__spot:active,
+.mscreen__chipbtn:active {
+  transform: scale(0.96);
+}
+
+/* Thanh cuộn mảnh nhưng nhìn thấy – user cần dấu hiệu có thể cuộn */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong, var(--color-border));
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong, var(--color-border)) transparent;
 }
 
 /* Huy hiệu trạng thái */

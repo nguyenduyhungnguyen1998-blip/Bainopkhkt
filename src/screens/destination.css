@@ -8,6 +8,17 @@
   flex: 1;
   min-width: 0;
 }
+a.dest__crumb--link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  padding: 2px 6px;
+  margin: -2px -6px;
+}
+a.dest__crumb--link:active {
+  background: var(--color-surface);
+}
 .dest__crumb h1 {
   font-size: var(--text-lg);
   line-height: 1.2;
@@ -21,6 +32,10 @@
   padding-bottom: var(--space-2);
   margin-bottom: var(--space-3);
   scrollbar-width: none;
+  scroll-padding-inline: 16px;
+  /* nhòe mép -> dấu hiệu còn nội dung để vuốt */
+  mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18px, #000 calc(100% - 18px), transparent 100%);
 }
 .dest__spots::-webkit-scrollbar {
   display: none;
@@ -139,11 +154,25 @@
   color: var(--color-on-primary);
   box-shadow: 0 6px 18px rgb(200 75 49 / 0.45);
 }
+/* Placeholder: nút play chỉ là trang trí – làm mờ để không giả affordance */
+.dcard__video-ph .dcard__play {
+  opacity: 0.45;
+  box-shadow: none;
+  filter: saturate(0.6);
+}
 .dcard__video-ph b {
   font-size: var(--text-sm);
 }
 .dcard__video-ph small {
   color: var(--color-text-muted);
+}
+/* Offline: toàn thẻ đi mờ, hint "cần mạng" nổi thay poster */
+.dcard__video-ph--off {
+  filter: saturate(0.35) brightness(0.92);
+}
+.dcard__video-ph--off small {
+  color: var(--color-accent-secondary-text);
+  font-weight: 600;
 }
 .dcard--audio {
   display: flex;

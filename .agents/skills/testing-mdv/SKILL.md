@@ -31,10 +31,18 @@ Chrome headful min width ~500px — for 390px mobile use CDP emulation:
 - Journey "draw-in" uses `pathLength={1}` + `stroke-dasharray`/`strokeDashoffset` (path-space units, not px). To verify it live: sample `getComputedStyle(p).strokeDashoffset` right after an unlock via `p.getAnimations()[0].currentTime` — mid-animation values ≠0 prove the draw is rendering (screenshots alone can be ambiguous at low zoom).
 
 ## Debug HUD & P3 tools
-- Expanded Debug HUD OVERLAYS the right ~65% of the page and covers page controls — hit-test with `elementFromPoint` before clicking, collapse via `.hud__toggle` first. HUD also overflows past 844px viewport (no max-height/overflow) — D3/D4 buttons below fold need a taller `setDeviceMetricsOverride` (e.g. 390x1400) to click with real input.
+- Debug HUD starts EXPANDED on every fresh page load (`useState(true)` — route-change auto-collapse only fires on in-app hashchange). It covers the right ~65% INCLUDING the bottom-right `.mscreen__zoomctl` buttons and can sit over map nodes — always collapse via `.hud__toggle` (or verify `.hud.hud--min` in DOM) before tapping anything bottom-right, and hit-test with `elementFromPoint` before clicking. HUD also overflows past 844px viewport — D3/D4 buttons below fold need a taller `setDeviceMetricsOverride` (e.g. 390x1400) to click with real input.
 - Hidden `<input type=file>` (passport import): drive via CDP `DOM.enable` → `DOM.getDocument` → `DOM.querySelector` → `DOM.setFileInputFiles` — fires the real change handler.
 - Downloads (passport export): enable via `Browser.setDownloadBehavior` on the BROWSER websocket (`/json/version` → webSocketDebuggerUrl) with `downloadPath` — `Page.setDownloadBehavior` alone may not capture.
 - lang change needs a REAL `Page.reload` (module-level cache) — hash navigation won't re-init; localStorage.setItem('mdv.lang','en') + reload.
 - `?debug=1` needs query BEFORE hash: `?debug=1#/map`. Signed scan URLs: `#/d/<site>/<spot>?s=<sig>` — generate via `node scripts/sign-qr.mjs`.
 - This box has 0 TTS voices → utterances error instantly → cards/probe hit the fallback path; to verify real playback you'd need espeak voices.
 - Errorlog introspection: `await import('/src/debug/errorlog.ts').then(m=>m.getErrors())` in Runtime.evaluate (vite serves source modules).
+
+## P4/P5-era gotchas
+- `mdv.hintDone` gate: onboarding hint chip (`.mhint`, NOT `.mscreen__hint`) persists until first node tap; reset = `localStorage.removeItem('mdv.seen')` + `localStorage.removeItem('mdv.hintDone')` + reload.
+- Map zoom level: read the `transform` ATTRIBUTE on `.vmap__world` (`translate(...) scale(k)`) or inline `--k` — `style.transform` is empty (SVG attr, not CSS).
+- Zoom buttons `.mscreen__zoombtn` sit behind the open bottom sheet (`msheet__head` intercepts) — close sheet via `.msheet__close` first.
+- Same-URL `Page.navigate` does NOT reload — hop via `about:blank` or use `Page.reload {ignoreCache:true}` to re-import modules (e.g. after editing a served data JSON).
+- Video offline hint (`UI.videoOffline`) only renders for cards with `src` — NO shipped card has `src`/`poster` (dead branch as shipped); to verify, inject `"src"`/`"poster"` into a `layoutSchema` video card in `src/data/sites/*.json`, hard-reload, emulate offline (`Network.emulateNetworkConditions` + `dispatchEvent(new Event('offline'))`), then `git checkout` the file.
+- Progress reset: `localStorage.clear()` does NOT clear IndexedDB progress — use `import('/src/lib/progress.ts').then(m=>m.resetProgress())` + reload.

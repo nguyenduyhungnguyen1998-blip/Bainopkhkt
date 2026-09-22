@@ -55,6 +55,13 @@ export function App() {
   const debug = useDebugFlag();
   usePerfGuard();
 
+  // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
+  const routeKey =
+    route.name === 'destination' ? `d:${route.siteId}/${route.spotId ?? ''}?${route.query}` : route.name === 'notfound' ? route.path : route.name;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [routeKey]);
+
   let screen;
   switch (route.name) {
     case 'map':

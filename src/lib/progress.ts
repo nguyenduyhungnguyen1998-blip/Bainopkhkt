@@ -205,6 +205,8 @@ export interface Achievement {
   id: string;
   icon: string;
   name: { vi: string; en: string };
+  /** Điều kiện đạt – hiển thị dưới tên để user biết cần làm gì. */
+  need: { vi: string; en: string };
   unlocked: boolean;
 }
 
@@ -214,10 +216,34 @@ export function computeAchievements(p: Progress = state): Achievement[] {
   const doneSites = SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length;
   const answered = Object.keys(p.quizDone).length;
   return [
-    { id: 'khoi-hanh', icon: 'flag', name: { vi: 'Khởi hành', en: 'First steps' }, unlocked: Object.keys(p.unlocked).length >= 1 },
-    { id: 'tham-hiem', icon: 'compass', name: { vi: 'Thám hiểm', en: 'Explorer' }, unlocked: touchedSites >= 3 },
-    { id: 'si-tu', icon: 'award', name: { vi: 'Sĩ tử', en: 'Challenger' }, unlocked: answered >= 3 },
-    { id: 'hoc-gia', icon: 'book', name: { vi: 'Học giả', en: 'Scholar' }, unlocked: doneSites === SITES.length },
+    {
+      id: 'khoi-hanh',
+      icon: 'flag',
+      name: { vi: 'Khởi hành', en: 'First steps' },
+      need: { vi: 'Quét mã QR đầu tiên', en: 'Scan your first QR' },
+      unlocked: Object.keys(p.unlocked).length >= 1,
+    },
+    {
+      id: 'tham-hiem',
+      icon: 'compass',
+      name: { vi: 'Thám hiểm', en: 'Explorer' },
+      need: { vi: 'Chạm vào 3 khu di sản', en: 'Unlock spots in 3 sites' },
+      unlocked: touchedSites >= 3,
+    },
+    {
+      id: 'si-tu',
+      icon: 'award',
+      name: { vi: 'Sĩ tử', en: 'Challenger' },
+      need: { vi: 'Trả lời 3 bộ câu hỏi', en: 'Finish 3 quizzes' },
+      unlocked: answered >= 3,
+    },
+    {
+      id: 'hoc-gia',
+      icon: 'book',
+      name: { vi: 'Học giả', en: 'Scholar' },
+      need: { vi: 'Hoàn thành cả 5 khu', en: 'Complete all 5 sites' },
+      unlocked: doneSites === SITES.length,
+    },
   ];
 }
 

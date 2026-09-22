@@ -338,6 +338,12 @@ function JourneyPanel() {
 
 export function DebugHud() {
   const [open, setOpen] = useState(true);
+  // Tự thu nhỏ khi đổi trang – panel mở che mất ~60% viewport 390px và bắt nhầm tap.
+  useEffect(() => {
+    const onNav = () => setOpen(false);
+    window.addEventListener('hashchange', onNav);
+    return () => window.removeEventListener('hashchange', onNav);
+  }, []);
   const online = useOnline();
   const [theme, setTheme] = useTheme();
   const progress = useProgress();

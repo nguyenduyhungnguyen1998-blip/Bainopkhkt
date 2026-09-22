@@ -43,12 +43,45 @@
 .mscreen__filters {
   display: flex;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + 2px);
   overflow-x: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  /* Nhòe mép phải báo còn nội dung cuộn được (mobile không vẽ scrollbar). */
+  mask-image: linear-gradient(to right, #000 0 calc(100% - 28px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, #000 0 calc(100% - 28px), transparent 100%);
 }
 .mscreen__filters::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+.mscreen__filters::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong, rgba(120, 120, 120, 0.5));
+  border-radius: 2px;
+}
+
+.mscreen__zoomctl {
+  position: absolute;
+  right: var(--space-3);
+  bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 4;
+}
+.mscreen__zoombtn {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.mscreen__zoombtn:active {
+  transform: scale(0.92);
 }
 .mscreen__filters .mdv-chip {
   flex: none;
@@ -142,7 +175,9 @@
 }
 .msheet__grip {
   touch-action: none;
-  padding: var(--space-2) 0 var(--space-2);
+  /* Vùng chạm cao hơn thanh gạt nhìn thấy – dễ nắm khi muốn kéo sheet. */
+  padding: 12px 0 14px;
+  margin-top: -6px;
   cursor: grab;
   flex: none;
 }
@@ -331,6 +366,11 @@
 .msheet__head p {
   margin: 0;
   font-size: var(--text-sm);
+}
+.msheet__summary--clip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .msheet__summary {
   margin: var(--space-3) 0;

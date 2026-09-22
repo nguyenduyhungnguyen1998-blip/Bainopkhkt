@@ -132,7 +132,7 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             // Bỏ chữ ký xấu khỏi URL để reload không hồi sinh cảnh báo.
             navigate(`d/${site.entityId}/${spot.spotId}`, true);
           }}
-          aria-label="close"
+          aria-label={t(UI.dismiss, lang)}
         >
           ✕
         </button>
@@ -232,7 +232,7 @@ function SiteIntro({ site }: { site: Site }) {
         </div>
 
         <h2 class="dintro__h">{t(UI.exploreMode, lang)}</h2>
-        <div class="dintro__modes" role="radiogroup">
+        <div class="dintro__modes" role="radiogroup" aria-label={t(UI.exploreMode, lang)}>
           <button
             class={`dintro__mode ${mode === 'audio' ? 'dintro__mode--on' : ''}`}
             role="radio"
@@ -379,7 +379,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
             setRate(r);
             playerRef.current?.setRate(r);
           }}
-          aria-label="speed"
+          aria-label={`${t(UI.playbackSpeed, lang)}: ${rate.toFixed(1)}×`}
         >
           {rate.toFixed(1)}×
         </button>
@@ -389,7 +389,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
           </button>
         )}
       </div>
-      <div class="dcard__progbar" role="progressbar" aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
+      <div class="dcard__progbar" role="progressbar" aria-label={t(UI.audioProgress, lang)} aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
         <span style={{ width: `${prog}%` }} />
       </div>
       {(status === 'failed' || !speechSupported()) && <p class="dcard__notice">{t(UI.listenFallback, lang)}</p>}
@@ -425,9 +425,9 @@ function AspectsCardView({ card, lang }: { card: AspectsCard; lang: Lang }) {
   };
   return (
     <div class={`dcard dcard--aspects dcard--${card.size}`}>
-      <div class="dcard__tabs" role="tablist">
+      <div class="dcard__tabs" role="group" aria-label={t(UI.aspects, lang)}>
         {card.aspects.map((a) => (
-          <button key={a.id} role="tab" class="mdv-chip" aria-pressed={a.id === cur.id} aria-selected={a.id === cur.id} onClick={() => setActive(a.id)}>
+          <button key={a.id} class="mdv-chip" aria-pressed={a.id === cur.id} onClick={() => setActive(a.id)}>
             {t(a.title, lang)}
           </button>
         ))}

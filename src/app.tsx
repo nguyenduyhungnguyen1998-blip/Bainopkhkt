@@ -28,11 +28,32 @@ function useDebugFlag(): boolean {
   return on;
 }
 
+/** Kính mờ tự tắt khi máy yếu (P2): đo FPS ~1.5s đầu, dưới ngưỡng thì bỏ backdrop-filter. */
+function usePerfGuard() {
+  useEffect(() => {
+    let frames = 0;
+    const t0 = performance.now();
+    let raf = 0;
+    const tick = () => {
+      frames++;
+      const el = performance.now() - t0;
+      if (el >= 1500) {
+        if ((frames / el) * 1000 < 35) document.documentElement.dataset.noBlur = '1';
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+}
+
 export function App() {
   const route = useRoute();
   const online = useOnline();
   const [lang] = useLang();
   const debug = useDebugFlag();
+  usePerfGuard();
 
   let screen;
   switch (route.name) {
@@ -40,7 +61,7 @@ export function App() {
       screen = <MapScreen />;
       break;
     case 'destination':
-      screen = <DestinationScreen key={`${route.siteId}/${route.spotId}`} siteId={route.siteId} spotId={route.spotId} />;
+      screen = <DestinationScreen key={`${route.siteId}/${route.spotId}`} siteId={route.siteId} spotId={route.spotId} query={route.query} />;
       break;
     case 'passport':
       screen = <PassportScreen />;

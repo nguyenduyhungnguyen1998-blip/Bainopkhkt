@@ -28,6 +28,11 @@
 }
 .hud__body {
   padding: 4px 10px 10px;
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 .hud__grid {
   display: grid;
@@ -110,3 +115,11 @@
   border-radius: 6px;
   padding: 2px 4px;
 }
+
+.hud__inspector { border-top: 1px solid var(--color-border); padding-top: 8px; margin-top: 8px; }
+.hud__sectitle { display: block; font-size: 11px; color: var(--color-accent-secondary-text); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+.hud__forcelist { display: grid; gap: 6px; margin: 6px 0; }
+.hud__forcerow { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.hud__forcerow span { width: 34px; color: var(--color-muted); }
+.hud__forcerow select { flex: 1; min-height: 30px; font-size: 11px; background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); border-radius: 6px; }
+.hud__mono { font-family: var(--font-mono, monospace); font-size: 10px; }

@@ -21,6 +21,9 @@ const PATHS: Record<string, string> = {
   book: 'M12 5c-1.5-1.2-3.5-1.8-6-1.8S3 4 3 4v14s1.5-.5 3-.5 4.5.6 6 1.8c1.5-1.2 3.5-1.8 6-1.8s3 .5 3 .5V4s-1.5-.3-3-.3-4.5.6-6 1.3Zm0 0v14.3',
   locate: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9ZM12 1v3m0 16v3M1 12h3m16 0h3',
   layers: 'm12 3 9 5-9 5-9-5 9-5Zm-9 9.5 9 5 9-5',
+  pause: 'M8 5v14M16 5v14',
+  warn: 'M12 3 2.5 20h19L12 3Zm0 7v4m0 3v.01',
+  leaf: 'M5 19c0-9 5-13 14-14-1 9-5 14-14 14Zm0 0c3-5 6-8 9-9',
 };
 
 export function Icon({ name, size = 24, class: cls }: { name: string; size?: number; class?: string }) {

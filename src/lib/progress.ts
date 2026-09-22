@@ -1,5 +1,6 @@
 /**
- * Tiến độ hành trình (P0: localStorage; P3 chuyển sang IndexedDB kèm schemaVersion).
+ * Tiến độ hành trình (P3: IndexedDB 'mdv' qua lib/db, localStorage giữ làm bản mirror/dự phòng).
+ * Khởi tạo bất đồng bộ bằng initProgress() trước khi render app; sau đó mọi đọc là đồng bộ.
  * Quy tắc trạng thái node trên bản đồ toàn quốc:
  *  - done   : đã mở hết mọi điểm QR trong khu
  *  - active : đã mở ít nhất một điểm nhưng chưa hết
@@ -9,43 +10,86 @@
 import { useEffect, useState } from 'preact/hooks';
 import { SITES } from '../data/content';
 import type { Site } from '../data/types';
+import { idbGet, idbSet } from './db';
 
 export type NodeStatus = 'locked' | 'next' | 'active' | 'done';
 
 export interface Progress {
-  schemaVersion: 1;
+  schemaVersion: 2;
   /** khóa "siteId/spotId" -> thời điểm mở (ms) */
   unlocked: Record<string, number>;
+  /** khóa "siteId/spotId" -> số câu đúng cao nhất ở quiz điểm đó */
+  quizDone: Record<string, number>;
   xp: number;
   badges: string[];
 }
 
-const KEY = 'mdv.progress.v1';
-const EMPTY: Progress = { schemaVersion: 1, unlocked: {}, xp: 0, badges: [] };
+const LS_KEY = 'mdv.progress.v1';
+const IDB_KEY = 'progress';
+const EMPTY: Progress = { schemaVersion: 2, unlocked: {}, quizDone: {}, xp: 0, badges: [] };
 
-function load(): Progress {
+/** Chấp nhận bản v1 (localStorage cũ, thiếu quizDone) lẫn v2. Trả null nếu không hợp lệ. */
+function migrate(raw: unknown): Progress | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const p = raw as { schemaVersion?: number } & Omit<Partial<Progress>, 'schemaVersion'>;
+  if (p.schemaVersion !== 1 && p.schemaVersion !== 2) return null;
+  if (!p.unlocked || typeof p.unlocked !== 'object') return null;
+  return {
+    schemaVersion: 2,
+    unlocked: p.unlocked,
+    quizDone: p.quizDone && typeof p.quizDone === 'object' ? p.quizDone : {},
+    xp: typeof p.xp === 'number' ? p.xp : 0,
+    badges: Array.isArray(p.badges) ? p.badges : [],
+  };
+}
+
+function loadLocal(): Progress {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return { ...EMPTY };
-    const p = JSON.parse(raw) as Progress;
-    if (p.schemaVersion !== 1) return { ...EMPTY };
-    return p;
+    const raw = localStorage.getItem(LS_KEY);
+    return migrate(raw ? JSON.parse(raw) : null) ?? { ...EMPTY, unlocked: {}, quizDone: {}, badges: [] };
   } catch {
-    return { ...EMPTY };
+    return { ...EMPTY, unlocked: {}, quizDone: {}, badges: [] };
   }
 }
 
-let state: Progress = load();
+let state: Progress = loadLocal();
 const listeners = new Set<() => void>();
 
 function commit(next: Progress) {
   state = next;
   try {
-    localStorage.setItem(KEY, JSON.stringify(next));
+    localStorage.setItem(LS_KEY, JSON.stringify(next));
   } catch {
-    /* ignore */
+    /* bộ nhớ riêng tư */
   }
+  void idbSet(IDB_KEY, next);
   listeners.forEach((l) => l());
+}
+
+/**
+ * Hydrate từ IndexedDB trước khi render. Nguồn ưu tiên: IDB (chuẩn P3) > localStorage (legacy/mirror).
+ * Nếu chỉ có localStorage, ghi ngược lên IDB để lần sau đọc thẳng từ IDB.
+ */
+export async function initProgress(): Promise<void> {
+  try {
+    const fromIdb = migrate(await idbGet(IDB_KEY));
+    if (fromIdb) {
+      if (JSON.stringify(fromIdb) !== JSON.stringify(state)) {
+        state = fromIdb;
+        try {
+          localStorage.setItem(LS_KEY, JSON.stringify(fromIdb));
+        } catch {
+          /* bộ nhớ riêng tư */
+        }
+        listeners.forEach((l) => l());
+      }
+      return;
+    }
+    // Chỉ có localStorage (legacy v1 hoặc mirror): đẩy lên IDB.
+    if (Object.keys(state.unlocked).length || state.xp || state.badges.length) void idbSet(IDB_KEY, state);
+  } catch {
+    /* IDB lỗi -> tiếp tục với localStorage */
+  }
 }
 
 export function getProgress(): Progress {
@@ -88,8 +132,27 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   return result;
 }
 
+export const QUIZ_XP_PER_CORRECT = 5;
+
+/**
+ * Ghi điểm quiz một điểm. XP thưởng chỉ tính phần vượt best cũ (làm lại vẫn được chơi
+ * nhưng không farm XP); trả về số XP thực nhận.
+ */
+export function recordQuizResult(siteId: string, spotId: string, correct: number, total: number): number {
+  const key = `${siteId}/${spotId}`;
+  const prev = state.quizDone[key] ?? 0;
+  const gained = Math.max(0, correct - Math.min(prev, total)) * QUIZ_XP_PER_CORRECT;
+  const quizDone = correct > prev ? { ...state.quizDone, [key]: correct } : state.quizDone;
+  commit({ ...state, quizDone, xp: state.xp + gained });
+  return gained;
+}
+
+export function quizBest(siteId: string, spotId: string): number | undefined {
+  return state.quizDone[`${siteId}/${spotId}`];
+}
+
 export function resetProgress() {
-  commit({ ...EMPTY, unlocked: {}, badges: [] });
+  commit({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] });
 }
 
 export function siteUnlockedCount(site: Site, p: Progress = state): number {
@@ -115,6 +178,29 @@ export function computeStatuses(p: Progress = state): Map<string, NodeStatus> {
   return out;
 }
 
+/** Xuất hộ chiếu: toàn bộ trạng thái khôi phục được, kèm meta để người xem biết nguồn. */
+export function exportPassportJson(): string {
+  return JSON.stringify(
+    { app: 'mo-dau-viet', kind: 'passport', exportedAt: new Date().toISOString(), progress: state },
+    null,
+    2
+  );
+}
+
+/** Nhập hộ chiếu: chỉ chấp nhận đúng kind + schemaVersion hỗ trợ. Trả false nếu file lạ. */
+export function importPassportJson(json: string): boolean {
+  try {
+    const raw = JSON.parse(json) as { kind?: string; progress?: unknown };
+    if (raw?.kind !== 'passport') return false;
+    const p = migrate(raw.progress);
+    if (!p) return false;
+    commit(p);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export interface Achievement {
   id: string;
   icon: string;
@@ -126,9 +212,11 @@ export interface Achievement {
 export function computeAchievements(p: Progress = state): Achievement[] {
   const touchedSites = SITES.filter((s) => siteUnlockedCount(s, p) > 0).length;
   const doneSites = SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length;
+  const answered = Object.keys(p.quizDone).length;
   return [
     { id: 'khoi-hanh', icon: 'flag', name: { vi: 'Khởi hành', en: 'First steps' }, unlocked: Object.keys(p.unlocked).length >= 1 },
     { id: 'tham-hiem', icon: 'compass', name: { vi: 'Thám hiểm', en: 'Explorer' }, unlocked: touchedSites >= 3 },
+    { id: 'si-tu', icon: 'award', name: { vi: 'Sĩ tử', en: 'Challenger' }, unlocked: answered >= 3 },
     { id: 'hoc-gia', icon: 'book', name: { vi: 'Học giả', en: 'Scholar' }, unlocked: doneSites === SITES.length },
   ];
 }

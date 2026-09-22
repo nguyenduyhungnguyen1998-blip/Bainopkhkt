@@ -1,16 +1,20 @@
 /**
- * Trang điểm đến – P0 dựng khung renderer JSON tối giản (P2 hoàn thiện đầy đủ card, TTS, âm thanh).
+ * Trang điểm đến – P2 renderer bento đầy đủ (hero/aspects vuốt/video poster/audio TTS/fact/ảnh)
+ * + luồng quét QR có chữ ký (P3): `?s=<sig>` hợp lệ -> xác nhận -> mở khóa; sai -> từ chối lịch sự.
  */
-import { useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
-import type { Card, Site } from '../data/types';
+import type { Card, Site, Spot, AudioCard, AspectsCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
-import { isSpotUnlocked, useProgress } from '../lib/progress';
+import { isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
+import { verifySignature } from '../lib/qr';
+import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
+import { startAmbient, stopAmbient } from '../lib/ambient';
 import { Icon } from '../components/Icon';
 import './destination.css';
 
-export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?: string }) {
+export function DestinationScreen({ siteId, spotId, query }: { siteId: string; spotId?: string; query?: URLSearchParams }) {
   const [lang] = useLang();
   useProgress(); // re-render khi mở khóa
   const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
@@ -31,6 +35,7 @@ export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?:
   const prev = site.spots[idx - 1];
   const next = site.spots[idx + 1];
   const unlocked = isSpotUnlocked(site.entityId, spot.spotId);
+  const sig = query?.get('s');
 
   return (
     <main class="mdv-screen dest">
@@ -46,6 +51,8 @@ export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?:
           {unlocked ? `+${spot.xp} XP` : t(UI.locked, lang)}
         </span>
       </header>
+
+      {sig && <ScanConfirm site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
 
       {/* Dải điểm QR trong khu – điều hướng nhanh giữa các điểm */}
       <nav class="dest__spots" aria-label="Các điểm trong khu">
@@ -83,6 +90,78 @@ export function DestinationScreen({ siteId, spotId }: { siteId: string; spotId?:
         )}
       </div>
     </main>
+  );
+}
+
+type SigState = 'checking' | 'ok' | 'bad';
+
+/** Bước "xác nhận" của luồng quét QR (P3): chữ ký hợp lệ -> bấm để mở khóa; sai -> cảnh báo êm. */
+function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Spot; sig: string; unlocked: boolean; lang: Lang }) {
+  const [state, setState] = useState<SigState>('checking');
+  const [reward, setReward] = useState<number | null>(null);
+  const [badgeName, setBadgeName] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    void verifySignature(site.entityId, spot.spotId, sig).then((ok) => {
+      if (live) setState(ok ? 'ok' : 'bad');
+    });
+    return () => {
+      live = false;
+    };
+  }, [site.entityId, spot.spotId, sig]);
+
+  if (dismissed || state === 'checking') return null;
+
+  if (state === 'bad') {
+    return (
+      <div class="dscan dscan--bad" role="alert">
+        <Icon name="warn" size={18} />
+        <span>{t(UI.scanInvalid, lang)}</span>
+        <button class="dscan__x" onClick={() => setDismissed(true)} aria-label="close">
+          ✕
+        </button>
+      </div>
+    );
+  }
+
+  if (reward !== null) {
+    return (
+      <div class="dscan dscan--done" role="status">
+        <Icon name="check" size={18} />
+        <span>
+          +{reward} XP{badgeName ? ` · ${badgeName}` : ''}
+        </span>
+      </div>
+    );
+  }
+
+  if (unlocked) {
+    return (
+      <div class="dscan dscan--done" role="status">
+        <Icon name="check" size={18} />
+        <span>{t(UI.unlockedDone, lang)}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
+      <Icon name="check" size={18} />
+      <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
+      <button
+        class="mdv-btn mdv-btn--primary dscan__cta"
+        onClick={() => {
+          const r = unlockSpot(site.entityId, spot.spotId);
+          setReward(r.gainedXp);
+          setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+          if (navigator.vibrate) navigator.vibrate(30);
+        }}
+      >
+        {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
+      </button>
+    </div>
   );
 }
 
@@ -193,19 +272,13 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
               </span>
               <b>{t(card.title, lang)}</b>
               <small>{t(UI.videoSoon, lang)}</small>
+              <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
             </div>
           )}
         </div>
       );
     case 'audio':
-      return (
-        <div class={`dcard dcard--audio dcard--${card.size}`}>
-          <button class="mdv-btn mdv-btn--ghost" disabled title={t(UI.comingSoon, lang)}>
-            <Icon name="volume" size={20} /> {t(UI.listen, lang)}
-          </button>
-          <p class="mdv-muted">{card.script[lang][0]}</p>
-        </div>
-      );
+      return <AudioCardView card={card} lang={lang} />;
     case 'fact':
       return (
         <div class={`dcard dcard--fact dcard--${card.size}`}>
@@ -223,9 +296,110 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
   }
 }
 
-function AspectsCardView({ card, lang }: { card: Extract<Card, { type: 'aspects' }>; lang: Lang }) {
+/** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */
+function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
+  const playerRef = useRef<SpeechPlayer | null>(null);
+  const [status, setStatus] = useState<SpeechStatus>('idle');
+  const [sent, setSent] = useState(-1);
+  const [rate, setRate] = useState(1);
+  const [ambientOn, setAmbientOn] = useState(false);
+  const sentences = card.script[lang];
+
+  useEffect(
+    () => () => {
+      playerRef.current?.stop();
+      // Không tắt ambient khi rời thẻ – người nghe có thể muốn giữ nền; HUD/D4 tắt được.
+    },
+    []
+  );
+
+  const toggle = () => {
+    if (!speechSupported()) {
+      setStatus('failed');
+      return;
+    }
+    if (!playerRef.current) playerRef.current = new SpeechPlayer();
+    const p = playerRef.current;
+    if (status === 'playing') return p.pause();
+    if (status === 'paused') return p.resume();
+    p.play(sentences, lang, {
+      onSentence: (i) => setSent(i),
+      onStatus: (s) => {
+        setStatus(s);
+        if (s === 'done' || s === 'failed' || s === 'idle') setSent(-1);
+      },
+    });
+  };
+
+  const toggleAmbient = () => {
+    if (ambientOn) {
+      stopAmbient();
+      setAmbientOn(false);
+    } else if (card.ambient) {
+      setAmbientOn(startAmbient(card.ambient));
+    }
+  };
+
+  const prog = status === 'playing' || status === 'paused' ? ((sent + 1) / sentences.length) * 100 : status === 'done' ? 100 : 0;
+
+  return (
+    <div class={`dcard dcard--audio dcard--${card.size}`}>
+      <div class="dcard__audio-ctrl">
+        <button class="mdv-btn mdv-btn--primary dcard__playbtn" onClick={toggle} aria-pressed={status === 'playing'}>
+          <Icon name={status === 'playing' ? 'pause' : 'volume'} size={20} />
+          {status === 'playing' ? t(UI.pause, lang) : status === 'paused' ? t(UI.resume, lang) : t(UI.play, lang)}
+        </button>
+        <button
+          class="mdv-chip"
+          onClick={() => {
+            const r = rate >= 1.2 ? 0.8 : rate + 0.2;
+            setRate(r);
+            playerRef.current?.setRate(r);
+          }}
+          aria-label="speed"
+        >
+          {rate.toFixed(1)}×
+        </button>
+        {card.ambient && (
+          <button class={`mdv-chip ${ambientOn ? 'is-on' : ''}`} aria-pressed={ambientOn} onClick={toggleAmbient}>
+            <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
+          </button>
+        )}
+      </div>
+      <div class="dcard__progbar" role="progressbar" aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
+        <span style={{ width: `${prog}%` }} />
+      </div>
+      {(status === 'failed' || !speechSupported()) && <p class="dcard__notice">{t(UI.listenFallback, lang)}</p>}
+      <ol class="dcard__script" data-reading={status === 'playing' || status === 'paused'}>
+        {sentences.map((s, i) => (
+          <li key={i} class={i === sent ? 'is-saying' : ''}>
+            {s}
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+const SWIPE_PX = 40;
+
+function AspectsCardView({ card, lang }: { card: AspectsCard; lang: Lang }) {
   const [active, setActive] = useState(card.aspects[0].id);
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
+  const idx = card.aspects.indexOf(cur);
+  const startX = useRef<number | null>(null);
+  // Vuốt ngang trên thân thẻ đổi tab (P2: "tab vuốt ngang")
+  const onPointerDown = (e: PointerEvent) => {
+    startX.current = e.clientX;
+  };
+  const onPointerUp = (e: PointerEvent) => {
+    if (startX.current === null) return;
+    const dx = e.clientX - startX.current;
+    startX.current = null;
+    if (Math.abs(dx) < SWIPE_PX) return;
+    const next = dx < 0 ? Math.min(idx + 1, card.aspects.length - 1) : Math.max(idx - 1, 0);
+    setActive(card.aspects[next].id);
+  };
   return (
     <div class={`dcard dcard--aspects dcard--${card.size}`}>
       <div class="dcard__tabs" role="tablist">
@@ -235,9 +409,14 @@ function AspectsCardView({ card, lang }: { card: Extract<Card, { type: 'aspects'
           </button>
         ))}
       </div>
-      <p key={cur.id} class="dcard__body">
+      <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
         {t(cur.body, lang)}
       </p>
+      <div class="dcard__dots" aria-hidden="true">
+        {card.aspects.map((a) => (
+          <i key={a.id} class={a.id === cur.id ? 'on' : ''} />
+        ))}
+      </div>
     </div>
   );
 }

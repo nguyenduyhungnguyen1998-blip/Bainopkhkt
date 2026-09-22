@@ -3,8 +3,9 @@ import { computeStatuses, type Progress } from '../src/lib/progress';
 import { SITES } from '../src/data/content';
 
 const p = (unlocked: string[]): Progress => ({
-  schemaVersion: 1,
+  schemaVersion: 2,
   unlocked: Object.fromEntries(unlocked.map((k) => [k, 1])),
+  quizDone: {},
   xp: 0,
   badges: [],
 });

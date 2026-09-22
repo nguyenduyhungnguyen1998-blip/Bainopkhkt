@@ -258,3 +258,113 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+/* === P2/P3: quét QR, audio player, aspects dots === */
+.dscan {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent-secondary) 14%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent-secondary) 45%, transparent);
+  font-size: var(--text-sm);
+}
+.dscan--bad {
+  background: color-mix(in srgb, var(--color-danger, #e5484d) 12%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-danger, #e5484d) 45%, transparent);
+}
+.dscan--done {
+  background: color-mix(in srgb, var(--color-accent-primary) 14%, var(--color-surface));
+  border-color: color-mix(in srgb, var(--color-accent-primary) 45%, transparent);
+}
+.dscan__txt {
+  flex: 1;
+  font-weight: 600;
+}
+.dscan__cta {
+  min-height: 40px;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+.dscan__x {
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  font-size: 16px;
+  min-width: 36px;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.dcard__audio-ctrl {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.dcard__playbtn {
+  min-height: 44px;
+}
+.dcard__progbar {
+  height: 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--color-text-muted) 18%, transparent);
+  overflow: hidden;
+  margin-top: 10px;
+}
+.dcard__progbar span {
+  display: block;
+  height: 100%;
+  background: var(--color-accent-secondary);
+  border-radius: 99px;
+  transition: width 240ms ease;
+}
+.dcard__notice {
+  margin: 8px 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.dcard__script {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  display: none;
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+.dcard__script[data-reading='true'],
+.dcard--audio .dcard__notice + .dcard__script {
+  display: block;
+}
+.dcard__script li {
+  color: var(--color-text-muted);
+  transition: color 160ms ease;
+}
+.dcard__script li.is-saying {
+  color: var(--color-text);
+  font-weight: 600;
+}
+.dcard__dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.dcard__dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+}
+.dcard__dots i.on {
+  background: var(--color-accent-secondary);
+  width: 16px;
+}
+.dcard__videotip {
+  color: var(--color-accent-secondary-text);
+  font-size: var(--text-xs);
+}
+.mdv-chip.is-on {
+  border-color: var(--color-accent-secondary);
+}

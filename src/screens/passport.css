@@ -107,3 +107,112 @@
   display: grid;
   gap: var(--space-3);
 }
+
+/* === P3: passport tools + quiz === */
+.ppass__tools {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.ppass__toolmsg {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-accent-secondary-text);
+}
+
+.quiz__list {
+  display: grid;
+  gap: 12px;
+}
+.quiz__site {
+  display: grid;
+  gap: 8px;
+}
+.quiz__sitename {
+  display: flex;
+  flex-direction: column;
+}
+.quiz__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+}
+.quiz__row svg {
+  color: var(--color-accent-secondary-text);
+  flex: none;
+}
+.quiz__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+.quiz__opt {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 14px;
+  min-height: 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease, opacity 160ms ease;
+}
+.quiz__opt.is-correct {
+  border-color: var(--color-accent-primary);
+  background: color-mix(in srgb, var(--color-accent-primary) 18%, var(--color-surface));
+  font-weight: 700;
+}
+.quiz__opt.is-wrong {
+  border-color: var(--color-danger, #e5484d);
+  background: color-mix(in srgb, var(--color-danger, #e5484d) 14%, var(--color-surface));
+}
+.quiz__opt.is-dim {
+  opacity: 0.5;
+}
+.quiz__q {
+  font-size: var(--text-md);
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.quiz__mark {
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+.quiz__mark.ok {
+  color: var(--color-accent-primary);
+}
+.quiz__mark.bad {
+  color: var(--color-danger, #e5484d);
+}
+.quiz__result {
+  text-align: center;
+  padding: var(--space-6) var(--space-4);
+}
+.quiz__result svg {
+  color: var(--color-accent-secondary-text);
+}
+.quiz__score {
+  font-size: var(--text-2xl, 28px);
+  font-weight: 800;
+}
+.quiz__xp {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-accent-secondary-text);
+}

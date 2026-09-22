@@ -1,7 +1,9 @@
-/** Hộ chiếu, Thử tài, Cài đặt – P0 dựng khung; P3/P6 hoàn thiện. */
-import { SITES } from '../data/content';
-import { UI, t, useLang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress } from '../lib/progress';
+/** Hộ chiếu, Thử tài, Cài đặt – P3: quiz engine + xuất/nhập hộ chiếu. */
+import { useRef, useState } from 'preact/hooks';
+import { SITES, getSpot } from '../data/content';
+import type { Site, Spot } from '../data/types';
+import { UI, t, useLang, type Lang } from '../lib/i18n';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, importPassportJson } from '../lib/progress';
 import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
@@ -56,6 +58,8 @@ export function PassportScreen() {
 
       <section class="mdv-card ppass__quote">“{t(UI.journeyQuote, lang)}”</section>
 
+      <PassportTools lang={lang} />
+
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
         <div class="ppass__badges">
@@ -98,9 +102,54 @@ export function PassportScreen() {
   );
 }
 
+/** Xuất/nhập hộ chiếu JSON (P3): lưu tiến độ ra file và khôi phục trên máy khác. */
+function PassportTools({ lang }: { lang: Lang }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const doExport = () => {
+    const blob = new Blob([exportPassportJson()], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ho-chieu-mo-dau-viet-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const doImport = async (f: File | undefined) => {
+    if (!f) return;
+    const ok = importPassportJson(await f.text());
+    setMsg(t(ok ? UI.importOk : UI.importBad, lang));
+    if (fileRef.current) fileRef.current.value = '';
+    window.setTimeout(() => setMsg(null), 2600);
+  };
+
+  return (
+    <section class="mdv-card ppass__tools">
+      <button class="mdv-btn mdv-btn--ghost" onClick={doExport}>
+        {t(UI.exportPassport, lang)}
+      </button>
+      <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
+        {t(UI.importPassport, lang)}
+      </button>
+      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => void doImport((e.target as HTMLInputElement).files?.[0])} />
+      {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
+    </section>
+  );
+}
+
 export function QuizScreen() {
   const [lang] = useLang();
-  const quizCount = SITES.reduce((n, s) => n + s.spots.reduce((m, sp) => m + (sp.quiz?.length ?? 0), 0), 0);
+  useProgress();
+  const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(null);
+  const spotsWithQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz && sp.quiz.length > 0).map((sp) => ({ site: s, spot: sp })));
+
+  if (active) {
+    const found = getSpot(active.siteId, active.spotId);
+    if (found?.spot.quiz?.length) {
+      return <QuizRun site={found.site} spot={found.spot} lang={lang} onExit={() => setActive(null)} />;
+    }
+  }
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -109,10 +158,125 @@ export function QuizScreen() {
           <h1>{lang === 'vi' ? 'Thử tài sĩ tử' : 'Scholar challenge'}</h1>
         </div>
       </header>
+      <p class="mdv-muted">{t(UI.quizPickSpot, lang)}</p>
+      <div class="quiz__list">
+        {SITES.map((s) => {
+          const withQuiz = s.spots.filter((sp) => sp.quiz && sp.quiz.length > 0);
+          if (!withQuiz.length) return null;
+          return (
+            <section key={s.entityId} class="mdv-card quiz__site">
+              <div class="quiz__sitename">
+                <b>{t(s.name, lang)}</b>
+                <span class="mdv-muted">{t(s.province, lang)}</span>
+              </div>
+              {withQuiz.map((sp) => {
+                const best = quizBest(s.entityId, sp.spotId);
+                return (
+                  <button key={sp.spotId} class="quiz__row" onClick={() => setActive({ siteId: s.entityId, spotId: sp.spotId })}>
+                    <Icon name="quiz" size={18} />
+                    <span class="quiz__name">{t(sp.name, lang)}</span>
+                    <small class="mdv-muted">
+                      {sp.quiz!.length} {lang === 'vi' ? 'câu' : 'qs'}
+                      {best !== undefined && ` · ${t(UI.bestScore, lang)} ${best}/${sp.quiz!.length}`}
+                    </small>
+                    <Icon name="back" size={16} class="flip" />
+                  </button>
+                );
+              })}
+            </section>
+          );
+        })}
+        {!spotsWithQuiz.length && <p class="mdv-muted">{t(UI.quizNoData, lang)}</p>}
+      </div>
+    </main>
+  );
+}
+
+/** Chơi quiz một điểm: chọn đáp án -> hiện đúng/sai -> câu tiếp -> kết quả + XP (phần vượt best). */
+function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: Lang; onExit: () => void }) {
+  const quiz = spot.quiz!;
+  const [idx, setIdx] = useState(0);
+  const [picked, setPicked] = useState<number | null>(null);
+  const [correct, setCorrect] = useState(0);
+  const [done, setDone] = useState(false);
+  const [gained, setGained] = useState<number | null>(null);
+  const best = quizBest(site.entityId, spot.spotId);
+
+  const pick = (i: number) => {
+    if (picked !== null) return;
+    setPicked(i);
+    if (i === quiz[idx].answer) setCorrect((c) => c + 1);
+    if (navigator.vibrate) navigator.vibrate(i === quiz[idx].answer ? 20 : [60, 40, 60]);
+  };
+  const nextQ = () => {
+    if (idx + 1 >= quiz.length) {
+      const g = recordQuizResult(site.entityId, spot.spotId, correct, quiz.length);
+      setGained(g);
+      setDone(true);
+    } else {
+      setIdx(idx + 1);
+      setPicked(null);
+    }
+  };
+
+  if (done) {
+    return (
+      <main class="mdv-screen">
+        <div class="mdv-card quiz__result">
+          <Icon name="award" size={40} />
+          <h2>{t(UI.quizResult, lang)}</h2>
+          <div class="quiz__score">
+            {correct}/{quiz.length} <small>{t(UI.quizCorrect, lang)}</small>
+          </div>
+          {gained !== null && gained > 0 ? (
+            <p class="quiz__xp">+{gained} XP</p>
+          ) : (
+            <p class="mdv-muted">{best !== undefined && `${t(UI.bestScore, lang)}: ${best}/${quiz.length}`}</p>
+          )}
+          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => (setIdx(0), setPicked(null), setCorrect(0), setDone(false), setGained(null))}>
+              {t(UI.quizAgain, lang)}
+            </button>
+            <button class="mdv-btn mdv-btn--primary" onClick={onExit}>
+              {t(UI.back, lang)}
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  const q = quiz[idx];
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">{t(spot.name, lang)}</span>
+          <h1>
+            {t(UI.quizQuestion, lang)} {idx + 1}/{quiz.length}
+          </h1>
+        </div>
+      </header>
       <div class="mdv-card">
-        <p class="mdv-muted">
-          {t(UI.comingSoon, lang)} (P3). {lang === 'vi' ? 'Đã có' : 'Ready:'} {quizCount} {lang === 'vi' ? 'câu hỏi trong dữ liệu.' : 'questions in content.'}
-        </p>
+        <p class="quiz__q">{t(q.q, lang)}</p>
+        <div class="quiz__opts">
+          {q.options.map((o, i) => {
+            const cls = picked === null ? '' : i === q.answer ? 'is-correct' : i === picked ? 'is-wrong' : 'is-dim';
+            return (
+              <button key={i} class={`quiz__opt ${cls}`} onClick={() => pick(i)} disabled={picked !== null}>
+                {t(o, lang)}
+              </button>
+            );
+          })}
+        </div>
+        {picked !== null && (
+          <div class={`quiz__mark ${picked === q.answer ? 'ok' : 'bad'}`}>{t(picked === q.answer ? UI.correctMark : UI.wrongMark, lang)}</div>
+        )}
+        {picked !== null && (
+          <button class="mdv-btn mdv-btn--primary" style="width:100%;margin-top:12px" onClick={nextQ}>
+            {t(UI.quizNext, lang)}
+          </button>
+        )}
       </div>
     </main>
   );

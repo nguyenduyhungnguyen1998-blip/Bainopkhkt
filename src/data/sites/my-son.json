@@ -33,7 +33,12 @@
           "en": ["You are in the My Son valley, sanctuary of the Champa kingdom.", "The bricks around you have stood for over a thousand years with no visible mortar."]
         } }
       ],
-      "sources": [ { "title": "UNESCO World Heritage Centre – My Son Sanctuary", "url": "https://whc.unesco.org/en/list/949", "reviewed": false } ]
+      "sources": [ { "title": "UNESCO World Heritage Centre – My Son Sanctuary", "url": "https://whc.unesco.org/en/list/949", "reviewed": false } ],
+      "quiz": [
+        { "q": { "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc nào?", "en": "My Son was the religious centre of which kingdom?" }, "options": [{ "vi": "Chăm Pa", "en": "Champa" }, { "vi": "Khmer", "en": "Khmer Empire" }, { "vi": "Đại Việt", "en": "Dai Viet" }, { "vi": "Phù Nam", "en": "Funan" }], "answer": 0 },
+        { "q": { "vi": "Các tháp Mỹ Sơn thờ thần nào?", "en": "Which deity are the My Son towers dedicated to?" }, "options": [{ "vi": "Vishnu", "en": "Vishnu" }, { "vi": "Shiva (Bhadresvara)", "en": "Shiva (Bhadresvara)" }, { "vi": "Phật", "en": "Buddha" }, { "vi": "Brahma", "en": "Brahma" }], "answer": 1 },
+        { "q": { "vi": "Điều đặc biệt trong kỹ thuật xây tháp Mỹ Sơn là gì?", "en": "What is special about My Son's construction technique?" }, "options": [{ "vi": "Gạch nung không thấy mạch vữa", "en": "Fired bricks with invisible mortar" }, { "vi": "Toàn đá ong", "en": "All basalt stone" }, { "vi": "Toàn gỗ lim", "en": "All ironwood" }, { "vi": "Cột đồng", "en": "Bronze pillars" }], "answer": 0 }
+      ]
     }
   ]
 }

@@ -4,13 +4,14 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
-import type { Card, Site, Spot, AudioCard, AspectsCard } from '../data/types';
+import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
+import { useOnline } from '../lib/theme';
 import { Icon } from '../components/Icon';
 import './destination.css';
 
@@ -261,22 +262,7 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
     case 'aspects':
       return <AspectsCardView card={card} lang={lang} />;
     case 'video':
-      return (
-        <div class={`dcard dcard--video dcard--${card.size}`}>
-          {card.src ? (
-            <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
-          ) : (
-            <div class="dcard__video-ph" style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}>
-              <span class="dcard__play">
-                <Icon name="play" size={28} />
-              </span>
-              <b>{t(card.title, lang)}</b>
-              <small>{t(UI.videoSoon, lang)}</small>
-              <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
-            </div>
-          )}
-        </div>
-      );
+      return <VideoCardView card={card} lang={lang} />;
     case 'audio':
       return <AudioCardView card={card} lang={lang} />;
     case 'fact':
@@ -294,6 +280,27 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
         </figure>
       );
   }
+}
+
+/** Thẻ video: embed khi có link; poster + gợi ý khi chưa. Offline → báo rõ video cần mạng, gợi nghe audio. */
+function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
+  const online = useOnline();
+  return (
+    <div class={`dcard dcard--video dcard--${card.size}`}>
+      {card.src && online ? (
+        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+      ) : (
+        <div class="dcard__video-ph" style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}>
+          <span class="dcard__play">
+            <Icon name="play" size={28} />
+          </span>
+          <b>{t(card.title, lang)}</b>
+          <small>{card.src && !online ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}</small>
+          <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
+        </div>
+      )}
+    </div>
+  );
 }
 
 /** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */

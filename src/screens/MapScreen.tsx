@@ -19,6 +19,7 @@ const FILTERS: { id: MapFocus; label: keyof typeof UI }[] = [
 ];
 
 const SEEN_KEY = 'mdv.seen';
+const HINT_KEY = 'mdv.hintDone';
 const SHEET_PEEK = 0.4; // 40% chiều cao màn hình
 const SHEET_FULL = 0.9; // 90% khi kéo lên
 const SITE_ZOOM_K = 4.6; // zoom sâu hơn mức này vào khu nhiều điểm -> mở sơ đồ cấp 2
@@ -31,12 +32,20 @@ export function MapScreen() {
   const [siteLevel, setSiteLevel] = useState<string | null>(null); // entityId của khu đang xem sơ đồ
   const [hintOn, setHintOn] = useState(() => {
     try {
+      return !localStorage.getItem(HINT_KEY);
+    } catch {
+      return true;
+    }
+  });
+  const [cinema] = useState(() => {
+    try {
       return !localStorage.getItem(SEEN_KEY);
     } catch {
       return true;
     }
   });
   const [homeSignal, setHomeSignal] = useState(0);
+  const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
   const [nextOffscreen, setNextOffscreen] = useState(false);
   const [toast, setToast] = useState<{ xp: number; seq: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -58,9 +67,18 @@ export function MapScreen() {
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
 
   const markSeen = () => {
-    setHintOn(false);
     try {
       localStorage.setItem(SEEN_KEY, '1');
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+  };
+  // Hint "Chạm điểm sáng" chỉ tắt khi user thật sự tương tác (tap node / bấm ✕) – không chết khi camera hạ cánh.
+  const dismissHint = () => {
+    setHintOn(false);
+    markSeen();
+    try {
+      localStorage.setItem(HINT_KEY, '1');
     } catch {
       /* bộ nhớ riêng tư */
     }
@@ -200,9 +218,10 @@ export function MapScreen() {
             selectedId={selectedId}
             focus={focus}
             lang={lang}
-            onboard={hintOn}
+            onboard={cinema}
             homeSignal={homeSignal}
-            onSelect={setSelectedId}
+            zoomSignal={zoomSignal}
+            onSelect={(id) => { setSelectedId(id); if (hintOn) dismissHint(); }}
             onTransform={onMapTransform}
             onOnboardDone={markSeen}
           />
@@ -215,6 +234,16 @@ export function MapScreen() {
         <div class="mscreen__counter">
           {unlockedSpots}/{totalSpots} {t(UI.spots, lang)}
         </div>
+        {!levelSite && (
+          <div class="mscreen__zoomctl" role="group" aria-label="zoom">
+            <button class="mscreen__zoombtn" onClick={() => setZoomSignal({ d: 1.5, n: Date.now() })} aria-label={t(UI.zoomIn, lang)}>
+              <Icon name="zoomIn" size={18} />
+            </button>
+            <button class="mscreen__zoombtn" onClick={() => setZoomSignal({ d: 1 / 1.5, n: Date.now() })} aria-label={t(UI.zoomOut, lang)}>
+              <Icon name="zoomOut" size={18} />
+            </button>
+          </div>
+        )}
         {levelSite && (
           <button class="mscreen__chipbtn mscreen__chipbtn--exit" onClick={() => setSiteLevel(null)}>
             <Icon name="map" size={16} /> {t(UI.countryMap, lang)}
@@ -239,7 +268,7 @@ export function MapScreen() {
         <div class="mhint" role="status">
           <Icon name="compass" size={18} />
           <span>{t(UI.hintTap, lang)}</span>
-          <button class="mhint__x" aria-label={t(UI.back, lang)} onClick={markSeen}>
+          <button class="mhint__x" aria-label={t(UI.back, lang)} onClick={dismissHint}>
             <Icon name="close" size={16} />
           </button>
         </div>
@@ -288,7 +317,7 @@ export function MapScreen() {
               </div>
             </div>
             <div class="msheet__body">
-              <p class="msheet__summary">{t(selected.summary, lang)}</p>
+              <p class="msheet__summary msheet__summary--clip">{t(selected.summary, lang)}</p>
               {expanded &&
                 selected.spots.map((sp, i) => {
                   const ok = isSpotUnlocked(selected.entityId, sp.spotId);

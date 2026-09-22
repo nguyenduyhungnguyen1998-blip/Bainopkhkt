@@ -42,6 +42,8 @@ interface Props {
   onboard: boolean;
   /** Tăng giá trị để ra lệnh bay về node "tiếp theo" (nút "Về hành trình"). */
   homeSignal: number;
+  /** {d, n}: đổi n để zoom quanh tâm khung nhìn (nút +/-, tiện cho người không pinch được). */
+  zoomSignal?: { d: number; n: number };
   onSelect(id: string | null): void;
   onTransform?(t: Transform): void;
   onOnboardDone?(): void;
@@ -99,6 +101,7 @@ export function VietnamMap({
   lang,
   onboard,
   homeSignal,
+  zoomSignal,
   onSelect,
   onTransform,
   onOnboardDone,
@@ -241,11 +244,21 @@ export function VietnamMap({
     animateTo(fitBox({ ...box, x: box.x - 40, w: box.w + 120 }, MAP_WIDTH, MAP_HEIGHT, 3.2));
   }, [focus, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Nút "Về hành trình"
-  const lastHome = useRef(homeSignal);
+  // Nút zoom +/- : nhân k quanh tâm khung nhìn (điểm map dưới tâm giữ nguyên).
+  const lastZoom = useRef(zoomSignal);
   useEffect(() => {
-    if (homeSignal === lastHome.current) return;
-    lastHome.current = homeSignal;
+    if (!zoomSignal || zoomSignal === lastZoom.current) return;
+    lastZoom.current = zoomSignal;
+    const t = getTransform();
+    const k2 = Math.min(6, Math.max(0.9, t.k * zoomSignal.d));
+    const f = k2 / t.k;
+    animateTo({ k: k2, tx: MAP_WIDTH / 2 - (MAP_WIDTH / 2 - t.tx) * f, ty: MAP_HEIGHT / 2 - (MAP_HEIGHT / 2 - t.ty) * f }, 280);
+  }, [zoomSignal, animateTo, getTransform]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const lastHome2 = useRef(homeSignal);
+  useEffect(() => {
+    if (homeSignal === lastHome2.current) return;
+    lastHome2.current = homeSignal;
     animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 600);
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 

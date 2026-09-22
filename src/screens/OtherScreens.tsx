@@ -58,15 +58,22 @@ export function PassportScreen() {
 
       <section class="mdv-card ppass__quote">“{t(UI.journeyQuote, lang)}”</section>
 
+      {doneSpots === 0 && (
+        <a class="mdv-btn mdv-btn--primary ppass__cta" href={routeHref.map}>
+          {t(UI.startScanning, lang)}
+        </a>
+      )}
+
       <PassportTools lang={lang} />
 
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
         <div class="ppass__badges">
           {computeAchievements(p).map((a) => (
-            <div key={a.id} class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`}>
+            <div key={a.id} class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`} title={t(a.need, lang)}>
               <Icon name={a.icon} size={26} />
               <b>{t(a.name, lang)}</b>
+              <small class="ppass__need">{t(a.need, lang)}</small>
               <small>{a.unlocked ? t(UI.earned, lang) : t(UI.badgeLocked, lang)}</small>
             </div>
           ))}
@@ -220,6 +227,10 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   };
 
   if (done) {
+    // Gợi ý điểm có quiz kế tiếp chưa làm – tránh màn kết quả thành ngõ cụt.
+    const nextQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ site: s, spot: sp }))).find(
+      ({ site: s, spot: sp }) => quizBest(s.entityId, sp.spotId) === undefined
+    );
     return (
       <main class="mdv-screen">
         <div class="mdv-card quiz__result">
@@ -241,6 +252,11 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
               {t(UI.back, lang)}
             </button>
           </div>
+          {nextQuiz && (
+            <a class="quiz__nextlink" href={routeHref.destination(nextQuiz.site.entityId, nextQuiz.spot.spotId)}>
+              {t(UI.quizNextSpot, lang)}: {t(nextQuiz.spot.name, lang)} →
+            </a>
+          )}
         </div>
       </main>
     );
@@ -250,6 +266,9 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
+        <button class="mdv-btn mdv-btn--icon" onClick={onExit} aria-label={t(UI.back, lang)}>
+          <Icon name="back" size={18} />
+        </button>
         <div>
           <span class="mdv-eyebrow">{t(spot.name, lang)}</span>
           <h1>

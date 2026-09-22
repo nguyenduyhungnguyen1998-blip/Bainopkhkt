@@ -13,6 +13,9 @@ let current: Lang = (() => {
   return 'vi';
 })();
 
+// Đồng bộ <html lang> với lựa chọn đã lưu ngay từ lần tải đầu (SR đọc đúng ngôn ngữ).
+if (typeof document !== 'undefined') document.documentElement.lang = current;
+
 export function getLang(): Lang {
   return current;
 }
@@ -68,6 +71,12 @@ export const UI = {
   quizNextSpot: { vi: 'Điểm tiếp theo có thử thách', en: 'Next spot with a quiz' },
   zoomIn: { vi: 'Phóng to', en: 'Zoom in' },
   zoomOut: { vi: 'Thu nhỏ', en: 'Zoom out' },
+  zoomControls: { vi: 'Nút thu phóng', en: 'Zoom controls' },
+  regionFilter: { vi: 'Lọc vùng', en: 'Filter region' },
+  dismiss: { vi: 'Đóng', en: 'Dismiss' },
+  playbackSpeed: { vi: 'Tốc độ đọc', en: 'Playback speed' },
+  audioProgress: { vi: 'Tiến độ nghe', en: 'Listening progress' },
+  aspects: { vi: 'Khía cạnh', en: 'Aspects' },
   videoSoon: { vi: 'Đang ghi hình tại hiện trường – bạn nghe thuyết minh trước nhé', en: 'Filming on site – try the audio narration meanwhile' },
   videoOffline: { vi: 'Video cần mạng – nghe audio bên dưới nhé', en: 'Video needs network – try the audio below' },
   listen: { vi: 'Nghe thuyết minh', en: 'Listen' },

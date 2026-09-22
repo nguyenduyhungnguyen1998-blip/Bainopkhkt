@@ -112,37 +112,42 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
               key={nd.spotId}
               class={`vnode ${nd.unlocked ? 'vnode--done' : nd.next ? 'vnode--next' : 'vnode--locked'}`}
               style={{ transform: `translate(${nd.x}px, ${nd.y}px) scale(calc(1 / var(--k, 1)))` }}
-              role="button"
-              tabIndex={0}
-              aria-label={t(spot.name, lang)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onOpenSpot(nd.spotId);
-                }
-              }}
             >
-              <circle class="vnode__hit" r={HIT_R} />
-              {nd.next && <circle class="vnode__pulse" r={NODE_R + 4} />}
-              {nd.next && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
-              <circle class="vnode__body" r={NODE_R} />
-              {nd.unlocked ? (
-                <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
-              ) : nd.next ? (
-                <text class="vnode__num" text-anchor="middle" dominant-baseline="central">
+              <g
+                role="button"
+                tabindex={0}
+                focusable="true"
+                aria-label={t(spot.name, lang)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenSpot(nd.spotId);
+                  }
+                }}
+              >
+                <circle class="vnode__hit" r={HIT_R} />
+                {nd.next && <circle class="vnode__pulse" r={NODE_R + 4} />}
+                {nd.next && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
+                <circle class="vnode__body" r={NODE_R} />
+                {nd.unlocked ? (
+                  <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
+                ) : nd.next ? null : (
+                  <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
+                )}
+                <text
+                  class="vnode__label"
+                  x={nd.labelSide === 'right' ? NODE_R + 12 : -(NODE_R + 12)}
+                  text-anchor={nd.labelSide === 'right' ? 'start' : 'end'}
+                  dominant-baseline="central"
+                >
+                  {t(spot.name, lang)}
+                </text>
+              </g>
+              {nd.next && !nd.unlocked && (
+                <text class="vnode__num" text-anchor="middle" dominant-baseline="central" aria-hidden="true" pointer-events="none">
                   {i + 1}
                 </text>
-              ) : (
-                <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
               )}
-              <text
-                class="vnode__label"
-                x={nd.labelSide === 'right' ? NODE_R + 12 : -(NODE_R + 12)}
-                text-anchor={nd.labelSide === 'right' ? 'start' : 'end'}
-                dominant-baseline="central"
-              >
-                {t(spot.name, lang)}
-              </text>
             </g>
           );
         })}

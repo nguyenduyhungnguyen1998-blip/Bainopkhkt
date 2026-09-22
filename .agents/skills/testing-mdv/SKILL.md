@@ -21,7 +21,9 @@ description: How to run & UI-test the Mở Dấu Việt Preact PWA in this repo 
 Chrome headful min width ~500px — for 390px mobile use CDP emulation:
 - `websocket-client` python pkg needed (`pip3 install websocket-client`); MUST pass `suppress_origin=True` to `create_connection` or Chrome 403s the WS handshake.
 - `Emulation.setDeviceMetricsOverride {width:390, height:844, deviceScaleFactor:1, mobile:true}` → page renders top-left of window.
+- **`Emulation.setDeviceMetricsOverride` is SESSION-scoped** — the override is cleared when the WS connection closes. Re-apply it on EVERY new connection (wrap it in your connect helper), or later evals/screenshots silently run at desktop width.
 - `Page.captureScreenshot` returns clean phone-frame PNGs (better evidence than desktop screenshots); `Input.dispatchMouseEvent` coords are CSS px of the emulated viewport.
+- `create_connection` defaults to a blocking `recv()` — call `ws.settimeout(n)` or evals that never settle (e.g. destroyed by an in-page reload) hang forever with no error.
 
 ## Map-specific gotchas
 - Node tap targets: use `.vnode__hit` circle's `getBoundingClientRect()` center — the `<g>` bbox includes the label text, its center is NOT on the node.
@@ -35,6 +37,10 @@ Chrome headful min width ~500px — for 390px mobile use CDP emulation:
 - Hidden `<input type=file>` (passport import): drive via CDP `DOM.enable` → `DOM.getDocument` → `DOM.querySelector` → `DOM.setFileInputFiles` — fires the real change handler.
 - Downloads (passport export): enable via `Browser.setDownloadBehavior` on the BROWSER websocket (`/json/version` → webSocketDebuggerUrl) with `downloadPath` — `Page.setDownloadBehavior` alone may not capture.
 - lang change needs a REAL `Page.reload` (module-level cache) — hash navigation won't re-init; localStorage.setItem('mdv.lang','en') + reload.
+- Same for `mdv.theme` — the inline boot script in index.html only applies it at document load.
+- Settings theme chips are labelled `Nguyệt Quang (tối)` / `Thái Dương (sáng)` — don't grep for plain 'Sáng'/'Tối'.
+- SW sanity: don't trust `register()` resolving — check `getRegistration().active` after a real reload. A registration object with all-null workers = install failed. (On this branch install throws `Cache.addAll(): duplicate requests` because `/index.html` is both in PRECACHE and appended as OFFLINE_URL — offline is broken until gen-sw dedupes.)
+- SVG `tabIndex` on `<g>` renders camelCase attr → NOT keyboard-focusable: Tab order skips all `.vnode` nodes and `.focus()` no-ops. To verify keydown wiring, dispatch `new KeyboardEvent('keydown',{key:'Enter',bubbles:true})` on the `g[role=button]` instead.
 - `?debug=1` needs query BEFORE hash: `?debug=1#/map`. Signed scan URLs: `#/d/<site>/<spot>?s=<sig>` — generate via `node scripts/sign-qr.mjs`.
 - This box has 0 TTS voices → utterances error instantly → cards/probe hit the fallback path; to verify real playback you'd need espeak voices.
 - Errorlog introspection: `await import('/src/debug/errorlog.ts').then(m=>m.getErrors())` in Runtime.evaluate (vite serves source modules).

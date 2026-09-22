@@ -1,0 +1,34 @@
+{
+  "name": "mo-dau-viet",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Mở Dấu Việt – nền tảng du lịch thông minh định danh văn hóa Việt (PWA + QR)",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "postbuild": "node scripts/gen-sw.mjs",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit",
+    "validate": "node scripts/validate-content.mjs",
+    "map:build": "node scripts/build-map.mjs",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run validate && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.6",
+    "@types/d3-geo": "^3.1.1",
+    "@types/topojson-client": "^3.1.5",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1",
+    "world-atlas": "^2.0.2"
+  },
+  "dependencies": {
+    "preact": "^10.29.8"
+  }
+}

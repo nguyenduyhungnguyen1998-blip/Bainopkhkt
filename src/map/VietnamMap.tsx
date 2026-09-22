@@ -453,7 +453,8 @@ function MapNodeView({
     >
       <g
         role="button"
-        tabIndex={0}
+        tabindex={0}
+        focusable="true"
         aria-label={`${t(site.name, lang)} – ${status}`}
         aria-pressed={selected}
         onKeyDown={(e) => {

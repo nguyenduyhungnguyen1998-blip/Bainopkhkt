@@ -44,7 +44,7 @@ self.addEventListener('install', (e) => {
   e.waitUntil(
     caches
       .open(PRE)
-      .then((c) => c.addAll(PRECACHE.concat([OFFLINE_URL])))
+      .then((c) => c.addAll([...new Set([...PRECACHE, OFFLINE_URL])]))
       .then(() => self.skipWaiting())
   );
 });

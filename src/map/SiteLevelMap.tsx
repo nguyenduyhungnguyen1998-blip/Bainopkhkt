@@ -115,7 +115,8 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
             >
               <g
                 role="button"
-                tabIndex={0}
+                tabindex={0}
+                focusable="true"
                 aria-label={t(spot.name, lang)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {

@@ -1,0 +1,345 @@
+@import './fonts.css';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  transition: background-color var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+
+#app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+}
+h2 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+}
+h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+a {
+  color: var(--color-accent-primary-text);
+  text-decoration: none;
+}
+p a,
+figcaption a {
+  text-decoration: underline;
+}
+
+.mdv-btn {
+  text-decoration: none;
+}
+
+/* Họa tiết trống đồng chìm dưới nền */
+.mdv-bg-pattern {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle at 50% 50%, transparent 0 38%, currentColor 38.5% 39%, transparent 39.5% 46%, currentColor 46.5% 47%, transparent 47.5%);
+  background-size: 420px 420px;
+  background-position: center;
+  color: var(--color-text);
+  opacity: 0.035;
+}
+
+/* Khu vực màn hình */
+.mdv-screen {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) calc(96px + env(safe-area-inset-bottom));
+  max-width: 560px;
+  width: 100%;
+  margin: 0 auto;
+  animation: mdv-screen-in var(--dur-base) var(--ease-out);
+}
+
+@keyframes mdv-screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mdv-screen__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.mdv-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent-secondary-text);
+}
+
+.mdv-muted {
+  color: var(--color-text-muted);
+}
+
+/* Thẻ kính mờ */
+.mdv-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+}
+
+html[data-no-blur='1'] .mdv-card {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--color-surface-solid);
+}
+
+/* Nút */
+.mdv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.mdv-btn:active {
+  transform: scale(0.97);
+}
+.mdv-btn--primary {
+  background: var(--color-accent-primary);
+  color: var(--color-on-primary);
+  box-shadow: 0 6px 18px rgb(200 75 49 / 0.35);
+}
+.mdv-btn--ghost {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+.mdv-btn--icon {
+  width: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Chip */
+.mdv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background-color var(--dur-fast), color var(--dur-fast);
+}
+.mdv-chip[aria-pressed='true'] {
+  background: var(--color-accent-secondary);
+  color: var(--color-on-secondary);
+  border-color: transparent;
+}
+
+/* Phản hồi chạm cho mọi bề mặt bấm được (chip/dòng list/option) */
+.mdv-chip:active,
+.quiz__opt:active,
+.quiz__row:active,
+.dest__spot:active,
+.mscreen__chipbtn:active {
+  transform: scale(0.96);
+}
+
+/* Thanh cuộn mảnh nhưng nhìn thấy – user cần dấu hiệu có thể cuộn */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong, var(--color-border));
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong, var(--color-border)) transparent;
+}
+
+/* Huy hiệu trạng thái */
+.mdv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.mdv-badge--unlocked {
+  background: var(--color-accent-tertiary);
+  color: var(--color-on-tertiary);
+}
+.mdv-badge--next {
+  background: var(--color-accent-secondary);
+  color: var(--color-on-secondary);
+}
+.mdv-badge--locked {
+  background: var(--color-locked);
+  color: #fff;
+}
+
+/* Dock nổi */
+.mdv-dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  gap: 2px;
+  padding: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  border: 1px solid rgb(255 213 106 / 0.35);
+  box-shadow: var(--shadow-card);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
+  width: min(520px, calc(100% - var(--space-6)));
+}
+.mdv-dock__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  transition: color var(--dur-fast), background-color var(--dur-fast);
+}
+.mdv-dock__item svg {
+  width: 22px;
+  height: 22px;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.mdv-dock__item[aria-current='page'] {
+  color: var(--color-on-secondary);
+  background: var(--color-accent-secondary);
+}
+.mdv-dock__item[aria-current='page'] svg {
+  transform: translateY(-2px);
+}
+
+/* Dải trạng thái offline */
+.mdv-offline-bar {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 4px 14px;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  background: var(--color-accent-secondary);
+  color: var(--color-on-secondary);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+/* Utility */
+.mdv-visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

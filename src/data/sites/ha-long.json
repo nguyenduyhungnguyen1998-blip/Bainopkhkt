@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "entityId": "ha-long",
+  "name": { "vi": "Vịnh Hạ Long", "en": "Ha Long Bay" },
+  "province": { "vi": "Quảng Ninh", "en": "Quang Ninh" },
+  "region": "bac",
+  "themeContext": "tu-nhien",
+  "coords": [107.08, 20.91],
+  "journeyOrder": 2,
+  "heroImage": "/img/ha-long/hero.svg",
+  "summary": {
+    "vi": "Gần 2.000 đảo đá vôi giữa biển xanh – Di sản thiên nhiên thế giới được UNESCO công nhận năm 1994.",
+    "en": "Nearly 2,000 limestone islands rising from emerald water – a UNESCO World Heritage Site since 1994."
+  },
+  "gamificationConfig": {
+    "badge": { "id": "rong-ha-long", "name": { "vi": "Rồng hạ long", "en": "Descending Dragon" }, "icon": "wave" },
+    "completionBonusXp": 80
+  },
+  "spots": [
+    {
+      "spotId": "hang-sung-sot",
+      "name": { "vi": "Hang Sửng Sốt", "en": "Surprise Cave" },
+      "xp": 40,
+      "layoutSchema": [
+        { "type": "hero", "size": "lg", "image": "/img/ha-long/hero.svg" },
+        { "type": "aspects", "size": "lg", "aspects": [
+          { "id": "tu-nhien", "title": { "vi": "Tự nhiên", "en": "Nature" }, "body": { "vi": "Hang nằm trên đảo Bồ Hòn, rộng hơn 10.000 m², với hai ngăn lớn và trần hang cao như một nhà hát tự nhiên.", "en": "Located on Bo Hon Island, the cave spans over 10,000 m² with two vast chambers and a ceiling as high as a natural theatre." } },
+          { "id": "truyen-thuyet", "title": { "vi": "Truyền thuyết", "en": "Legend" }, "body": { "vi": "Tên Hạ Long nghĩa là \"rồng hạ xuống\": truyền thuyết kể rằng rồng mẹ và đàn rồng con phun ngọc tạo thành các đảo đá chắn giặc ngoài biển.", "en": "Ha Long means \"descending dragon\": legend says a mother dragon and her children spat pearls that became islands shielding the land from invaders." } }
+        ] },
+        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Hang Sửng Sốt", "en": "Narrated clip: Surprise Cave" } },
+        { "type": "audio", "size": "md", "ambient": "wind-water", "script": {
+          "vi": ["Bạn đang ở giữa vịnh Hạ Long, nơi gần hai nghìn đảo đá vôi nhô lên từ biển.", "Hang Sửng Sốt là một trong những hang đẹp nhất của vịnh."],
+          "en": ["You are in the heart of Ha Long Bay, where nearly two thousand limestone islands rise from the sea.", "Surprise Cave is among the most beautiful caves of the bay."]
+        } }
+      ],
+      "sources": [ { "title": "UNESCO World Heritage Centre – Ha Long Bay", "url": "https://whc.unesco.org/en/list/672", "reviewed": false } ],
+      "quiz": [
+        { "q": { "vi": "Hang Sửng Sốt nằm trên đảo nào?", "en": "Which island is Sung Sot Cave on?" }, "options": [{ "vi": "Đảo Bồ Hòn", "en": "Bo Hon Island" }, { "vi": "Đảo Cát Bà", "en": "Cat Ba Island" }, { "vi": "Đảo Tuần Châu", "en": "Tuan Chau Island" }, { "vi": "Đảo Cô Tô", "en": "Co To Island" }], "answer": 0 },
+        { "q": { "vi": "Hang Sửng Sốt rộng khoảng bao nhiêu?", "en": "Roughly how large is Sung Sot Cave?" }, "options": [{ "vi": "1.000 m²", "en": "1,000 m²" }, { "vi": "10.000 m²", "en": "10,000 m²" }, { "vi": "100.000 m²", "en": "100,000 m²" }, { "vi": "1.000.000 m²", "en": "1,000,000 m²" }], "answer": 1 },
+        { "q": { "vi": "Tên Hạ Long nghĩa là gì?", "en": "What does 'Ha Long' mean?" }, "options": [{ "vi": "Rồng bay lên", "en": "Ascending dragon" }, { "vi": "Rồng hạ xuống", "en": "Descending dragon" }, { "vi": "Rồng nằm nghỉ", "en": "Resting dragon" }, { "vi": "Rồng đá", "en": "Stone dragon" }], "answer": 1 }
+      ]
+    }
+  ]
+}

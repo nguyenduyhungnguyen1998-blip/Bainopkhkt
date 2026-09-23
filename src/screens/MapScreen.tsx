@@ -8,6 +8,7 @@ import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProg
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
+import { asset } from '../lib/asset';
 import './map-screen.css';
 
 const FILTERS: { id: MapFocus; label: keyof typeof UI }[] = [
@@ -24,12 +25,15 @@ const SHEET_PEEK = 0.4; // 40% chiều cao màn hình
 const SHEET_FULL = 0.9; // 90% khi kéo lên
 const SITE_ZOOM_K = 4.6; // zoom sâu hơn mức này vào khu nhiều điểm -> mở sơ đồ cấp 2
 
+// Trạng thái bản đồ giữa các lần điều hướng: quay từ trang di tích về đúng zoom/vùng/lựa chọn cũ.
+let mapMem: { t: Transform | null; focus: MapFocus; site: string | null; sel: string | null } | null = null;
+
 export function MapScreen() {
   const [lang] = useLang();
   const progress = useProgress();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focus, setFocus] = useState<MapFocus>('all');
-  const [siteLevel, setSiteLevel] = useState<string | null>(null); // entityId của khu đang xem sơ đồ
+  const [selectedId, setSelectedId] = useState<string | null>(mapMem?.sel ?? null);
+  const [focus, setFocus] = useState<MapFocus>(mapMem?.focus ?? 'all');
+  const [siteLevel, setSiteLevel] = useState<string | null>(mapMem?.site ?? null); // entityId của khu đang xem sơ đồ
   const [hintOn, setHintOn] = useState(() => {
     try {
       return !localStorage.getItem(HINT_KEY);
@@ -49,7 +53,24 @@ export function MapScreen() {
   const [nextOffscreen, setNextOffscreen] = useState(false);
   const [toast, setToast] = useState<{ xp: number; seq: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [flyReq, setFlyReq] = useState<{ x: number; y: number; k: number; n: number } | undefined>();
   const toastTimer = useRef(0);
+  const tRef = useRef<Transform | null>(mapMem?.t ?? null); // transform mới nhất để lưu trạng thái
+  const keepMem = useRef(false); // khi dive-then-navigate: mem đã chốt trước lúc bay, unmount không ghi đè
+  const divingNav = useRef(false); // đang fly-to để điều hướng -> chặn auto-mở sơ đồ khi k>4.6
+  const flyDone = useRef<() => void>(() => {});
+
+  // Lưu trạng thái bản đồ khi rời màn hình (điều hướng sang di tích/quiz/...).
+  useEffect(
+    () => () => {
+      if (keepMem.current) {
+        keepMem.current = false;
+        return;
+      }
+      mapMem = { t: tRef.current, focus, site: siteLevel, sel: selectedId };
+    },
+    [focus, siteLevel, selectedId]
+  );
 
   const statuses = useMemo(() => computeStatuses(progress), [progress]);
   const progressBySite = useMemo(
@@ -148,7 +169,8 @@ export function MapScreen() {
   // zoom rất sâu vào khu có nhiều điểm -> mở sơ đồ cấp 2.
   const offscreenRef = useRef(false);
   const onMapTransform = (t: Transform) => {
-    if (siteLevel) return;
+    tRef.current = t;
+    if (siteLevel || divingNav.current) return;
     const next: MapNode | undefined =
       nodesRef.current.find((n) => n.status === 'next') ?? nodesRef.current.find((n) => n.status === 'active');
     let off = false;
@@ -266,6 +288,12 @@ export function MapScreen() {
             onboard={cinema}
             homeSignal={homeSignal}
             zoomSignal={zoomSignal}
+            flyRequest={flyReq}
+            onFlyDone={() => {
+              divingNav.current = false;
+              flyDone.current();
+            }}
+            initialTransform={mapMem?.t ?? undefined}
             onSelect={(id) => { setSelectedId(id); if (hintOn) dismissHint(); }}
             onTransform={onMapTransform}
             onOnboardDone={markSeen}
@@ -348,7 +376,7 @@ export function MapScreen() {
               <Icon name="close" size={20} />
             </button>
             <div class="msheet__head">
-              <img class="msheet__img" src={selected.heroImage} alt="" loading="lazy" />
+              <img class="msheet__img" src={asset(selected.heroImage)} alt="" loading="lazy" />
               <div>
                 <span class={`mdv-badge mdv-badge--${selectedStatus === 'locked' ? 'locked' : selectedStatus === 'next' ? 'next' : 'unlocked'}`}>
                   {selectedStatus === 'locked'
@@ -378,11 +406,37 @@ export function MapScreen() {
                 })}
             </div>
             <div class="msheet__actions">
-              <a class="mdv-btn mdv-btn--primary" href={routeHref.destination(selected.entityId)}>
+              <button
+                class="mdv-btn mdv-btn--primary"
+                onClick={() => {
+                  // Fly-to: chốt trạng thái pre-dive rồi camera lao vào node trước khi mở trang di tích.
+                  const n = nodes.find((nd) => nd.site.entityId === selected.entityId);
+                  if (!n) return navigate(`d/${selected.entityId}`);
+                  mapMem = { t: tRef.current, focus, site: siteLevel, sel: selectedId };
+                  keepMem.current = true;
+                  divingNav.current = true;
+                  flyDone.current = () => navigate(`d/${selected.entityId}`);
+                  setFlyReq({ x: n.x, y: n.y, k: 5.1, n: Date.now() });
+                  try {
+                    navigator.vibrate?.(10);
+                  } catch {
+                    /* bỏ qua */
+                  }
+                }}
+              >
                 <Icon name="compass" size={20} /> {t(UI.explore, lang)}
-              </a>
+              </button>
               {selected.spots.length > 1 && (
-                <button class="mdv-btn mdv-btn--ghost" onClick={() => { setSelectedId(null); setSiteLevel(selected.entityId); }}>
+                <button
+                  class="mdv-btn mdv-btn--ghost"
+                  onClick={() => {
+                    // Camera lao sâu vào khu; khi k vượt SITE_ZOOM_K cơ chế zoom sẽ tự mở sơ đồ.
+                    const n = nodes.find((nd) => nd.site.entityId === selected.entityId);
+                    setSelectedId(null);
+                    if (n) setFlyReq({ x: n.x, y: n.y, k: SITE_ZOOM_K + 0.6, n: Date.now() });
+                    else setSiteLevel(selected.entityId);
+                  }}
+                >
                   <Icon name="layers" size={20} /> {t(UI.siteMap, lang)}
                 </button>
               )}

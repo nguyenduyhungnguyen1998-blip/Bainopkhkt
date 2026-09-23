@@ -26,6 +26,7 @@ const PATHS: Record<string, string> = {
   pause: 'M8 5v14M16 5v14',
   warn: 'M12 3 2.5 20h19L12 3Zm0 7v4m0 3v.01',
   leaf: 'M5 19c0-9 5-13 14-14-1 9-5 14-14 14Zm0 0c3-5 6-8 9-9',
+  share: 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13',
 };
 
 export function Icon({ name, size = 24, class: cls }: { name: string; size?: number; class?: string }) {

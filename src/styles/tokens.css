@@ -34,6 +34,7 @@
   --dur-fast: 120ms;
   --dur-base: 240ms;
   --dur-slow: 600ms;
+  --dur-sheet: 340ms; /* bottom sheet – motion mobile ~300-375ms; 600ms thấy ì khi dùng lặp */
 
   --shadow-card: 0 8px 24px rgb(0 0 0 / 0.28);
   --glass-blur: 10px;

@@ -95,7 +95,8 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
       const svg = svgRef.current!;
       const r = svg.getBoundingClientRect();
       const s = Math.min(r.width / W, r.height / H);
-      const hit = HIT_R / s / getTransform().k;
+      const k = getTransform().k;
+      const hit = HIT_R / s / k;
       let best: SpotNode | null = null;
       let bestD = Infinity;
       for (const nd of nodesRef.current) {
@@ -103,6 +104,17 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
         if (d < hit && d < bestD) {
           best = nd;
           bestD = d;
+          continue;
+        }
+        // Nhãn tên điểm cũng bấm được (cùng cơ chế counter-scale như bản đồ quốc gia).
+        const spot = site.spots.find((sp) => sp.spotId === nd.spotId);
+        const labelW = (7.5 * (spot ? t(spot.name, lang).length : 12) + 10) / k;
+        const lx0 = nd.labelSide === 'right' ? nd.x + (NODE_R + 4) / k : nd.x - (NODE_R + 4) / k - labelW;
+        if (mx >= lx0 && mx <= lx0 + labelW && Math.abs(my - nd.y) < 11 / k) {
+          if (d < bestD) {
+            best = nd;
+            bestD = d;
+          }
         }
       }
       if (best) onOpenSpot(best.spotId);

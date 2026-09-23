@@ -155,7 +155,7 @@
   display: flex;
   flex-direction: column;
   transform: translate(-50%, 105%);
-  transition: transform var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-sheet) var(--ease-out), height var(--dur-sheet) var(--ease-out);
   z-index: 40;
   padding: 0 var(--space-4) calc(100px + env(safe-area-inset-bottom));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;

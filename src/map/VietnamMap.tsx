@@ -44,6 +44,11 @@ interface Props {
   homeSignal: number;
   /** {d, n}: đổi n để zoom quanh tâm khung nhìn (nút +/-, tiện cho người không pinch được). */
   zoomSignal?: { d: number; n: number };
+  /** {x,y,k,n}: đổi n để camera "lao" vào điểm theo đường log-k (fly-to Earth). */
+  flyRequest?: { x: number; y: number; k: number; n: number };
+  onFlyDone?(): void;
+  /** Transform khởi tạo khác mặc định – dùng để khôi phục trạng thái khi quay lại. */
+  initialTransform?: Transform;
   onSelect(id: string | null): void;
   onTransform?(t: Transform): void;
   onOnboardDone?(): void;
@@ -102,6 +107,9 @@ export function VietnamMap({
   onboard,
   homeSignal,
   zoomSignal,
+  flyRequest,
+  onFlyDone,
+  initialTransform,
   onSelect,
   onTransform,
   onOnboardDone,
@@ -124,7 +132,7 @@ export function VietnamMap({
     viewH: MAP_HEIGHT,
     minK: 0.9,
     maxK: 6,
-    initial: ALL_TRANSFORM,
+    initial: initialTransform ?? ALL_TRANSFORM,
     onChange: (t) => {
       inspector.setTransform(t);
       onTransform?.(t);
@@ -137,7 +145,8 @@ export function VietnamMap({
       const svg = svgRef.current!;
       const r = svg.getBoundingClientRect();
       const s = Math.min(r.width / MAP_WIDTH, r.height / MAP_HEIGHT);
-      const hit = HIT_R / s / getTransform().k; // 22px màn hình -> đơn vị bản đồ
+      const k = getTransform().k;
+      const hit = HIT_R / s / k; // 22px màn hình -> đơn vị bản đồ
       let best: MapNode | null = null;
       let bestD = Infinity;
       for (const n of nodesRef.current) {
@@ -145,6 +154,19 @@ export function VietnamMap({
         if (d < hit && d < bestD) {
           best = n;
           bestD = d;
+          continue;
+        }
+        // Nhãn tên địa danh cũng là vùng chạm: text nằm trong nhóm counter-scale 1/k
+        // nên offset/rộng tính theo đơn vị bản đồ = px/k. Font 15px ~ 7.5px/ký tự.
+        const labelW = (7.5 * t(n.site.name, lang).length + 10) / k;
+        const lx0 = n.labelSide === 'right' ? n.x + (NODE_R + 4) / k : n.x - (NODE_R + 4) / k - labelW;
+        const inLabel = mx >= lx0 && mx <= lx0 + labelW && Math.abs(my - n.y) < 11 / k;
+        if (inLabel) {
+          const dl = Math.hypot(n.x - mx, n.y - my);
+          if (dl < bestD) {
+            best = n;
+            bestD = dl;
+          }
         }
       }
       onSelect(best ? best.site.entityId : null);
@@ -227,7 +249,8 @@ export function VietnamMap({
   useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
-      if (focus === 'all') return;
+      // Restore map (initialTransform): trạng thái đã đúng vị trí, không animate lại lần đầu.
+      if (focus === 'all' || initialTransform) return;
     }
     if (focus === 'all') {
       animateTo(ALL_TRANSFORM);
@@ -261,6 +284,14 @@ export function VietnamMap({
     lastHome2.current = homeSignal;
     animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 600);
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fly-to: camera "lao" vào điểm theo đường log-k rồi báo xong (mở sơ đồ/điều hướng).
+  const lastFly = useRef(flyRequest);
+  useEffect(() => {
+    if (!flyRequest || flyRequest === lastFly.current) return;
+    lastFly.current = flyRequest;
+    void animateTo(focusPoint(flyRequest.x, flyRequest.y, flyRequest.k), 640, true).then(() => onFlyDone?.());
+  }, [flyRequest, animateTo, onFlyDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const archi = ARCHIPELAGOS.map((a) => ({ ...a, p: project(a.lon, a.lat) }));
 

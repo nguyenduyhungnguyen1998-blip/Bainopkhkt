@@ -7,6 +7,7 @@ import { getSpot, getSite } from '../data/content';
 import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
+import { asset } from '../lib/asset';
 import { isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
@@ -32,6 +33,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
     );
   }
   const { site, spot } = found;
+  const mode = getExploreMode();
   const idx = site.spots.indexOf(spot);
   const prev = site.spots[idx - 1];
   const next = site.spots[idx + 1];
@@ -77,7 +79,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} />
+          <CardView key={i} card={card} lang={lang} mode={mode} />
         ))}
       </div>
 
@@ -214,7 +216,7 @@ function SiteIntro({ site }: { site: Site }) {
         </a>
       </header>
       <figure class="dintro__hero">
-        <img src={site.heroImage} alt={t(site.name, lang)} />
+        <img src={asset(site.heroImage)} alt={t(site.name, lang)} />
       </figure>
       <div class="dintro__body">
         <span class="mdv-eyebrow">{t(site.province, lang)}</span>
@@ -263,21 +265,23 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang }: { card: Card; lang: Lang }) {
+function CardView({ card, lang, mode }: { card: Card; lang: Lang; mode: ExploreMode }) {
   switch (card.type) {
     case 'hero':
       return (
         <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={card.image} alt={t(card.caption, lang)} />
+          <img src={asset(card.image)} alt={t(card.caption, lang)} />
           {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
         </figure>
       );
     case 'aspects':
       return <AspectsCardView card={card} lang={lang} />;
     case 'video':
-      return <VideoCardView card={card} lang={lang} />;
+      // "Văn bản + Hình ảnh": không render thẻ video – lựa chọn hình thức phải thật.
+      return mode === 'text' ? null : <VideoCardView card={card} lang={lang} />;
     case 'audio':
-      return <AudioCardView card={card} lang={lang} />;
+      // "Văn bản + Hình ảnh": audio biến thành bản đọc thuần chữ, không nút TTS/ambient.
+      return mode === 'text' ? <AudioTextView card={card} lang={lang} /> : <AudioCardView card={card} lang={lang} />;
     case 'fact':
       return (
         <div class={`dcard dcard--fact dcard--${card.size}`}>
@@ -288,7 +292,7 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
     case 'image':
       return (
         <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={card.image} alt={t(card.caption, lang)} loading="lazy" />
+          <img src={asset(card.image)} alt={t(card.caption, lang)} loading="lazy" />
           {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
         </figure>
       );
@@ -319,6 +323,19 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   );
 }
 
+/** Bản đọc thuần chữ của thẻ audio – dùng trong chế độ "Văn bản + Hình ảnh". */
+function AudioTextView({ card, lang }: { card: AudioCard; lang: Lang }) {
+  return (
+    <div class={`dcard dcard--audio dcard--${card.size}`}>
+      <ol class="dcard__script">
+        {card.script[lang].map((s, i) => (
+          <li key={i}>{s}</li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 /** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */
 function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const playerRef = useRef<SpeechPlayer | null>(null);
@@ -331,9 +348,11 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   useEffect(
     () => () => {
       playerRef.current?.stop();
-      // Không tắt ambient khi rời thẻ – người nghe có thể muốn giữ nền; HUD/D4 tắt được.
+      // Rời điểm là tắt cả âm nền – không để tiếng chạy lửng lơ không nút tắt ở màn khác.
+      if (ambientOn) stopAmbient();
     },
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ambientOn]
   );
 
   const toggle = () => {

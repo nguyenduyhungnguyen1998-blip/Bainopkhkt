@@ -304,6 +304,25 @@
   stroke: var(--color-bg);
   stroke-width: 1.5;
 }
+/* Ranh giới các lớp sân + giếng (mặt bằng schematic) */
+.smap__band {
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1.5;
+  stroke-dasharray: 6 8;
+  vector-effect: non-scaling-stroke;
+}
+.smap__well {
+  fill: var(--color-sea);
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.smap__well-in {
+  fill: none;
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .vnode__pulse,

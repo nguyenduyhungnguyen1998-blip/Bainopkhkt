@@ -41,12 +41,10 @@ const PRECACHE = ${JSON.stringify(precache, null, 2)};
 const OFFLINE_URL = BASE + '/index.html';
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches
-      .open(PRE)
-      .then((c) => c.addAll([...new Set([...PRECACHE, OFFLINE_URL])]))
-      .then(() => self.skipWaiting())
-  );
+  // KHÔNG skipWaiting ở đây: bản mới nằm chờ, app hiện toast "Có bản mới"
+  // và chỉ chiếm quyền khi user bấm cập nhật (message SKIP_WAITING) –
+  // tránh trang tự reload giữa demo.
+  e.waitUntil(caches.open(PRE).then((c) => c.addAll([...new Set([...PRECACHE, OFFLINE_URL])])));
 });
 
 self.addEventListener('activate', (e) => {

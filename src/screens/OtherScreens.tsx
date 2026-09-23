@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, importPassportJson } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, importPassportJson, isSpotUnlocked } from '../lib/progress';
 import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
@@ -178,10 +178,16 @@ export function QuizScreen() {
               </div>
               {withQuiz.map((sp) => {
                 const best = quizBest(s.entityId, sp.spotId);
+                const locked = !isSpotUnlocked(s.entityId, sp.spotId);
                 return (
                   <button key={sp.spotId} class="quiz__row" onClick={() => setActive({ siteId: s.entityId, spotId: sp.spotId })}>
                     <Icon name="quiz" size={18} />
                     <span class="quiz__name">{t(sp.name, lang)}</span>
+                    {locked && (
+                      <span class="quiz__lock" title={t(UI.quizLockedHint, lang)}>
+                        <Icon name="lock" size={11} /> {t(UI.locked, lang)}
+                      </span>
+                    )}
                     <small class="mdv-muted">
                       {sp.quiz!.length} {lang === 'vi' ? 'câu' : 'qs'}
                       {best !== undefined && ` · ${t(UI.bestScore, lang)} ${best}/${sp.quiz!.length}`}
@@ -246,6 +252,9 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
           <div class="quiz__score">
             {correct}/{quiz.length} <small>{t(UI.quizCorrect, lang)}</small>
           </div>
+          <p class="quiz__praise">
+            {t(correct === quiz.length ? UI.quizPraisePerfect : correct / quiz.length >= 0.6 ? UI.quizPraiseGood : UI.quizPraiseLow, lang)}
+          </p>
           {gained !== null && gained > 0 ? (
             <p class="quiz__xp">+{gained} XP</p>
           ) : (
@@ -284,6 +293,16 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
         </div>
       </header>
       <div class="mdv-card">
+        <div
+          class="quiz__prog"
+          role="progressbar"
+          aria-label={t(UI.quizProgress, lang)}
+          aria-valuemin={0}
+          aria-valuemax={quiz.length}
+          aria-valuenow={idx + (picked !== null ? 1 : 0)}
+        >
+          <span style={{ width: `${((idx + (picked !== null ? 1 : 0)) / quiz.length) * 100}%` }} />
+        </div>
         <p class="quiz__q">{t(q.q, lang)}</p>
         <div class="quiz__opts">
           {q.options.map((o, i) => {

@@ -152,6 +152,12 @@ export function quizBest(siteId: string, spotId: string): number | undefined {
 }
 
 export function resetProgress() {
+  // Reset hành trình -> cho phép finale 9/9 xuất hiện lại ở hành trình mới.
+  try {
+    localStorage.removeItem('mdv.finale.v1');
+  } catch {
+    /* bộ nhớ riêng tư */
+  }
   commit({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] });
 }
 

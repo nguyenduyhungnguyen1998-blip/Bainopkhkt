@@ -3,6 +3,6 @@
 <pattern id="p" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M24 4 44 24 24 44 4 24Z" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="2"/></pattern></defs>
 <rect width="1200" height="800" fill="url(#g)"/><rect width="1200" height="800" fill="url(#p)"/>
 <circle cx="936" cy="240" r="176" fill="#fff" fill-opacity=".08"/>
-<text x="64" y="704" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="56" font-weight="800" fill="#F4F1EA">Nhà Thái Học</text>
-<text x="64" y="752" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="26" fill="#F4F1EA" fill-opacity=".8">Ảnh minh họa tạm – sẽ thay bằng ảnh thực địa</text>
+<text x="600" y="704" text-anchor="middle" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="56" font-weight="800" fill="#F4F1EA">Nhà Thái Học</text>
+<text x="600" y="752" text-anchor="middle" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="26" fill="#F4F1EA" fill-opacity=".8">Ảnh minh họa tạm – sẽ thay bằng ảnh thực địa</text>
 </svg>

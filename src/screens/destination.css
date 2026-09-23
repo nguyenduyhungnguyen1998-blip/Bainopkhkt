@@ -363,6 +363,7 @@ a.dest__crumb--link:active {
   line-height: 1.7;
 }
 .dcard__script[data-reading='true'],
+.dcard__script--show,
 .dcard--audio .dcard__notice + .dcard__script {
   display: block;
 }

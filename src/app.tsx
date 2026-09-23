@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'preact/compat';
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
 import { useRoute } from './lib/router';
 import { useOnline } from './lib/theme';
 import { UI, t, useLang } from './lib/i18n';
@@ -7,6 +7,7 @@ import { Dock } from './components/Dock';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Celebrate } from './components/Celebrate';
 import { applySwUpdate, useSwStatus } from './lib/sw';
+import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
 import { PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
@@ -17,16 +18,7 @@ const DebugHud = lazy(() => import('./debug/hud').then((m) => ({ default: m.Debu
 function useDebugFlag(): boolean {
   const [on, setOn] = useState(false);
   useEffect(() => {
-    const q = new URLSearchParams(location.search).get('debug');
-    let ls: string | null = null;
-    try {
-      ls = localStorage.getItem('mdv.debug');
-      if (q === '1') localStorage.setItem('mdv.debug', '1');
-      if (q === '0') localStorage.removeItem('mdv.debug');
-    } catch {
-      /* ignore */
-    }
-    setOn(q === '1' || (q !== '0' && ls === '1'));
+    setOn(isDebug());
   }, []);
   return on;
 }
@@ -60,9 +52,10 @@ export function App() {
   usePerfGuard();
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
+  // useLayoutEffect để cuộn chạy TRƯỚC paint – không còn 1 frame nội dung mới nằm giữa trang.
   const routeKey =
     route.name === 'destination' ? `d:${route.siteId}/${route.spotId ?? ''}?${route.query}` : route.name === 'notfound' ? route.path : route.name;
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, [routeKey]);
 

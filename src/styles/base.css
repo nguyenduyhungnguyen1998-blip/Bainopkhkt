@@ -358,7 +358,8 @@ html {
 .mdv-update-bar {
   position: fixed;
   left: 50%;
-  bottom: calc(96px + env(safe-area-inset-bottom));
+  /* cạnh trên: banner cập nhật không được che CTA/sheet phía dưới (WCAG – không chắn phần tử đang focus) */
+  top: calc(28px + env(safe-area-inset-top));
   transform: translateX(-50%);
   z-index: 55;
   display: flex;

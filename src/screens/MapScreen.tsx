@@ -9,6 +9,7 @@ import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
 import { asset } from '../lib/asset';
+import { isDebug } from '../lib/debug';
 import './map-screen.css';
 
 const FILTERS: { id: MapFocus; label: keyof typeof UI }[] = [
@@ -54,6 +55,8 @@ export function MapScreen() {
   const [toast, setToast] = useState<{ xp: number; seq: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [flyReq, setFlyReq] = useState<{ x: number; y: number; k: number; n: number } | undefined>();
+  const [mountT, setMountT] = useState<Transform | undefined>(mapMem?.t ?? undefined); // transform khi VietnamMap remount sau sơ đồ khu
+  const deepExit = useRef(false); // vừa thoát sơ đồ khu: chặn auto-mở lại tới khi k tụt hẳn
   const toastTimer = useRef(0);
   const tRef = useRef<Transform | null>(mapMem?.t ?? null); // transform mới nhất để lưu trạng thái
   const keepMem = useRef(false); // khi dive-then-navigate: mem đã chốt trước lúc bay, unmount không ghi đè
@@ -125,8 +128,8 @@ export function MapScreen() {
       if (selectedId) {
         setExpanded(false);
         setSelectedId(null);
-      } else if (siteLevel) {
-        setSiteLevel(null);
+      } else {
+        exitSiteLevel();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -183,7 +186,9 @@ export function MapScreen() {
       offscreenRef.current = off;
       setNextOffscreen(off);
     }
+    if (deepExit.current && t.k <= SITE_ZOOM_K) deepExit.current = false; // đã tụt khỏi ngưỡng -> cho auto-mở lại
     if (t.k > SITE_ZOOM_K) {
+      if (deepExit.current) return;
       const cx = (MAP_WIDTH / 2 - t.tx) / t.k;
       const cy = (MAP_HEIGHT / 2 - t.ty) / t.k;
       let best: MapNode | null = null;
@@ -200,6 +205,17 @@ export function MapScreen() {
         setSiteLevel(best.site.entityId);
       }
     }
+  };
+
+  // Thoát sơ đồ khu: kéo camera ngược ra mức vùng tại đúng khu vừa xem (không đổi màn đột ngột,
+  // và tránh vòng lặp remount ở zoom sâu -> auto-mở lại sơ đồ).
+  const exitSiteLevel = () => {
+    if (!siteLevel) return;
+    deepExit.current = true;
+    const n = nodesRef.current.find((nd) => nd.site.entityId === siteLevel);
+    setSiteLevel(null);
+    setMountT(tRef.current ?? undefined); // VietnamMap remount đúng độ sâu cũ, rồi zoom-out
+    if (n) setFlyReq({ x: n.x, y: n.y, k: 2.4, n: Date.now() });
   };
 
   // Demo: mô phỏng quét QR tại điểm đầu tiên chưa mở của khu đang chọn (P3 thay bằng camera + xác thực).
@@ -262,6 +278,8 @@ export function MapScreen() {
             aria-pressed={focus === f.id}
             onClick={() => {
               setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
+              deepExit.current = true;
+              setMountT(undefined); // remount cảnh toàn quốc rồi focus-anim bay tới vùng
               setSiteLevel(null);
               setFocus(f.id);
             }}
@@ -293,7 +311,7 @@ export function MapScreen() {
               divingNav.current = false;
               flyDone.current();
             }}
-            initialTransform={mapMem?.t ?? undefined}
+            initialTransform={mountT}
             onSelect={(id) => { setSelectedId(id); if (hintOn) dismissHint(); }}
             onTransform={onMapTransform}
             onOnboardDone={markSeen}
@@ -318,7 +336,7 @@ export function MapScreen() {
           </div>
         )}
         {levelSite && (
-          <button class="mscreen__chipbtn mscreen__chipbtn--exit" onClick={() => setSiteLevel(null)}>
+          <button class="mscreen__chipbtn mscreen__chipbtn--exit" onClick={exitSiteLevel}>
             <Icon name="map" size={16} /> {t(UI.countryMap, lang)}
           </button>
         )}
@@ -440,7 +458,7 @@ export function MapScreen() {
                   <Icon name="layers" size={20} /> {t(UI.siteMap, lang)}
                 </button>
               )}
-              {selectedStatus !== 'done' && (
+              {isDebug() && selectedStatus !== 'done' && (
                 <button class="mdv-btn mdv-btn--ghost" onClick={simulateScan} title={t(UI.scanToUnlock, lang)}>
                   <Icon name="qr" size={20} /> {t(UI.simulateScan, lang)}
                 </button>

@@ -207,6 +207,34 @@ export function importPassportJson(json: string): boolean {
   }
 }
 
+/** Đọc file sao lưu mà không ghi đè – trả tóm tắt để hiện bản xem trước trước khi xác nhận. */
+export function previewPassportJson(json: string): { progress: Progress; spots: number; xp: number; exportedAt: string | null } | null {
+  try {
+    const raw = JSON.parse(json) as { kind?: string; progress?: unknown; exportedAt?: string };
+    if (raw?.kind !== 'passport') return null;
+    const p = migrate(raw.progress);
+    if (!p) return null;
+    return { progress: p, spots: Object.keys(p.unlocked).length, xp: p.xp, exportedAt: raw.exportedAt ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Áp bản sao đã xem trước: 'replace' ghi đè toàn bộ;
+ * 'merge' hợp nhất điểm đã mở + lấy điểm quiz cao hơn + XP lấy mức lớn hơn + hợp nhất huy hiệu.
+ */
+export function applyPassportImport(p: Progress, mode: 'merge' | 'replace'): void {
+  if (mode === 'replace') {
+    commit(p);
+    return;
+  }
+  const unlocked = { ...p.unlocked, ...state.unlocked };
+  const quizDone: Record<string, number> = { ...p.quizDone };
+  for (const [k, v] of Object.entries(state.quizDone)) quizDone[k] = Math.max(v, quizDone[k] ?? 0);
+  commit({ ...p, unlocked, quizDone, badges: Array.from(new Set([...state.badges, ...p.badges])), xp: Math.max(p.xp, state.xp) });
+}
+
 export interface Achievement {
   id: string;
   icon: string;

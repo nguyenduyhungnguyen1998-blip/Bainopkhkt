@@ -72,7 +72,7 @@ export interface Spot {
   xp: number;
   layoutSchema: Card[];
   sources: Source[];
-  quiz?: { q: Localized; options: Localized[]; answer: number }[];
+  quiz?: { q: Localized; options: Localized[]; answer: number; explain?: Localized }[];
 }
 
 export interface Site {

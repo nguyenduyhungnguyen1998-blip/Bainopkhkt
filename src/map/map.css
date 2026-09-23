@@ -336,3 +336,23 @@
     animation-duration: 0.01ms;
   }
 }
+
+/* Sơ đồ khu "rơi" vào sau khi camera lao sâu – cảm giác không gian liên tục. */
+.smap {
+  animation: smap-in 340ms var(--ease-out) both;
+}
+@keyframes smap-in {
+  from {
+    opacity: 0.25;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smap {
+    animation: none;
+  }
+}

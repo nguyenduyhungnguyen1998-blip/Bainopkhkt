@@ -110,6 +110,7 @@ for (const f of files) {
     if (spot.quiz) {
       for (const [i, q] of spot.quiz.entries()) {
         if (q.answer >= q.options.length) err(tag, `quiz[${i}].answer=${q.answer} vượt số phương án`);
+        if (!q.explain) warn(tag, `quiz[${i}] thiếu explain – người trả lời sai không được giải thích`);
       }
     }
   }

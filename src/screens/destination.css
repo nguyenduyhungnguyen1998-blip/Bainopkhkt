@@ -397,3 +397,45 @@ a.dest__crumb--link:active {
 .mdv-chip.is-on {
   border-color: var(--color-accent-secondary);
 }
+
+/* Fly-to tiếp đất: hero "nới zoom" nhẹ, nội dung hạ xuống lệch nhau – nối mạch từ bản đồ. */
+.dintro__hero img {
+  animation: dintro-hero 480ms var(--ease-out) both;
+}
+.dintro__body > * {
+  animation: dintro-up 380ms var(--ease-out) both;
+}
+.dintro__body > *:nth-child(1) { animation-delay: 60ms; }
+.dintro__body > *:nth-child(2) { animation-delay: 100ms; }
+.dintro__body > *:nth-child(3) { animation-delay: 140ms; }
+.dintro__body > *:nth-child(4) { animation-delay: 180ms; }
+.dintro__body > *:nth-child(5) { animation-delay: 220ms; }
+.dintro__body > *:nth-child(6) { animation-delay: 260ms; }
+.dintro__body > *:nth-child(7) { animation-delay: 300ms; }
+.dintro__body > *:nth-child(8) { animation-delay: 340ms; }
+@keyframes dintro-hero {
+  from {
+    opacity: 0.4;
+    transform: scale(1.12);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes dintro-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dintro__hero img,
+  .dintro__body > * {
+    animation: none;
+  }
+}

@@ -109,7 +109,8 @@
             "properties": {
               "q": { "$ref": "#/definitions/localized" },
               "options": { "type": "array", "minItems": 2, "maxItems": 4, "items": { "$ref": "#/definitions/localized" } },
-              "answer": { "type": "integer", "minimum": 0, "maximum": 3 }
+              "answer": { "type": "integer", "minimum": 0, "maximum": 3 },
+              "explain": { "$ref": "#/definitions/localized" }
             }
           }
         }

@@ -271,3 +271,32 @@
   font-weight: 700;
   flex: none;
 }
+
+/* giải thích sau mỗi câu trả lời quiz */
+.quiz__explain {
+  margin: 10px 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-text-muted);
+}
+.quiz__explain b {
+  color: var(--color-text);
+}
+.backup__preview {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md, 8px);
+  margin-bottom: 10px;
+}
+.backup__pvtitle {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+.backup__pvmeta {
+  margin: 0 0 10px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.ppass__share {
+  width: fit-content;
+}

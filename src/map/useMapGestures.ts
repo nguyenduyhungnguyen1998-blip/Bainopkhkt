@@ -63,21 +63,38 @@ export function useMapGestures(opts: GestureOptions) {
     [viewW, viewH, minK, maxK]
   );
 
-  /** Bay mượt tới transform mới (ưu tiên reduced-motion: nhảy thẳng). */
+  /**
+   * Bay mượt tới transform mới (ưu tiên reduced-motion: nhảy thẳng).
+   * `logK`: nội suy zoom theo log(k) – cảm giác lao nhanh lúc còn trên cao
+   * rồi chậm dần khi gần đích, giống fly-to của Google Earth.
+   * Trả Promise resolve khi xong (hoặc ngay khi nhảy thẳng/hủy giữa chừng).
+   */
+  const animDone = useRef<() => void>(() => {});
   const animateTo = useCallback(
-    (target: Transform, duration = 480) => {
+    (target: Transform, duration = 480, logK = false): Promise<void> => {
       cancelAnimationFrame(anim.current);
+      animDone.current();
       const from = { ...tRef.current };
       const to = clampTransform(target, viewW, viewH, minK, maxK);
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches || duration <= 0) return apply(to);
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || duration <= 0) {
+        apply(to);
+        return Promise.resolve();
+      }
+      const lk0 = Math.log(Math.max(from.k, 1e-4));
+      const lk1 = Math.log(Math.max(to.k, 1e-4));
       const t0 = performance.now();
-      const step = (now: number) => {
-        const p = Math.min(1, (now - t0) / duration);
-        const e = easeOutCubic(p);
-        apply({ k: from.k + (to.k - from.k) * e, tx: from.tx + (to.tx - from.tx) * e, ty: from.ty + (to.ty - from.ty) * e });
-        if (p < 1) anim.current = requestAnimationFrame(step);
-      };
-      anim.current = requestAnimationFrame(step);
+      return new Promise<void>((resolve) => {
+        animDone.current = resolve;
+        const step = (now: number) => {
+          const p = Math.min(1, (now - t0) / duration);
+          const e = easeOutCubic(p);
+          const k = logK ? Math.exp(lk0 + (lk1 - lk0) * e) : from.k + (to.k - from.k) * e;
+          apply({ k, tx: from.tx + (to.tx - from.tx) * e, ty: from.ty + (to.ty - from.ty) * e });
+          if (p < 1) anim.current = requestAnimationFrame(step);
+          else resolve();
+        };
+        anim.current = requestAnimationFrame(step);
+      });
     },
     [apply, viewW, viewH, minK, maxK]
   );

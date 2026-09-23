@@ -1,0 +1,67 @@
+{
+  "dinh-doc-lap.json": {
+    "cong-chinh": [
+      {"vi": "Kiến trúc sư Ngô Viết Thụ thiết kế tòa dinh mới, khởi công năm 1962 trên nền dinh Norodom cũ.", "en": "Architect Ngo Viet Thu designed the new palace, started in 1962 on the old Norodom site."},
+      {"vi": "Dinh khánh thành ngày 31/10/1966 và lấy tên 'Dinh Độc Lập' từ đó.", "en": "The palace was inaugurated on 31 October 1966 and named 'Independence Palace'."},
+      {"vi": "Trưa 30/4/1975 xe tăng 390 và 843 của Quân Giải phóng húc đổ cổng dinh – sự kiện chấm dứt chiến tranh.", "en": "At noon on 30 April 1975 tanks 390 and 843 crashed the palace gates – the moment that ended the war."}
+    ]
+  },
+  "ha-long.json": {
+    "hang-sung-sot": [
+      {"vi": "Hang Sửng Sốt nằm trên đảo Bồ Hòn, cùng cụm với hang Thiên Cung ở trung tâm vịnh.", "en": "Sung Sot Cave sits on Bo Hon Island, in the same cluster as Thien Cung Cave."},
+      {"vi": "Hang rộng khoảng 10.000 m² chia ba khoang lần lượt – lớn và đẹp bậc nhất vịnh Hạ Long.", "en": "The cave spans about 10,000 m² in three chambers – among the bay's largest and finest."},
+      {"vi": "'Hạ Long' nghĩa là rồng hạ xuống – theo truyền thuyết mẹ rồng và đàn con hạ trần giúp dân đánh giặc ngoại xâm.", "en": "'Ha Long' means 'dragon descending' – legend says a mother dragon and her young came down to help repel invaders."}
+    ]
+  },
+  "hue.json": {
+    "ngo-mon": [
+      {"vi": "Ngọ Môn xây năm 1833 dưới vua Minh Mạng, là cổng chính phía Nam của Hoàng thành Huế.", "en": "Ngo Mon was built in 1833 under Emperor Minh Mang as the southern main gate of the Hue Citadel."},
+      {"vi": "Ngày 30/8/1945 vua Bảo Đại đọc chiếu thoái vị tại Ngọ Môn – kết thúc chế độ quân chủ Việt Nam.", "en": "On 30 August 1945 Emperor Bao Dai read his abdication edict at Ngo Mon – ending Vietnam's monarchy."},
+      {"vi": "Lầu Ngũ Phụng phía trên Ngọ Môn dựng bằng 100 cột gỗ lim theo tư liệu kiến trúc Huế.", "en": "The Ngu Phung pavilion atop Ngo Mon stands on 100 ironwood columns per Hue architectural records."}
+    ]
+  },
+  "my-son.json": {
+    "nhom-thap-b": [
+      {"vi": "Mỹ Sơn là trung tâm tôn giáo quan trọng nhất của vương quốc Chăm Pa từ thế kỷ IV đến XIII.", "en": "My Son was the most important religious center of the Champa kingdom from the 4th to 13th century."},
+      {"vi": "Các tháp thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.", "en": "The towers worship Shiva as Bhadresvara – the protector deity of the Cham kings."},
+      {"vi": "Người Chăm xếp gạch khít đến mức không thấy mạch vữa – chất kết dính của họ vẫn là đề tài nghiên cứu.", "en": "Cham builders fitted bricks so tightly no mortar joint shows – their bonding technique is still studied."}
+    ]
+  },
+  "van-mieu.json": {
+    "van-mieu-mon": [
+      {"vi": "Năm 1070 vua Lý Thánh Tông cho xây Văn Miếu thờ Khổng Tử – một trong các di tích lâu đời nhất Thăng Long.", "en": "In 1070 King Ly Thanh Tong built the Temple of Literature honoring Confucius – one of Thang Long's oldest monuments."},
+      {"vi": "Cổng giữa ngày xưa chỉ dành cho vua; quan lại và khách phải đi hai lối phụ hai bên.", "en": "The central gate was once reserved for the king; mandarins and guests used the two side gates."},
+      {"vi": "Đôi rồng đá đầu thềm mang phong cách thời Lê – thân mềm mại, đầu ngẩng cao uy nghi.", "en": "The stone dragon pair follows Later Le style – sinuous bodies with proudly raised heads."},
+      {"vi": "Khu di tích rộng khoảng 54.000 m² – lớn hơn 7 sân bóng đá.", "en": "The complex covers about 54,000 m² – bigger than seven football fields."},
+      {"vi": "Năm lớp sân dọc trục Bắc–Nam từ cổng Văn Miếu tới nhà Thái Học, mỗi sân một công trình trung tâm.", "en": "Five courtyards follow the north–south axis from the gate to Thai Hoc hall, each with a focal building."}
+    ],
+    "khue-van-cac": [
+      {"vi": "Năm 2012 Khuê Văn Các được chọn làm biểu tượng của Thủ đô Hà Nội.", "en": "In 2012 Khue Van Cac was chosen as the symbol of Hanoi."},
+      {"vi": "Gác xây năm 1805 thời vua Gia Long, khi triều Nguyễn tu bổ lại khu Văn Miếu.", "en": "The pavilion was built in 1805 under Emperor Gia Long during Nguyen-era restorations."},
+      {"vi": "'Khuê' là sao Khuê – chòm sao chủ văn chương trong quan niệm xưa; 'các' nghĩa là gác, lầu.", "en": "'Khue' is the Khue star – the constellation of literature in old belief; 'cac' means pavilion."},
+      {"vi": "Bốn cửa sổ tròn tượng trưng ánh sáng tri thức tỏa khắp bốn phương.", "en": "The four round windows symbolize the light of knowledge radiating in all directions."},
+      {"vi": "Hình Khuê Văn Các được in trên mặt sau tờ 100.000 đồng polymer hiện hành.", "en": "Khue Van Cac appears on the back of the current 100,000 VND polymer note."}
+    ],
+    "bia-tien-si": [
+      {"vi": "Vườn bia có 82 tấm bia đá ghi danh các khoa thi từ 1442 đến 1779.", "en": "The stela garden holds 82 stone stelae recording examinations from 1442 to 1779."},
+      {"vi": "Tấm bia đầu tiên dựng năm 1484 dưới vua Lê Thánh Tông, ghi danh khoa Giáp Thìn 1442.", "en": "The first stela was erected in 1484 under King Le Thanh Tong for the 1442 Giap Thin exam."},
+      {"vi": "Bia đặt trên lưng rùa đá – biểu tượng trường tồn, nâng đỡ tri thức qua các thế hệ.", "en": "Each stela rests on a stone turtle – a symbol of endurance carrying knowledge through ages."},
+      {"vi": "82 tấm bia ghi tên 1.304 vị đỗ đại khoa – bia khuyến học này được UNESCO công nhận Memory of the World.", "en": "82 stelae name 1,304 laureates – UNESCO lists them as a Memory of the World heritage."},
+      {"vi": "Hàng triệu lượt tay xoa đã làm mòn mặt bia và đầu rùa hàng trăm năm tuổi – ngắm thôi, đừng sờ nhé.", "en": "Millions of hands have worn down the centuries-old stone – please look, don't touch."}
+    ],
+    "dai-thanh-mon": [
+      {"vi": "Điện Đại Thành thờ Khổng Tử cùng Tứ Phối – nơi trang nghiêm nhất của khu di tích.", "en": "Dai Thanh hall worships Confucius and the Four Sages – the most solemn place of the complex."},
+      {"vi": "Tứ Phối là Nhan Hồi, Tăng Tử, Tử Tư và Mạnh Tử – bốn đại đệ tử trong hệ thống thờ Nho giáo.", "en": "Tu Phoi are Yan Hui, Zengzi, Zisi and Mencius – the four great disciples in Confucian worship."},
+      {"vi": "Hệ cột gỗ lim quý, nặng và bền – đặc trưng của các đại công trình gỗ Việt Nam cổ.", "en": "The hall uses precious ironwood columns – signature of Vietnam's great wooden structures."},
+      {"vi": "Điện mang phong cách thời Hậu Lê: mái cong duyên dáng, cột lớn, họa tiết hàm ý nho học.", "en": "The hall follows Later Le style: gracefully curved roofs, large columns, Confucian motifs."},
+      {"vi": "Học sinh Hà Nội tới dâng hương cầu may trước mỗi mùa thi – tục 'cầu đỗ' giữ tới nay.", "en": "Hanoi students still come to offer incense for luck before each exam season."}
+    ],
+    "nha-thai-hoc": [
+      {"vi": "Khu Thái Học xưa đặt Quốc Tử Giám – trường đại học đầu tiên của Việt Nam, thành lập năm 1076.", "en": "Thai Hoc once housed Quoc Tu Giam – Vietnam's first national university, founded in 1076."},
+      {"vi": "Nhà Thái Học hiện nay xây lại năm 1999–2000, đúng kỷ niệm 990 năm Thăng Long – Hà Nội.", "en": "Today's Thai Hoc hall was rebuilt in 1999–2000, for Thang Long–Hanoi's 990th anniversary."},
+      {"vi": "Tầng trên thờ ba vua: Lý Thánh Tông (dựng Văn Miếu), Lý Nhân Tông (lập Quốc Tử Giám), Lê Thánh Tông (dựng bia Tiến sĩ).", "en": "The upper floor honors three kings: Ly Thanh Tong (temple), Ly Nhan Tong (university), Le Thanh Tong (stelae)."},
+      {"vi": "Tầng dưới thờ Chu Văn An – vị thầy tiêu biểu được xem như 'vạn thế sư biểu' của giáo dục Việt.", "en": "The lower floor honors Chu Van An – the exemplary teacher of Vietnamese education."},
+      {"vi": "Chu Văn An giữ chức Tư nghiệp – tương đương giám đốc học vụ của Quốc Tử Giám, thầy dạy vua Trần Minh Tông.", "en": "Chu Van An served as Tu Nghiep – rector of Quoc Tu Giam and teacher to King Tran Minh Tong."}
+    ]
+  }
+}

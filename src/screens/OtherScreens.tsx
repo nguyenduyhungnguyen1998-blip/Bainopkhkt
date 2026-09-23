@@ -3,7 +3,9 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, importPassportJson, isSpotUnlocked } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, previewPassportJson, applyPassportImport, isSpotUnlocked } from '../lib/progress';
+import type { Progress } from '../lib/progress';
+import { asset } from '../lib/asset';
 import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
@@ -64,7 +66,7 @@ export function PassportScreen() {
         </a>
       )}
 
-      <PassportTools lang={lang} />
+      <ShareJourney lang={lang} done={doneSpots} total={totalSpots} xp={p.xp} />
 
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
@@ -85,7 +87,7 @@ export function PassportScreen() {
           const done = n === s.spots.length;
           return (
             <a key={s.entityId} class="mdv-card" href={routeHref.destination(s.entityId)} style="display:flex;gap:12px;align-items:center;color:inherit">
-              <img src={s.heroImage} alt="" width="56" height="56" style="border-radius:12px;object-fit:cover" />
+              <img src={asset(s.heroImage)} alt="" width="56" height="56" style="border-radius:12px;object-fit:cover" />
               <div style="flex:1;min-width:0">
                 <b>{t(s.name, lang)}</b>
                 <div class="mdv-muted" style="font-size:var(--text-sm)">
@@ -109,10 +111,47 @@ export function PassportScreen() {
   );
 }
 
-/** Xuất/nhập hộ chiếu JSON (P3): lưu tiến độ ra file và khôi phục trên máy khác. */
-function PassportTools({ lang }: { lang: Lang }) {
+/** Chia sẻ hành trình: Web Share API nếu có, không thì chép nội dung vào clipboard. */
+function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; total: number; xp: number }) {
+  const [copied, setCopied] = useState(false);
+  const text =
+    lang === 'vi'
+      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Mở Dấu Việt`
+      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in Mo Dau Viet`;
+  const share = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Mở Dấu Việt', text });
+        return;
+      }
+    } catch {
+      /* user hủy share sheet hoặc API lỗi -> fallback copy */
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* clipboard bị chặn */
+    }
+  };
+  return (
+    <button class="mdv-btn mdv-btn--ghost ppass__share" onClick={() => void share()}>
+      <Icon name="share" size={18} /> {copied ? t(UI.shareCopied, lang) : t(UI.sharePassport, lang)}
+    </button>
+  );
+}
+
+/** Sao lưu & chuyển thiết bị (Cài đặt): xuất JSON có thông báo; nhập có xem trước + chọn gộp/thay thế. */
+function BackupCard({ lang }: { lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ progress: Progress; spots: number; xp: number; exportedAt: string | null } | null>(null);
+
+  const flash = (m: string) => {
+    setMsg(m);
+    window.setTimeout(() => setMsg(null), 2600);
+  };
 
   const doExport = () => {
     const blob = new Blob([exportPassportJson()], { type: 'application/json' });
@@ -121,25 +160,60 @@ function PassportTools({ lang }: { lang: Lang }) {
     a.download = `ho-chieu-mo-dau-viet-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
+    flash(t(UI.backupExported, lang));
   };
 
-  const doImport = async (f: File | undefined) => {
+  const doPick = async (f: File | undefined) => {
     if (!f) return;
-    const ok = importPassportJson(await f.text());
-    setMsg(t(ok ? UI.importOk : UI.importBad, lang));
     if (fileRef.current) fileRef.current.value = '';
-    window.setTimeout(() => setMsg(null), 2600);
+    const pv = previewPassportJson(await f.text());
+    if (!pv) {
+      flash(t(UI.importBad, lang));
+      return;
+    }
+    setPreview(pv);
+  };
+
+  const apply = (mode: 'merge' | 'replace') => {
+    if (preview) applyPassportImport(preview.progress, mode);
+    setPreview(null);
+    flash(t(UI.importOk, lang));
   };
 
   return (
-    <section class="mdv-card ppass__tools">
-      <button class="mdv-btn mdv-btn--ghost" onClick={doExport}>
-        {t(UI.exportPassport, lang)}
-      </button>
-      <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
-        {t(UI.importPassport, lang)}
-      </button>
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doImport((e.target as HTMLInputElement).files?.[0])} />
+    <section class="mdv-card">
+      <h2 style="font-size:var(--text-md);margin:0 0 4px">{t(UI.backupTitle, lang)}</h2>
+      <p class="mdv-muted" style="margin:0 0 10px;font-size:var(--text-sm)">{t(UI.backupDesc, lang)}</p>
+      {preview ? (
+        <div class="backup__preview">
+          <p class="backup__pvtitle">{t(UI.backupPreviewTitle, lang)}</p>
+          <p class="backup__pvmeta">
+            {preview.spots}/9 {t(UI.spots, lang)} · {preview.xp} XP
+            {preview.exportedAt ? ` · ${new Date(preview.exportedAt).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}` : ''}
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="mdv-btn mdv-btn--primary" onClick={() => apply('merge')}>
+              {t(UI.backupMerge, lang)}
+            </button>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => apply('replace')}>
+              {t(UI.backupReplace, lang)}
+            </button>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => setPreview(null)}>
+              {t(UI.cancel, lang)}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--ghost" onClick={doExport}>
+            {t(UI.exportPassport, lang)}
+          </button>
+          <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
+            {t(UI.importPassport, lang)}
+          </button>
+        </div>
+      )}
+      <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doPick((e.target as HTMLInputElement).files?.[0])} />
       {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
     </section>
   );
@@ -228,9 +302,11 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
     if (i === quiz[idx].answer) setCorrect((c) => c + 1);
     if (navigator.vibrate) navigator.vibrate(i === quiz[idx].answer ? 20 : [60, 40, 60]);
   };
+  const locked = !isSpotUnlocked(site.entityId, spot.spotId);
   const nextQ = () => {
     if (idx + 1 >= quiz.length) {
-      const g = recordQuizResult(site.entityId, spot.spotId, correct, quiz.length);
+      // Điểm chưa check-in: chơi thử được (hội đồng xem trước) nhưng không ghi XP.
+      const g = locked ? 0 : recordQuizResult(site.entityId, spot.spotId, correct, quiz.length);
       setGained(g);
       setDone(true);
     } else {
@@ -257,6 +333,8 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
           </p>
           {gained !== null && gained > 0 ? (
             <p class="quiz__xp">+{gained} XP</p>
+          ) : locked ? (
+            <p class="mdv-muted">{t(UI.quizTrial, lang)}</p>
           ) : (
             <p class="mdv-muted">{best !== undefined && `${t(UI.bestScore, lang)}: ${best}/${quiz.length}`}</p>
           )}
@@ -317,6 +395,11 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
         {picked !== null && (
           <div class={`quiz__mark ${picked === q.answer ? 'ok' : 'bad'}`}>{t(picked === q.answer ? UI.correctMark : UI.wrongMark, lang)}</div>
         )}
+        {picked !== null && q.explain && (
+          <p class="quiz__explain">
+            <b>{t(UI.quizExplain, lang)}</b> {t(q.explain, lang)}
+          </p>
+        )}
         {picked !== null && (
           <button class="mdv-btn mdv-btn--primary" style="width:100%;margin-top:12px" onClick={nextQ}>
             {t(idx + 1 >= quiz.length ? UI.quizResult : UI.quizNext, lang)}
@@ -361,6 +444,7 @@ export function SettingsScreen() {
             </button>
           </div>
         </section>
+        <BackupCard lang={lang} />
         <section class="mdv-card">
           <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dữ liệu' : 'Data'}</h2>
           <button

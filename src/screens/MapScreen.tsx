@@ -212,6 +212,11 @@ export function MapScreen() {
   const exitSiteLevel = () => {
     if (!siteLevel) return;
     deepExit.current = true;
+    // An toàn: nếu user chen ngón tay hủy lượt bay giữa chừng (k vẫn >4.6),
+    // latch tự nhả sau 900ms để cơ chế zoom-sâu auto-mở sơ đồ hoạt động lại.
+    window.setTimeout(() => {
+      deepExit.current = false;
+    }, 900);
     const n = nodesRef.current.find((nd) => nd.site.entityId === siteLevel);
     setSiteLevel(null);
     setMountT(tRef.current ?? undefined); // VietnamMap remount đúng độ sâu cũ, rồi zoom-out
@@ -280,6 +285,7 @@ export function MapScreen() {
               setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
               deepExit.current = true;
               setMountT(undefined); // remount cảnh toàn quốc rồi focus-anim bay tới vùng
+              setFlyReq(undefined); // flyReq cũ không được tái chạy trên remount
               setSiteLevel(null);
               setFocus(f.id);
             }}

@@ -137,4 +137,26 @@ export const UI = {
   bestScore: { vi: 'Kỷ lục', en: 'Best' },
   correctMark: { vi: 'Đúng!', en: 'Correct!' },
   wrongMark: { vi: 'Chưa đúng', en: 'Not quite' },
+  // Tối ưu UX sâu – khoảnh khắc mở khóa, finale, lỗi, cập nhật
+  badgeEarned: { vi: 'Huy hiệu mới', en: 'New badge' },
+  finaleTitle: { vi: 'Hoàn thành hành trình!', en: 'Journey complete!' },
+  finaleBody: {
+    vi: 'Bạn đã mở khóa toàn bộ điểm di sản – hành trình Mở Dấu Việt khép lại trọn vẹn.',
+    en: 'You unlocked every heritage spot – the Mo Dau Viet journey is complete.',
+  },
+  finalePassport: { vi: 'Xem hộ chiếu đầy đủ', en: 'View full passport' },
+  errTitle: { vi: 'Có lỗi nhỏ rồi', en: 'Something went wrong' },
+  errBody: {
+    vi: 'Tiến độ của bạn vẫn an toàn trong máy. Thử tải lại trang nhé.',
+    en: 'Your progress is safe on this device. Try reloading the page.',
+  },
+  errReload: { vi: 'Tải lại trang', en: 'Reload page' },
+  errHome: { vi: 'Về bản đồ', en: 'Back to map' },
+  updateReady: { vi: 'Có bản cập nhật mới', en: 'New version available' },
+  updateNow: { vi: 'Cập nhật', en: 'Update' },
+  quizProgress: { vi: 'Tiến độ câu hỏi', en: 'Question progress' },
+  quizPraisePerfect: { vi: 'Tràng nguyên! Đỗ đạt toàn bộ!', en: 'Full marks, scholar!' },
+  quizPraiseGood: { vi: 'Khá lắm, sĩ tử!', en: 'Well done, scholar!' },
+  quizPraiseLow: { vi: 'Cố lên – sĩ tử rèn thêm nhé!', en: 'Keep practicing, scholar!' },
+  quizLockedHint: { vi: 'Chơi trước được – điểm chưa mở', en: 'Preview – spot not unlocked' },
 } satisfies Record<string, Localized>;

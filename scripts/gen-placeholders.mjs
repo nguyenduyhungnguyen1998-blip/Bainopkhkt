@@ -20,8 +20,8 @@ function svg(label, [a, b], w = 1200, h = 800) {
 <pattern id="p" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M24 4 44 24 24 44 4 24Z" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="2"/></pattern></defs>
 <rect width="${w}" height="${h}" fill="url(#g)"/><rect width="${w}" height="${h}" fill="url(#p)"/>
 <circle cx="${w * 0.78}" cy="${h * 0.3}" r="${h * 0.22}" fill="#fff" fill-opacity=".08"/>
-<text x="64" y="${h - 96}" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="56" font-weight="800" fill="#F4F1EA">${esc}</text>
-<text x="64" y="${h - 48}" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="26" fill="#F4F1EA" fill-opacity=".8">Ảnh minh họa tạm – sẽ thay bằng ảnh thực địa</text>
+<text x="${w / 2}" y="${h - 96}" text-anchor="middle" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="56" font-weight="800" fill="#F4F1EA">${esc}</text>
+<text x="${w / 2}" y="${h - 48}" text-anchor="middle" font-family="Be Vietnam Pro, system-ui, sans-serif" font-size="26" fill="#F4F1EA" fill-opacity=".8">Ảnh minh họa tạm – sẽ thay bằng ảnh thực địa</text>
 </svg>`;
 }
 

@@ -112,6 +112,38 @@ export function MapScreen() {
     return () => window.removeEventListener('keydown', onKey);
   }, [selectedId, siteLevel]);
 
+  // Sheet mở: đưa focus vào sheet, giữ Tab trong sheet, đóng thì trả focus về nút trước đó.
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    if (!selected || !sheet) return;
+    const prev = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(sheet.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(
+        (el) => !el.hasAttribute('aria-hidden')
+      );
+    focusables()[0]?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const els = focusables();
+      if (!els.length) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    };
+    sheet.addEventListener('keydown', onKey);
+    return () => {
+      sheet.removeEventListener('keydown', onKey);
+      if (prev && document.contains(prev)) prev.focus();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
   // Phát hiện node "kế tiếp" ra khỏi khung nhìn -> hiện nút Về hành trình;
   // zoom rất sâu vào khu có nhiều điểm -> mở sơ đồ cấp 2.
   const offscreenRef = useRef(false);
@@ -330,7 +362,7 @@ export function MapScreen() {
               </div>
             </div>
             <div class="msheet__body">
-              <p class="msheet__summary msheet__summary--clip">{t(selected.summary, lang)}</p>
+              <p class={`msheet__summary${expanded ? '' : ' msheet__summary--clip'}`}>{t(selected.summary, lang)}</p>
               {expanded &&
                 selected.spots.map((sp, i) => {
                   const ok = isSpotUnlocked(selected.entityId, sp.spotId);
@@ -360,6 +392,11 @@ export function MapScreen() {
                 </button>
               )}
             </div>
+            {selectedStatus === 'locked' && (
+              <p class="msheet__scanhint">
+                <Icon name="qr" size={14} /> {t(UI.scanToUnlock, lang)}
+              </p>
+            )}
           </>
         )}
       </section>

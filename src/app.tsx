@@ -4,6 +4,9 @@ import { useRoute } from './lib/router';
 import { useOnline } from './lib/theme';
 import { UI, t, useLang } from './lib/i18n';
 import { Dock } from './components/Dock';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { Celebrate } from './components/Celebrate';
+import { applySwUpdate, useSwStatus } from './lib/sw';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
 import { PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
@@ -53,6 +56,7 @@ export function App() {
   const online = useOnline();
   const [lang] = useLang();
   const debug = useDebugFlag();
+  const { hasUpdate } = useSwStatus();
   usePerfGuard();
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
@@ -95,7 +99,16 @@ export function App() {
     <>
       <div class="mdv-bg-pattern" aria-hidden="true" />
       {!online && <div class="mdv-offline-bar" role="status">{t(UI.offline, lang)}</div>}
-      {screen}
+      <ErrorBoundary>{screen}</ErrorBoundary>
+      {hasUpdate && (
+        <div class="mdv-update-bar" role="status">
+          <span>{t(UI.updateReady, lang)}</span>
+          <button class="mdv-chip" onClick={applySwUpdate}>
+            {t(UI.updateNow, lang)}
+          </button>
+        </div>
+      )}
+      <Celebrate />
       <Dock route={route} />
       {debug && (
         <Suspense fallback={null}>

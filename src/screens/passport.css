@@ -237,3 +237,37 @@
 .quiz__nextlink:active {
   opacity: 0.7;
 }
+
+/* Tiến độ quiz + lời khen theo điểm + cờ "điểm chưa mở" (UX sâu) */
+.quiz__prog {
+  height: 6px;
+  border-radius: 99px;
+  background: color-mix(in srgb, var(--color-text-muted) 18%, transparent);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.quiz__prog span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--color-accent-secondary);
+  transition: width 260ms var(--ease-out);
+}
+.quiz__praise {
+  margin: 8px 0 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-accent-tertiary-text);
+}
+.quiz__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-locked) 18%, transparent);
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  flex: none;
+}

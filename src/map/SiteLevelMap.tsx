@@ -26,20 +26,49 @@ interface SpotNode {
   labelSide: 'left' | 'right';
 }
 
-/** Bố trí điểm dọc trục dưới->trên, lệch trái/phải so le (mặt bằng kiểu dãy sân). */
+/**
+ * Vị trí riêng theo đúng mặt bằng di tích (C1). Văn Miếu: trục Bắc–Nam
+ * Môn -> Khuê Văn -> giếng Thiên Quang + vườn bia -> Đại Thành -> Thái Học;
+ * vườn bia nằm sườn giếng chứ không nằm trên trục.
+ */
+const CUSTOM_POS: Record<string, Record<string, { x: number; y: number; labelSide?: 'left' | 'right' }>> = {
+  'van-mieu': {
+    'van-mieu-mon': { x: W / 2, y: H - 100 },
+    'khue-van-cac': { x: W / 2, y: H - 192 },
+    'bia-tien-si': { x: W / 2 + 118, y: H - 284, labelSide: 'left' },
+    'dai-thanh-mon': { x: W / 2, y: H - 376 },
+    'nha-thai-hoc': { x: W / 2, y: H - 468 },
+  },
+};
+
+/** Khu có sơ đồ mặt bằng riêng (ví dụ giếng Thiên Quang của Văn Miếu). */
+function siteDecors(site: Site, nodes: SpotNode[]) {
+  if (site.entityId !== 'van-mieu' || nodes.length < 4) return null;
+  // Giếng vuông giữa sân thứ ba: tâm trục ngang, mức y của vườn bia.
+  const wellY = nodes[2].y;
+  return (
+    <g aria-hidden="true">
+      <rect class="smap__well" x={W / 2 - 56} y={wellY - 56} width={112} height={112} rx={8} />
+      <rect class="smap__well-in" x={W / 2 - 32} y={wellY - 32} width={64} height={64} />
+    </g>
+  );
+}
+
+/** Bố trí điểm dọc trục dưới->trên (mặt bằng kiểu các lớp sân nối nhau). */
 export function layoutSpots(site: Site, p: Progress): SpotNode[] {
   const n = site.spots.length;
   const firstLocked = site.spots.findIndex((s) => !(`${site.entityId}/${s.spotId}` in p.unlocked));
+  const custom = CUSTOM_POS[site.entityId];
   return site.spots.map((s, i) => {
+    const c = custom?.[s.spotId];
     const ratio = n === 1 ? 0.5 : i / (n - 1); // 0 -> 1 dọc hành trình
-    const swing = n === 1 ? 0 : Math.sin(ratio * Math.PI) * 110 * (i % 2 === 0 ? 1 : -1);
     return {
       spotId: s.spotId,
-      x: W / 2 + swing,
-      y: H - 90 - ratio * (H - 190),
+      x: c ? c.x : W / 2,
+      y: c ? c.y : H - 90 - ratio * (H - 190),
       unlocked: `${site.entityId}/${s.spotId}` in p.unlocked,
       next: firstLocked === -1 ? false : i === firstLocked,
-      labelSide: swing > 0 ? 'left' : 'right',
+      labelSide: c?.labelSide ?? (i % 2 === 0 ? 'right' : 'left'),
     };
   });
 }
@@ -102,6 +131,12 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
         <g class="smap__gate" transform={`translate(${W / 2} ${H - 52})`}>
           <rect x={-34} y={-12} width={68} height={24} rx={6} />
         </g>
+        {/* Ranh giới các lớp sân: vạch ngang giữa hai điểm liên tiếp */}
+        {nodes.slice(1).map((nd, i) => {
+          const y = (nodes[i].y + nd.y) / 2;
+          return <line key={i} class="smap__band" x1={118} x2={W - 118} y1={y} y2={y} />;
+        })}
+        {siteDecors(site, nodes)}
         {/* Trục hành trình trong khu */}
         <path class="vmap__journey vmap__journey--all" d={path} />
         {donePath && <path class="vmap__journey vmap__journey--done" d={donePath} />}

@@ -1,215 +1,1321 @@
 {
   "schemaVersion": 1,
   "entityId": "van-mieu",
-  "name": { "vi": "Văn Miếu – Quốc Tử Giám", "en": "Temple of Literature" },
-  "province": { "vi": "Hà Nội", "en": "Hanoi" },
+  "name": {
+    "vi": "Văn Miếu – Quốc Tử Giám",
+    "en": "Temple of Literature"
+  },
+  "province": {
+    "vi": "Hà Nội",
+    "en": "Hanoi"
+  },
   "region": "bac",
   "themeContext": "lich-su",
-  "coords": [105.8356, 21.0277],
+  "coords": [
+    105.8356,
+    21.0277
+  ],
   "journeyOrder": 1,
   "heroImage": "/img/van-mieu/hero.svg",
+  "tint": "#5a2320",
   "summary": {
     "vi": "Trường đại học đầu tiên của Việt Nam, nơi lưu giữ 82 bia Tiến sĩ – Di sản tư liệu thế giới.",
     "en": "Vietnam's first national university, home to 82 doctoral steles recognised by UNESCO."
   },
   "gamificationConfig": {
-    "badge": { "id": "si-tu-thang-long", "name": { "vi": "Sĩ tử Thăng Long", "en": "Scholar of Thang Long" }, "icon": "scroll" },
+    "badge": {
+      "id": "si-tu-thang-long",
+      "name": {
+        "vi": "Sĩ tử Thăng Long",
+        "en": "Scholar of Thang Long"
+      },
+      "icon": "scroll"
+    },
     "completionBonusXp": 100
   },
   "spots": [
     {
       "spotId": "van-mieu-mon",
-      "name": { "vi": "Văn Miếu Môn", "en": "Great Portico" },
-      "coords": [105.8352, 21.0262],
+      "qrId": "mdvq05",
+      "name": {
+        "vi": "Văn Miếu Môn",
+        "en": "Great Portico"
+      },
+      "coords": [
+        105.8352,
+        21.0262
+      ],
       "xp": 30,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/van-mieu/van-mieu-mon.svg", "caption": { "vi": "Cổng tam quan hai tầng dẫn vào khu di tích", "en": "The two-storey triple gate at the entrance" } },
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/van-mieu-mon.svg",
+          "caption": {
+            "vi": "Cổng tam quan hai tầng dẫn vào khu di tích",
+            "en": "The two-storey triple gate at the entrance"
+          }
+        },
         {
           "type": "aspects",
           "size": "lg",
           "aspects": [
-            { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Văn Miếu được xây dựng năm 1070 dưới triều vua Lý Thánh Tông để thờ Khổng Tử và các bậc hiền triết. Năm 1076, vua Lý Nhân Tông lập Quốc Tử Giám bên cạnh – trường học dành cho hoàng tử và con em quý tộc, sau mở rộng cho người tài trong cả nước.", "en": "The Temple of Literature was founded in 1070 under King Ly Thanh Tong to honour Confucius. In 1076 King Ly Nhan Tong established the Imperial Academy beside it, first for princes and later for gifted students nationwide." } },
-            { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Cổng chính gồm ba lối đi, hai tầng, lối giữa xưa chỉ dành cho vua. Hai bên có đôi rồng đá mang phong cách thời Lê.", "en": "The main gate has three passages on two levels; the central one was reserved for the king. A pair of Le-dynasty stone dragons flank the steps." } },
-            { "id": "y-nghia", "title": { "vi": "Ý nghĩa", "en": "Meaning" }, "body": { "vi": "Bước qua cổng là bước vào không gian tôn vinh việc học – tinh thần hiếu học được xem là cốt lõi của văn hóa Việt.", "en": "Passing through the gate means entering a space devoted to learning – a value at the heart of Vietnamese culture." } }
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Văn Miếu được xây dựng năm 1070 dưới triều vua Lý Thánh Tông để thờ Khổng Tử và các bậc hiền triết. Năm 1076, vua Lý Nhân Tông lập Quốc Tử Giám bên cạnh – trường học dành cho hoàng tử và con em quý tộc, sau mở rộng cho người tài trong cả nước.",
+                "en": "The Temple of Literature was founded in 1070 under King Ly Thanh Tong to honour Confucius. In 1076 King Ly Nhan Tong established the Imperial Academy beside it, first for princes and later for gifted students nationwide."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Cổng chính gồm ba lối đi, hai tầng, lối giữa xưa chỉ dành cho vua. Hai bên có đôi rồng đá mang phong cách thời Lê.",
+                "en": "The main gate has three passages on two levels; the central one was reserved for the king. A pair of Le-dynasty stone dragons flank the steps."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Bước qua cổng là bước vào không gian tôn vinh việc học – tinh thần hiếu học được xem là cốt lõi của văn hóa Việt.",
+                "en": "Passing through the gate means entering a space devoted to learning – a value at the heart of Vietnamese culture."
+              }
+            }
           ]
         },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Văn Miếu Môn", "en": "Narrated clip: Great Portico" } },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Văn Miếu Môn",
+            "en": "Narrated clip: Great Portico"
+          }
+        },
         {
           "type": "audio",
           "size": "md",
           "ambient": "garden",
           "script": {
-            "vi": ["Chào mừng bạn đến Văn Miếu Quốc Tử Giám.", "Cổng tam quan trước mặt bạn được dựng lại từ thời Lê, với ba lối đi mà lối giữa xưa chỉ dành cho nhà vua.", "Hãy đi qua lối bên và bắt đầu hành trình của một sĩ tử."],
-            "en": ["Welcome to the Temple of Literature.", "The triple gate before you dates from the Le dynasty; its central passage was once reserved for the king.", "Take a side passage and begin your journey as a scholar."]
+            "vi": [
+              "Chào mừng bạn đến Văn Miếu Quốc Tử Giám.",
+              "Cổng tam quan trước mặt bạn được dựng lại từ thời Lê, với ba lối đi mà lối giữa xưa chỉ dành cho nhà vua.",
+              "Hãy đi qua lối bên và bắt đầu hành trình của một sĩ tử."
+            ],
+            "en": [
+              "Welcome to the Temple of Literature.",
+              "The triple gate before you dates from the Le dynasty; its central passage was once reserved for the king.",
+              "Take a side passage and begin your journey as a scholar."
+            ]
           }
         },
-        { "type": "fact", "size": "sm", "icon": "spark", "text": { "vi": "Khu di tích rộng hơn 54.000 m², chia thành 5 lớp sân nối tiếp nhau.", "en": "The complex spans over 54,000 m², arranged in five successive courtyards." } }
+        {
+          "type": "fact",
+          "size": "sm",
+          "icon": "spark",
+          "text": {
+            "vi": "Khu di tích rộng hơn 54.000 m², chia thành 5 lớp sân nối tiếp nhau.",
+            "en": "The complex spans over 54,000 m², arranged in five successive courtyards."
+          }
+        }
       ],
       "sources": [
-        { "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám (giới thiệu di tích)", "url": "https://vanmieu.gov.vn", "reviewed": false }
+        {
+          "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám (giới thiệu di tích)",
+          "url": "https://vanmieu.gov.vn",
+          "reviewed": false
+        }
       ],
       "quiz": [
-        { "q": { "vi": "Văn Miếu được xây dựng vào năm nào?", "en": "When was the Temple of Literature founded?" }, "options": [{ "vi": "1010", "en": "1010" }, { "vi": "1070", "en": "1070" }, { "vi": "1076", "en": "1076" }, { "vi": "1484", "en": "1484" }], "answer": 1, "explain": {"vi": "Năm 1070 vua Lý Thánh Tông cho xây Văn Miếu thờ Khổng Tử – một trong các di tích lâu đời nhất Thăng Long.", "en": "In 1070 King Ly Thanh Tong built the Temple of Literature honoring Confucius – one of Thang Long's oldest monuments."} },
-        { "q": { "vi": "Lối đi giữa của cổng Văn Miếu Môn xưa dành cho ai?", "en": "Who was the central path of the Great Portico reserved for?" }, "options": [{ "vi": "Quan lại", "en": "Mandarins" }, { "vi": "Vua", "en": "The king" }, { "vi": "Học trò", "en": "Students" }, { "vi": "Sư thầy", "en": "Monks" }], "answer": 1, "explain": {"vi": "Cổng giữa ngày xưa chỉ dành cho vua; quan lại và khách phải đi hai lối phụ hai bên.", "en": "The central gate was once reserved for the king; mandarins and guests used the two side gates."} },
-        { "q": { "vi": "Đôi rồng đá hai bên cổng mang phong cách thời nào?", "en": "Which dynasty's style are the stone dragons beside the gate?" }, "options": [{ "vi": "Lý", "en": "Ly" }, { "vi": "Trần", "en": "Tran" }, { "vi": "Lê", "en": "Le" }, { "vi": "Nguyễn", "en": "Nguyen" }], "answer": 2, "explain": {"vi": "Đôi rồng đá đầu thềm mang phong cách thời Lê – thân mềm mại, đầu ngẩng cao uy nghi.", "en": "The stone dragon pair follows Later Le style – sinuous bodies with proudly raised heads."} },
-        { "q": { "vi": "Khu di tích Văn Miếu – Quốc Tử Giám rộng khoảng bao nhiêu?", "en": "Roughly how large is the Temple of Literature complex?" }, "options": [{ "vi": "5.400 m²", "en": "5,400 m²" }, { "vi": "54.000 m²", "en": "54,000 m²" }, { "vi": "540.000 m²", "en": "540,000 m²" }, { "vi": "5.400.000 m²", "en": "5,400,000 m²" }], "answer": 1, "explain": {"vi": "Khu di tích rộng khoảng 54.000 m² – lớn hơn 7 sân bóng đá.", "en": "The complex covers about 54,000 m² – bigger than seven football fields."} },
-        { "q": { "vi": "Khu di tích được chia thành mấy lớp sân?", "en": "How many successive courtyards is the complex divided into?" }, "options": [{ "vi": "3", "en": "3" }, { "vi": "4", "en": "4" }, { "vi": "5", "en": "5" }, { "vi": "7", "en": "7" }], "answer": 2, "explain": {"vi": "Năm lớp sân dọc trục Bắc–Nam từ cổng Văn Miếu tới nhà Thái Học, mỗi sân một công trình trung tâm.", "en": "Five courtyards follow the north–south axis from the gate to Thai Hoc hall, each with a focal building."} }
+        {
+          "q": {
+            "vi": "Văn Miếu được xây dựng vào năm nào?",
+            "en": "When was the Temple of Literature founded?"
+          },
+          "options": [
+            {
+              "vi": "1010",
+              "en": "1010"
+            },
+            {
+              "vi": "1070",
+              "en": "1070"
+            },
+            {
+              "vi": "1076",
+              "en": "1076"
+            },
+            {
+              "vi": "1484",
+              "en": "1484"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Năm 1070 vua Lý Thánh Tông cho xây Văn Miếu thờ Khổng Tử – một trong các di tích lâu đời nhất Thăng Long.",
+            "en": "In 1070 King Ly Thanh Tong built the Temple of Literature honoring Confucius – one of Thang Long's oldest monuments."
+          }
+        },
+        {
+          "q": {
+            "vi": "Lối đi giữa của cổng Văn Miếu Môn xưa dành cho ai?",
+            "en": "Who was the central path of the Great Portico reserved for?"
+          },
+          "options": [
+            {
+              "vi": "Quan lại",
+              "en": "Mandarins"
+            },
+            {
+              "vi": "Vua",
+              "en": "The king"
+            },
+            {
+              "vi": "Học trò",
+              "en": "Students"
+            },
+            {
+              "vi": "Sư thầy",
+              "en": "Monks"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Cổng giữa ngày xưa chỉ dành cho vua; quan lại và khách phải đi hai lối phụ hai bên.",
+            "en": "The central gate was once reserved for the king; mandarins and guests used the two side gates."
+          }
+        },
+        {
+          "q": {
+            "vi": "Đôi rồng đá hai bên cổng mang phong cách thời nào?",
+            "en": "Which dynasty's style are the stone dragons beside the gate?"
+          },
+          "options": [
+            {
+              "vi": "Lý",
+              "en": "Ly"
+            },
+            {
+              "vi": "Trần",
+              "en": "Tran"
+            },
+            {
+              "vi": "Lê",
+              "en": "Le"
+            },
+            {
+              "vi": "Nguyễn",
+              "en": "Nguyen"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Đôi rồng đá đầu thềm mang phong cách thời Lê – thân mềm mại, đầu ngẩng cao uy nghi.",
+            "en": "The stone dragon pair follows Later Le style – sinuous bodies with proudly raised heads."
+          }
+        },
+        {
+          "q": {
+            "vi": "Khu di tích Văn Miếu – Quốc Tử Giám rộng khoảng bao nhiêu?",
+            "en": "Roughly how large is the Temple of Literature complex?"
+          },
+          "options": [
+            {
+              "vi": "5.400 m²",
+              "en": "5,400 m²"
+            },
+            {
+              "vi": "54.000 m²",
+              "en": "54,000 m²"
+            },
+            {
+              "vi": "540.000 m²",
+              "en": "540,000 m²"
+            },
+            {
+              "vi": "5.400.000 m²",
+              "en": "5,400,000 m²"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Khu di tích rộng khoảng 54.000 m² – lớn hơn 7 sân bóng đá.",
+            "en": "The complex covers about 54,000 m² – bigger than seven football fields."
+          }
+        },
+        {
+          "q": {
+            "vi": "Khu di tích được chia thành mấy lớp sân?",
+            "en": "How many successive courtyards is the complex divided into?"
+          },
+          "options": [
+            {
+              "vi": "3",
+              "en": "3"
+            },
+            {
+              "vi": "4",
+              "en": "4"
+            },
+            {
+              "vi": "5",
+              "en": "5"
+            },
+            {
+              "vi": "7",
+              "en": "7"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Năm lớp sân dọc trục Bắc–Nam từ cổng Văn Miếu tới nhà Thái Học, mỗi sân một công trình trung tâm.",
+            "en": "Five courtyards follow the north–south axis from the gate to Thai Hoc hall, each with a focal building."
+          }
+        }
       ]
     },
     {
       "spotId": "khue-van-cac",
-      "name": { "vi": "Khuê Văn Các", "en": "Constellation of Literature Pavilion" },
-      "coords": [105.8355, 21.0270],
+      "qrId": "mdvq06",
+      "name": {
+        "vi": "Khuê Văn Các",
+        "en": "Constellation of Literature Pavilion"
+      },
+      "coords": [
+        105.8355,
+        21.027
+      ],
       "xp": 40,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/van-mieu/khue-van-cac.svg", "caption": { "vi": "Gác Khuê Văn – biểu tượng của Thủ đô Hà Nội", "en": "Khue Van Pavilion – the symbol of Hanoi" } },
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/khue-van-cac.svg",
+          "caption": {
+            "vi": "Gác Khuê Văn – biểu tượng của Thủ đô Hà Nội",
+            "en": "Khue Van Pavilion – the symbol of Hanoi"
+          }
+        },
         {
           "type": "aspects",
           "size": "lg",
           "aspects": [
-            { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Khuê Văn Các được xây năm 1805 dưới triều Nguyễn, do Tổng trấn Bắc Thành Nguyễn Văn Thành cho dựng. Tên gọi lấy từ sao Khuê – ngôi sao chủ về văn học trong quan niệm phương Đông.", "en": "Built in 1805 under the Nguyen dynasty by Governor Nguyen Van Thanh. Its name refers to Khue, the star governing literature in East Asian tradition." } },
-            { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Gác hai tầng, tầng dưới là bốn trụ gạch vuông, tầng trên bằng gỗ sơn đỏ với bốn cửa sổ tròn tỏa tia như mặt trời – tượng trưng cho ánh sáng của tri thức lan ra bốn phương.", "en": "A two-storey pavilion: four square brick pillars below, a red-lacquered wooden storey above with four round radiating windows – knowledge shining in all directions." } },
-            { "id": "y-nghia", "title": { "vi": "Ý nghĩa", "en": "Meaning" }, "body": { "vi": "Năm 2012, Khuê Văn Các được Quốc hội chọn làm biểu tượng chính thức của Thủ đô Hà Nội và xuất hiện trên đồng tiền 100.000 đồng.", "en": "In 2012 the pavilion was chosen as the official symbol of Hanoi; it also appears on the 100,000 dong banknote." } }
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Khuê Văn Các được xây năm 1805 dưới triều Nguyễn, do Tổng trấn Bắc Thành Nguyễn Văn Thành cho dựng. Tên gọi lấy từ sao Khuê – ngôi sao chủ về văn học trong quan niệm phương Đông.",
+                "en": "Built in 1805 under the Nguyen dynasty by Governor Nguyen Van Thanh. Its name refers to Khue, the star governing literature in East Asian tradition."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Gác hai tầng, tầng dưới là bốn trụ gạch vuông, tầng trên bằng gỗ sơn đỏ với bốn cửa sổ tròn tỏa tia như mặt trời – tượng trưng cho ánh sáng của tri thức lan ra bốn phương.",
+                "en": "A two-storey pavilion: four square brick pillars below, a red-lacquered wooden storey above with four round radiating windows – knowledge shining in all directions."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Năm 2012, Khuê Văn Các được Quốc hội chọn làm biểu tượng chính thức của Thủ đô Hà Nội và xuất hiện trên đồng tiền 100.000 đồng.",
+                "en": "In 2012 the pavilion was chosen as the official symbol of Hanoi; it also appears on the 100,000 dong banknote."
+              }
+            }
           ]
         },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Khuê Văn Các", "en": "Narrated clip: Khue Van Pavilion" } },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Khuê Văn Các",
+            "en": "Narrated clip: Khue Van Pavilion"
+          }
+        },
         {
           "type": "audio",
           "size": "md",
           "ambient": "wind-water",
           "script": {
-            "vi": ["Bạn đang đứng trước Khuê Văn Các, biểu tượng của Hà Nội.", "Bốn cửa sổ tròn trên gác tượng trưng cho ánh sao Khuê, ánh sáng của tri thức tỏa ra bốn phương.", "Phía sau là giếng Thiên Quang, nơi trời và đất soi vào nhau."],
-            "en": ["You are standing before the Khue Van Pavilion, the symbol of Hanoi.", "Its four round windows represent the light of the Khue star, knowledge radiating in all directions.", "Behind it lies the Well of Heavenly Clarity, where sky and earth reflect one another."]
+            "vi": [
+              "Bạn đang đứng trước Khuê Văn Các, biểu tượng của Hà Nội.",
+              "Bốn cửa sổ tròn trên gác tượng trưng cho ánh sao Khuê, ánh sáng của tri thức tỏa ra bốn phương.",
+              "Phía sau là giếng Thiên Quang, nơi trời và đất soi vào nhau."
+            ],
+            "en": [
+              "You are standing before the Khue Van Pavilion, the symbol of Hanoi.",
+              "Its four round windows represent the light of the Khue star, knowledge radiating in all directions.",
+              "Behind it lies the Well of Heavenly Clarity, where sky and earth reflect one another."
+            ]
           }
         },
-        { "type": "fact", "size": "sm", "icon": "spark", "text": { "vi": "Hình ảnh Khuê Văn Các được in trên tờ tiền 100.000 đồng.", "en": "The pavilion is printed on the 100,000 dong banknote." } }
+        {
+          "type": "fact",
+          "size": "sm",
+          "icon": "spark",
+          "text": {
+            "vi": "Hình ảnh Khuê Văn Các được in trên tờ tiền 100.000 đồng.",
+            "en": "The pavilion is printed on the 100,000 dong banknote."
+          }
+        }
       ],
       "sources": [
-        { "title": "Luật Thủ đô 2012, Điều 6 – Biểu tượng của Thủ đô", "reviewed": false },
-        { "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám", "url": "https://vanmieu.gov.vn", "reviewed": false }
+        {
+          "title": "Luật Thủ đô 2012, Điều 6 – Biểu tượng của Thủ đô",
+          "reviewed": false
+        },
+        {
+          "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám",
+          "url": "https://vanmieu.gov.vn",
+          "reviewed": false
+        }
       ],
       "quiz": [
-        { "q": { "vi": "Khuê Văn Các được chọn làm biểu tượng Thủ đô năm nào?", "en": "When did Khue Van Pavilion become Hanoi's official symbol?" }, "options": [{ "vi": "1805", "en": "1805" }, { "vi": "2010", "en": "2010" }, { "vi": "2012", "en": "2012" }], "answer": 2, "explain": {"vi": "Năm 2012 Khuê Văn Các được chọn làm biểu tượng của Thủ đô Hà Nội.", "en": "In 2012 Khue Van Cac was chosen as the symbol of Hanoi."} },
-        { "q": { "vi": "Khuê Văn Các được xây dựng vào năm nào?", "en": "When was Khue Van Pavilion built?" }, "options": [{ "vi": "1070", "en": "1070" }, { "vi": "1484", "en": "1484" }, { "vi": "1805", "en": "1805" }, { "vi": "1945", "en": "1945" }], "answer": 2, "explain": {"vi": "Gác xây năm 1805 thời vua Gia Long, khi triều Nguyễn tu bổ lại khu Văn Miếu.", "en": "The pavilion was built in 1805 under Emperor Gia Long during Nguyen-era restorations."} },
-        { "q": { "vi": "Tên Khuê Văn Các lấy từ đâu?", "en": "What does the name Khue Van Cac refer to?" }, "options": [{ "vi": "Sao Khuê chủ về văn học", "en": "Khue, the star of literature" }, { "vi": "Tên một vị vua", "en": "A king's name" }, { "vi": "Tên học giả", "en": "A scholar's name" }, { "vi": "Tên dòng sông", "en": "A river's name" }], "answer": 0, "explain": {"vi": "'Khuê' là sao Khuê – chòm sao chủ văn chương trong quan niệm xưa; 'các' nghĩa là gác, lầu.", "en": "'Khue' is the Khue star – the constellation of literature in old belief; 'cac' means pavilion."} },
-        { "q": { "vi": "Bốn cửa sổ tròn của Khuê Văn Các tượng trưng cho điều gì?", "en": "What do the four round windows symbolise?" }, "options": [{ "vi": "Ánh sáng tri thức tỏa bốn phương", "en": "The light of knowledge radiating in all directions" }, { "vi": "Bốn mùa", "en": "Four seasons" }, { "vi": "Bốn hướng đền", "en": "Four shrine directions" }, { "vi": "Bốn vị vua", "en": "Four kings" }], "answer": 0, "explain": {"vi": "Bốn cửa sổ tròn tượng trưng ánh sáng tri thức tỏa khắp bốn phương.", "en": "The four round windows symbolize the light of knowledge radiating in all directions."} },
-        { "q": { "vi": "Khuê Văn Các xuất hiện trên mệnh giá tiền nào?", "en": "On which banknote does Khue Van Pavilion appear?" }, "options": [{ "vi": "10.000 đồng", "en": "10,000 dong" }, { "vi": "50.000 đồng", "en": "50,000 dong" }, { "vi": "100.000 đồng", "en": "100,000 dong" }, { "vi": "500.000 đồng", "en": "500,000 dong" }], "answer": 2, "explain": {"vi": "Hình Khuê Văn Các được in trên mặt sau tờ 100.000 đồng polymer hiện hành.", "en": "Khue Van Cac appears on the back of the current 100,000 VND polymer note."} }
+        {
+          "q": {
+            "vi": "Khuê Văn Các được chọn làm biểu tượng Thủ đô năm nào?",
+            "en": "When did Khue Van Pavilion become Hanoi's official symbol?"
+          },
+          "options": [
+            {
+              "vi": "1805",
+              "en": "1805"
+            },
+            {
+              "vi": "2010",
+              "en": "2010"
+            },
+            {
+              "vi": "2012",
+              "en": "2012"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Năm 2012 Khuê Văn Các được chọn làm biểu tượng của Thủ đô Hà Nội.",
+            "en": "In 2012 Khue Van Cac was chosen as the symbol of Hanoi."
+          }
+        },
+        {
+          "q": {
+            "vi": "Khuê Văn Các được xây dựng vào năm nào?",
+            "en": "When was Khue Van Pavilion built?"
+          },
+          "options": [
+            {
+              "vi": "1070",
+              "en": "1070"
+            },
+            {
+              "vi": "1484",
+              "en": "1484"
+            },
+            {
+              "vi": "1805",
+              "en": "1805"
+            },
+            {
+              "vi": "1945",
+              "en": "1945"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Gác xây năm 1805 thời vua Gia Long, khi triều Nguyễn tu bổ lại khu Văn Miếu.",
+            "en": "The pavilion was built in 1805 under Emperor Gia Long during Nguyen-era restorations."
+          }
+        },
+        {
+          "q": {
+            "vi": "Tên Khuê Văn Các lấy từ đâu?",
+            "en": "What does the name Khue Van Cac refer to?"
+          },
+          "options": [
+            {
+              "vi": "Sao Khuê chủ về văn học",
+              "en": "Khue, the star of literature"
+            },
+            {
+              "vi": "Tên một vị vua",
+              "en": "A king's name"
+            },
+            {
+              "vi": "Tên học giả",
+              "en": "A scholar's name"
+            },
+            {
+              "vi": "Tên dòng sông",
+              "en": "A river's name"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "'Khuê' là sao Khuê – chòm sao chủ văn chương trong quan niệm xưa; 'các' nghĩa là gác, lầu.",
+            "en": "'Khue' is the Khue star – the constellation of literature in old belief; 'cac' means pavilion."
+          }
+        },
+        {
+          "q": {
+            "vi": "Bốn cửa sổ tròn của Khuê Văn Các tượng trưng cho điều gì?",
+            "en": "What do the four round windows symbolise?"
+          },
+          "options": [
+            {
+              "vi": "Ánh sáng tri thức tỏa bốn phương",
+              "en": "The light of knowledge radiating in all directions"
+            },
+            {
+              "vi": "Bốn mùa",
+              "en": "Four seasons"
+            },
+            {
+              "vi": "Bốn hướng đền",
+              "en": "Four shrine directions"
+            },
+            {
+              "vi": "Bốn vị vua",
+              "en": "Four kings"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Bốn cửa sổ tròn tượng trưng ánh sáng tri thức tỏa khắp bốn phương.",
+            "en": "The four round windows symbolize the light of knowledge radiating in all directions."
+          }
+        },
+        {
+          "q": {
+            "vi": "Khuê Văn Các xuất hiện trên mệnh giá tiền nào?",
+            "en": "On which banknote does Khue Van Pavilion appear?"
+          },
+          "options": [
+            {
+              "vi": "10.000 đồng",
+              "en": "10,000 dong"
+            },
+            {
+              "vi": "50.000 đồng",
+              "en": "50,000 dong"
+            },
+            {
+              "vi": "100.000 đồng",
+              "en": "100,000 dong"
+            },
+            {
+              "vi": "500.000 đồng",
+              "en": "500,000 dong"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Hình Khuê Văn Các được in trên mặt sau tờ 100.000 đồng polymer hiện hành.",
+            "en": "Khue Van Cac appears on the back of the current 100,000 VND polymer note."
+          }
+        }
       ]
     },
     {
       "spotId": "bia-tien-si",
-      "name": { "vi": "Vườn bia Tiến sĩ", "en": "Garden of Doctoral Steles" },
-      "coords": [105.8356, 21.0274],
+      "qrId": "mdvq07",
+      "name": {
+        "vi": "Vườn bia Tiến sĩ",
+        "en": "Garden of Doctoral Steles"
+      },
+      "coords": [
+        105.8356,
+        21.0274
+      ],
       "xp": 50,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/van-mieu/bia-tien-si.svg", "caption": { "vi": "82 bia đá đặt trên lưng rùa quanh giếng Thiên Quang", "en": "82 stone steles on tortoise backs around the Well of Heavenly Clarity" } },
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/bia-tien-si.svg",
+          "caption": {
+            "vi": "82 bia đá đặt trên lưng rùa quanh giếng Thiên Quang",
+            "en": "82 stone steles on tortoise backs around the Well of Heavenly Clarity"
+          }
+        },
         {
           "type": "aspects",
           "size": "lg",
           "aspects": [
-            { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "82 tấm bia ghi tên 1.304 tiến sĩ đỗ trong 82 khoa thi từ năm 1442 đến 1779. Bia đầu tiên được dựng năm 1484 theo lệnh vua Lê Thánh Tông. Năm 2011, bộ bia được UNESCO công nhận là Di sản tư liệu thế giới.", "en": "The 82 steles record 1,304 doctoral laureates from 82 examinations held between 1442 and 1779. The first was erected in 1484 by order of King Le Thanh Tong. UNESCO inscribed them on the Memory of the World Register in 2011." } },
-            { "id": "kien-truc", "title": { "vi": "Nghệ thuật", "en": "Art" }, "body": { "vi": "Mỗi bia đặt trên lưng một con rùa đá – biểu tượng của sự trường tồn. Hoa văn trán bia thay đổi theo từng thời kỳ, là tư liệu quý về điêu khắc Việt qua ba thế kỷ.", "en": "Each stele rests on a stone tortoise, a symbol of longevity. Their carved motifs change over time, documenting three centuries of Vietnamese sculpture." } },
-            { "id": "y-nghia", "title": { "vi": "Ý nghĩa", "en": "Meaning" }, "body": { "vi": "Bia ghi lại tư tưởng \"Hiền tài là nguyên khí của quốc gia\" – tôn vinh việc trọng dụng người tài của dân tộc.", "en": "The inscriptions carry the idea that \"talented people are the vital energy of the nation\" – honouring the tradition of valuing talent." } }
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "82 tấm bia ghi tên 1.304 tiến sĩ đỗ trong 82 khoa thi từ năm 1442 đến 1779. Bia đầu tiên được dựng năm 1484 theo lệnh vua Lê Thánh Tông. Năm 2011, bộ bia được UNESCO công nhận là Di sản tư liệu thế giới.",
+                "en": "The 82 steles record 1,304 doctoral laureates from 82 examinations held between 1442 and 1779. The first was erected in 1484 by order of King Le Thanh Tong. UNESCO inscribed them on the Memory of the World Register in 2011."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Nghệ thuật",
+                "en": "Art"
+              },
+              "body": {
+                "vi": "Mỗi bia đặt trên lưng một con rùa đá – biểu tượng của sự trường tồn. Hoa văn trán bia thay đổi theo từng thời kỳ, là tư liệu quý về điêu khắc Việt qua ba thế kỷ.",
+                "en": "Each stele rests on a stone tortoise, a symbol of longevity. Their carved motifs change over time, documenting three centuries of Vietnamese sculpture."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Bia ghi lại tư tưởng \"Hiền tài là nguyên khí của quốc gia\" – tôn vinh việc trọng dụng người tài của dân tộc.",
+                "en": "The inscriptions carry the idea that \"talented people are the vital energy of the nation\" – honouring the tradition of valuing talent."
+              }
+            }
           ]
         },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Vườn bia", "en": "Narrated clip: Garden of Steles" } },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Vườn bia",
+            "en": "Narrated clip: Garden of Steles"
+          }
+        },
         {
           "type": "audio",
           "size": "md",
           "ambient": "garden",
           "script": {
-            "vi": ["Trước mặt bạn là 82 tấm bia đá ghi danh hơn một nghìn ba trăm tiến sĩ.", "Mỗi tấm bia đặt trên lưng một con rùa, biểu tượng của sự trường tồn.", "Đây là Di sản tư liệu thế giới được UNESCO công nhận."],
-            "en": ["Before you stand 82 stone steles naming more than thirteen hundred doctoral laureates.", "Each rests on the back of a tortoise, the symbol of longevity.", "They are inscribed on UNESCO's Memory of the World Register."]
+            "vi": [
+              "Trước mặt bạn là 82 tấm bia đá ghi danh hơn một nghìn ba trăm tiến sĩ.",
+              "Mỗi tấm bia đặt trên lưng một con rùa, biểu tượng của sự trường tồn.",
+              "Đây là Di sản tư liệu thế giới được UNESCO công nhận."
+            ],
+            "en": [
+              "Before you stand 82 stone steles naming more than thirteen hundred doctoral laureates.",
+              "Each rests on the back of a tortoise, the symbol of longevity.",
+              "They are inscribed on UNESCO's Memory of the World Register."
+            ]
           }
         },
-        { "type": "fact", "size": "sm", "icon": "spark", "text": { "vi": "Xin đừng xoa đầu rùa – việc này làm mòn di sản hàng trăm năm tuổi.", "en": "Please don't rub the tortoise heads – it wears down centuries-old heritage." } }
+        {
+          "type": "fact",
+          "size": "sm",
+          "icon": "spark",
+          "text": {
+            "vi": "Xin đừng xoa đầu rùa – việc này làm mòn di sản hàng trăm năm tuổi.",
+            "en": "Please don't rub the tortoise heads – it wears down centuries-old heritage."
+          }
+        }
       ],
       "sources": [
-        { "title": "UNESCO Memory of the World – Stone Stele Records of Royal Examinations (2011)", "url": "https://www.unesco.org", "reviewed": false }
+        {
+          "title": "UNESCO Memory of the World – Stone Stele Records of Royal Examinations (2011)",
+          "url": "https://www.unesco.org",
+          "reviewed": false
+        }
       ],
       "quiz": [
-        { "q": { "vi": "Có bao nhiêu bia Tiến sĩ tại Văn Miếu?", "en": "How many doctoral steles are there?" }, "options": [{ "vi": "62", "en": "62" }, { "vi": "82", "en": "82" }, { "vi": "102", "en": "102" }], "answer": 1, "explain": {"vi": "Vườn bia có 82 tấm bia đá ghi danh các khoa thi từ 1442 đến 1779.", "en": "The stela garden holds 82 stone stelae recording examinations from 1442 to 1779."} },
-        { "q": { "vi": "Bia Tiến sĩ đầu tiên được dựng năm nào?", "en": "When was the first doctor's stele erected?" }, "options": [{ "vi": "1070", "en": "1070" }, { "vi": "1484", "en": "1484" }, { "vi": "1805", "en": "1805" }, { "vi": "1945", "en": "1945" }], "answer": 1, "explain": {"vi": "Tấm bia đầu tiên dựng năm 1484 dưới vua Lê Thánh Tông, ghi danh khoa Giáp Thìn 1442.", "en": "The first stela was erected in 1484 under King Le Thanh Tong for the 1442 Giap Thin exam."} },
-        { "q": { "vi": "Mỗi tấm bia được đặt trên lưng con vật nào?", "en": "Each stele rests on which animal?" }, "options": [{ "vi": "Rồng", "en": "A dragon" }, { "vi": "Rùa", "en": "A turtle" }, { "vi": "Nghê", "en": "A nghe" }, { "vi": "Phượng", "en": "A phoenix" }], "answer": 1, "explain": {"vi": "Bia đặt trên lưng rùa đá – biểu tượng trường tồn, nâng đỡ tri thức qua các thế hệ.", "en": "Each stela rests on a stone turtle – a symbol of endurance carrying knowledge through ages."} },
-        { "q": { "vi": "82 tấm bia ghi tên bao nhiêu tiến sĩ?", "en": "How many laureates are recorded on the 82 steles?" }, "options": [{ "vi": "82", "en": "82" }, { "vi": "304", "en": "304" }, { "vi": "1.304", "en": "1,304" }, { "vi": "2.304", "en": "2,304" }], "answer": 2, "explain": {"vi": "82 tấm bia ghi tên 1.304 vị đỗ đại khoa – bia khuyến học này được UNESCO công nhận Memory of the World.", "en": "82 stelae name 1,304 laureates – UNESCO lists them as a Memory of the World heritage."} },
-        { "q": { "vi": "Vì sao khách không nên xoa đầu rùa?", "en": "Why should visitors not rub the turtles' heads?" }, "options": [{ "vi": "Vì rùa linh thiêng", "en": "Turtles are sacred" }, { "vi": "Vì làm mòn di sản hàng trăm năm tuổi", "en": "It erodes centuries-old heritage" }, { "vi": "Vì mất may mắn", "en": "It brings bad luck" }, { "vi": "Vì quy định tôn giáo", "en": "Religious rules" }], "answer": 1, "explain": {"vi": "Hàng triệu lượt tay xoa đã làm mòn mặt bia và đầu rùa hàng trăm năm tuổi – ngắm thôi, đừng sờ nhé.", "en": "Millions of hands have worn down the centuries-old stone – please look, don't touch."} }
+        {
+          "q": {
+            "vi": "Có bao nhiêu bia Tiến sĩ tại Văn Miếu?",
+            "en": "How many doctoral steles are there?"
+          },
+          "options": [
+            {
+              "vi": "62",
+              "en": "62"
+            },
+            {
+              "vi": "82",
+              "en": "82"
+            },
+            {
+              "vi": "102",
+              "en": "102"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Vườn bia có 82 tấm bia đá ghi danh các khoa thi từ 1442 đến 1779.",
+            "en": "The stela garden holds 82 stone stelae recording examinations from 1442 to 1779."
+          }
+        },
+        {
+          "q": {
+            "vi": "Bia Tiến sĩ đầu tiên được dựng năm nào?",
+            "en": "When was the first doctor's stele erected?"
+          },
+          "options": [
+            {
+              "vi": "1070",
+              "en": "1070"
+            },
+            {
+              "vi": "1484",
+              "en": "1484"
+            },
+            {
+              "vi": "1805",
+              "en": "1805"
+            },
+            {
+              "vi": "1945",
+              "en": "1945"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Tấm bia đầu tiên dựng năm 1484 dưới vua Lê Thánh Tông, ghi danh khoa Giáp Thìn 1442.",
+            "en": "The first stela was erected in 1484 under King Le Thanh Tong for the 1442 Giap Thin exam."
+          }
+        },
+        {
+          "q": {
+            "vi": "Mỗi tấm bia được đặt trên lưng con vật nào?",
+            "en": "Each stele rests on which animal?"
+          },
+          "options": [
+            {
+              "vi": "Rồng",
+              "en": "A dragon"
+            },
+            {
+              "vi": "Rùa",
+              "en": "A turtle"
+            },
+            {
+              "vi": "Nghê",
+              "en": "A nghe"
+            },
+            {
+              "vi": "Phượng",
+              "en": "A phoenix"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Bia đặt trên lưng rùa đá – biểu tượng trường tồn, nâng đỡ tri thức qua các thế hệ.",
+            "en": "Each stela rests on a stone turtle – a symbol of endurance carrying knowledge through ages."
+          }
+        },
+        {
+          "q": {
+            "vi": "82 tấm bia ghi tên bao nhiêu tiến sĩ?",
+            "en": "How many laureates are recorded on the 82 steles?"
+          },
+          "options": [
+            {
+              "vi": "82",
+              "en": "82"
+            },
+            {
+              "vi": "304",
+              "en": "304"
+            },
+            {
+              "vi": "1.304",
+              "en": "1,304"
+            },
+            {
+              "vi": "2.304",
+              "en": "2,304"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "82 tấm bia ghi tên 1.304 vị đỗ đại khoa – bia khuyến học này được UNESCO công nhận Memory of the World.",
+            "en": "82 stelae name 1,304 laureates – UNESCO lists them as a Memory of the World heritage."
+          }
+        },
+        {
+          "q": {
+            "vi": "Vì sao khách không nên xoa đầu rùa?",
+            "en": "Why should visitors not rub the turtles' heads?"
+          },
+          "options": [
+            {
+              "vi": "Vì rùa linh thiêng",
+              "en": "Turtles are sacred"
+            },
+            {
+              "vi": "Vì làm mòn di sản hàng trăm năm tuổi",
+              "en": "It erodes centuries-old heritage"
+            },
+            {
+              "vi": "Vì mất may mắn",
+              "en": "It brings bad luck"
+            },
+            {
+              "vi": "Vì quy định tôn giáo",
+              "en": "Religious rules"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Hàng triệu lượt tay xoa đã làm mòn mặt bia và đầu rùa hàng trăm năm tuổi – ngắm thôi, đừng sờ nhé.",
+            "en": "Millions of hands have worn down the centuries-old stone – please look, don't touch."
+          }
+        }
       ]
     },
     {
       "spotId": "dai-thanh-mon",
-      "name": { "vi": "Đại Thành Môn & Điện Đại Thành", "en": "Gate and Hall of Great Success" },
-      "coords": [105.8357, 21.0279],
+      "qrId": "mdvq08",
+      "name": {
+        "vi": "Đại Thành Môn & Điện Đại Thành",
+        "en": "Gate and Hall of Great Success"
+      },
+      "coords": [
+        105.8357,
+        21.0279
+      ],
       "xp": 40,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/van-mieu/dai-thanh.svg" },
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/dai-thanh.svg"
+        },
         {
           "type": "aspects",
           "size": "lg",
           "aspects": [
-            { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Điện Đại Thành là nơi thờ Khổng Tử cùng bốn học trò xuất sắc (Tứ Phối). Đây là trung tâm tế lễ của Văn Miếu suốt gần một nghìn năm.", "en": "The Hall of Great Success honours Confucius and his four principal disciples. It was the ceremonial heart of the temple for nearly a millennium." } },
-            { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Điện gồm chín gian, mái ngói mũi hài, hệ cột gỗ lim sơn son thếp vàng theo lối kiến trúc thời Hậu Lê.", "en": "A nine-bay hall with a tiled roof and red-lacquered, gilded ironwood columns in the Later Le style." } },
-            { "id": "y-nghia", "title": { "vi": "Ý nghĩa", "en": "Meaning" }, "body": { "vi": "Trước mỗi mùa thi, học sinh Hà Nội vẫn đến đây dâng hương cầu may – truyền thống hiếu học được nối tiếp tới hôm nay.", "en": "Before each exam season, Hanoi students still come to offer incense – a living tradition of reverence for learning." } }
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Điện Đại Thành là nơi thờ Khổng Tử cùng bốn học trò xuất sắc (Tứ Phối). Đây là trung tâm tế lễ của Văn Miếu suốt gần một nghìn năm.",
+                "en": "The Hall of Great Success honours Confucius and his four principal disciples. It was the ceremonial heart of the temple for nearly a millennium."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Điện gồm chín gian, mái ngói mũi hài, hệ cột gỗ lim sơn son thếp vàng theo lối kiến trúc thời Hậu Lê.",
+                "en": "A nine-bay hall with a tiled roof and red-lacquered, gilded ironwood columns in the Later Le style."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Trước mỗi mùa thi, học sinh Hà Nội vẫn đến đây dâng hương cầu may – truyền thống hiếu học được nối tiếp tới hôm nay.",
+                "en": "Before each exam season, Hanoi students still come to offer incense – a living tradition of reverence for learning."
+              }
+            }
           ]
         },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Điện Đại Thành", "en": "Narrated clip: Hall of Great Success" } },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Điện Đại Thành",
+            "en": "Narrated clip: Hall of Great Success"
+          }
+        },
         {
           "type": "audio",
           "size": "md",
           "ambient": "temple-bell",
           "script": {
-            "vi": ["Bạn đã bước vào sân Đại Thành, không gian thiêng nhất của Văn Miếu.", "Điện thờ Khổng Tử và các bậc hiền triết nằm ngay trước mặt.", "Hãy giữ yên lặng và cảm nhận nhịp thời gian gần một nghìn năm."],
-            "en": ["You have entered the Great Success courtyard, the most sacred space of the temple.", "The hall honouring Confucius and the sages lies straight ahead.", "Keep quiet and feel the rhythm of nearly a thousand years."]
+            "vi": [
+              "Bạn đã bước vào sân Đại Thành, không gian thiêng nhất của Văn Miếu.",
+              "Điện thờ Khổng Tử và các bậc hiền triết nằm ngay trước mặt.",
+              "Hãy giữ yên lặng và cảm nhận nhịp thời gian gần một nghìn năm."
+            ],
+            "en": [
+              "You have entered the Great Success courtyard, the most sacred space of the temple.",
+              "The hall honouring Confucius and the sages lies straight ahead.",
+              "Keep quiet and feel the rhythm of nearly a thousand years."
+            ]
           }
         }
       ],
       "sources": [
-        { "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám", "url": "https://vanmieu.gov.vn", "reviewed": false }
+        {
+          "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám",
+          "url": "https://vanmieu.gov.vn",
+          "reviewed": false
+        }
       ],
       "quiz": [
-        { "q": { "vi": "Điện Đại Thành là nơi thờ ai?", "en": "Who is worshipped in the Dai Thanh Sanctuary?" }, "options": [{ "vi": "Vua Lý Thánh Tông", "en": "King Ly Thanh Tong" }, { "vi": "Khổng Tử", "en": "Confucius" }, { "vi": "Chu Văn An", "en": "Chu Van An" }, { "vi": "Phật Thích Ca", "en": "Buddha" }], "answer": 1, "explain": {"vi": "Điện Đại Thành thờ Khổng Tử cùng Tứ Phối – nơi trang nghiêm nhất của khu di tích.", "en": "Dai Thanh hall worships Confucius and the Four Sages – the most solemn place of the complex."} },
-        { "q": { "vi": "'Tứ Phối' là gì?", "en": "What is 'Tu Phoi' (the Four Sages)?" }, "options": [{ "vi": "Bốn học trò xuất sắc của Khổng Tử", "en": "Confucius' four most distinguished disciples" }, { "vi": "Bốn vị vua nhà Lý", "en": "Four Ly kings" }, { "vi": "Bốn vị quan triều Lê", "en": "Four Le mandarins" }, { "vi": "Bốn khoa thi", "en": "Four exams" }], "answer": 0, "explain": {"vi": "Tứ Phối là Nhan Hồi, Tăng Tử, Tử Tư và Mạnh Tử – bốn đại đệ tử trong hệ thống thờ Nho giáo.", "en": "Tu Phoi are Yan Hui, Zengzi, Zisi and Mencius – the four great disciples in Confucian worship."} },
-        { "q": { "vi": "Hệ cột của Điện Đại Thành làm bằng gỗ gì?", "en": "What wood are the sanctuary's pillars made of?" }, "options": [{ "vi": "Gỗ lim", "en": "Ironwood" }, { "vi": "Gỗ dổi", "en": "Dau wood" }, { "vi": "Gỗ mít", "en": "Jackfruit wood" }, { "vi": "Gỗ sến", "en": "Sindora" }], "answer": 0, "explain": {"vi": "Hệ cột gỗ lim quý, nặng và bền – đặc trưng của các đại công trình gỗ Việt Nam cổ.", "en": "The hall uses precious ironwood columns – signature of Vietnam's great wooden structures."} },
-        { "q": { "vi": "Kiến trúc điện Đại Thành theo lối thời nào?", "en": "Which dynasty's style is the sanctuary built in?" }, "options": [{ "vi": "Lý", "en": "Ly" }, { "vi": "Trần", "en": "Tran" }, { "vi": "Hậu Lê", "en": "Later Le" }, { "vi": "Nguyễn", "en": "Nguyen" }], "answer": 2, "explain": {"vi": "Điện mang phong cách thời Hậu Lê: mái cong duyên dáng, cột lớn, họa tiết hàm ý nho học.", "en": "The hall follows Later Le style: gracefully curved roofs, large columns, Confucian motifs."} },
-        { "q": { "vi": "Học sinh Hà Nội đến Điện Đại Thành dâng hương khi nào?", "en": "When do Hanoi students offer incense here?" }, "options": [{ "vi": "Tết Nguyên Đán", "en": "Lunar New Year" }, { "vi": "Trước mỗi mùa thi", "en": "Before each exam season" }, { "vi": "Rằm hằng tháng", "en": "Every full moon" }, { "vi": "Ngày Quốc khánh", "en": "National Day" }], "answer": 1, "explain": {"vi": "Học sinh Hà Nội tới dâng hương cầu may trước mỗi mùa thi – tục 'cầu đỗ' giữ tới nay.", "en": "Hanoi students still come to offer incense for luck before each exam season."} }
+        {
+          "q": {
+            "vi": "Điện Đại Thành là nơi thờ ai?",
+            "en": "Who is worshipped in the Dai Thanh Sanctuary?"
+          },
+          "options": [
+            {
+              "vi": "Vua Lý Thánh Tông",
+              "en": "King Ly Thanh Tong"
+            },
+            {
+              "vi": "Khổng Tử",
+              "en": "Confucius"
+            },
+            {
+              "vi": "Chu Văn An",
+              "en": "Chu Van An"
+            },
+            {
+              "vi": "Phật Thích Ca",
+              "en": "Buddha"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Điện Đại Thành thờ Khổng Tử cùng Tứ Phối – nơi trang nghiêm nhất của khu di tích.",
+            "en": "Dai Thanh hall worships Confucius and the Four Sages – the most solemn place of the complex."
+          }
+        },
+        {
+          "q": {
+            "vi": "'Tứ Phối' là gì?",
+            "en": "What is 'Tu Phoi' (the Four Sages)?"
+          },
+          "options": [
+            {
+              "vi": "Bốn học trò xuất sắc của Khổng Tử",
+              "en": "Confucius' four most distinguished disciples"
+            },
+            {
+              "vi": "Bốn vị vua nhà Lý",
+              "en": "Four Ly kings"
+            },
+            {
+              "vi": "Bốn vị quan triều Lê",
+              "en": "Four Le mandarins"
+            },
+            {
+              "vi": "Bốn khoa thi",
+              "en": "Four exams"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Tứ Phối là Nhan Hồi, Tăng Tử, Tử Tư và Mạnh Tử – bốn đại đệ tử trong hệ thống thờ Nho giáo.",
+            "en": "Tu Phoi are Yan Hui, Zengzi, Zisi and Mencius – the four great disciples in Confucian worship."
+          }
+        },
+        {
+          "q": {
+            "vi": "Hệ cột của Điện Đại Thành làm bằng gỗ gì?",
+            "en": "What wood are the sanctuary's pillars made of?"
+          },
+          "options": [
+            {
+              "vi": "Gỗ lim",
+              "en": "Ironwood"
+            },
+            {
+              "vi": "Gỗ dổi",
+              "en": "Dau wood"
+            },
+            {
+              "vi": "Gỗ mít",
+              "en": "Jackfruit wood"
+            },
+            {
+              "vi": "Gỗ sến",
+              "en": "Sindora"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Hệ cột gỗ lim quý, nặng và bền – đặc trưng của các đại công trình gỗ Việt Nam cổ.",
+            "en": "The hall uses precious ironwood columns – signature of Vietnam's great wooden structures."
+          }
+        },
+        {
+          "q": {
+            "vi": "Kiến trúc điện Đại Thành theo lối thời nào?",
+            "en": "Which dynasty's style is the sanctuary built in?"
+          },
+          "options": [
+            {
+              "vi": "Lý",
+              "en": "Ly"
+            },
+            {
+              "vi": "Trần",
+              "en": "Tran"
+            },
+            {
+              "vi": "Hậu Lê",
+              "en": "Later Le"
+            },
+            {
+              "vi": "Nguyễn",
+              "en": "Nguyen"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Điện mang phong cách thời Hậu Lê: mái cong duyên dáng, cột lớn, họa tiết hàm ý nho học.",
+            "en": "The hall follows Later Le style: gracefully curved roofs, large columns, Confucian motifs."
+          }
+        },
+        {
+          "q": {
+            "vi": "Học sinh Hà Nội đến Điện Đại Thành dâng hương khi nào?",
+            "en": "When do Hanoi students offer incense here?"
+          },
+          "options": [
+            {
+              "vi": "Tết Nguyên Đán",
+              "en": "Lunar New Year"
+            },
+            {
+              "vi": "Trước mỗi mùa thi",
+              "en": "Before each exam season"
+            },
+            {
+              "vi": "Rằm hằng tháng",
+              "en": "Every full moon"
+            },
+            {
+              "vi": "Ngày Quốc khánh",
+              "en": "National Day"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Học sinh Hà Nội tới dâng hương cầu may trước mỗi mùa thi – tục 'cầu đỗ' giữ tới nay.",
+            "en": "Hanoi students still come to offer incense for luck before each exam season."
+          }
+        }
       ]
     },
     {
       "spotId": "nha-thai-hoc",
-      "name": { "vi": "Nhà Thái Học", "en": "Thai Hoc House" },
-      "coords": [105.8358, 21.0285],
+      "qrId": "mdvq09",
+      "name": {
+        "vi": "Nhà Thái Học",
+        "en": "Thai Hoc House"
+      },
+      "coords": [
+        105.8358,
+        21.0285
+      ],
       "xp": 40,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/van-mieu/thai-hoc.svg" },
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/thai-hoc.svg"
+        },
         {
           "type": "aspects",
           "size": "lg",
           "aspects": [
-            { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Khu Thái Học là nơi đặt trường Quốc Tử Giám xưa. Công trình cũ bị phá hủy trong chiến tranh; nhà Thái Học hiện nay được xây lại năm 2000 nhân kỷ niệm 990 năm Thăng Long – Hà Nội.", "en": "This area housed the original Imperial Academy. Destroyed in wartime, the present Thai Hoc House was rebuilt in 2000 for the 990th anniversary of Thang Long – Hanoi." } },
-            { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Nhà hai tầng theo lối kiến trúc truyền thống; tầng trên thờ ba vị vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.", "en": "A two-storey traditional building; the upper floor honours three kings who founded and developed the academy: Ly Thanh Tong, Ly Nhan Tong and Le Thanh Tong." } },
-            { "id": "y-nghia", "title": { "vi": "Ý nghĩa", "en": "Meaning" }, "body": { "vi": "Tầng dưới thờ thầy Chu Văn An – người thầy tiêu biểu của nền giáo dục Việt Nam, từng làm Tư nghiệp Quốc Tử Giám.", "en": "The ground floor honours Chu Van An, the exemplary teacher of Vietnamese education, who once directed the Academy." } }
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Khu Thái Học là nơi đặt trường Quốc Tử Giám xưa. Công trình cũ bị phá hủy trong chiến tranh; nhà Thái Học hiện nay được xây lại năm 2000 nhân kỷ niệm 990 năm Thăng Long – Hà Nội.",
+                "en": "This area housed the original Imperial Academy. Destroyed in wartime, the present Thai Hoc House was rebuilt in 2000 for the 990th anniversary of Thang Long – Hanoi."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Nhà hai tầng theo lối kiến trúc truyền thống; tầng trên thờ ba vị vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.",
+                "en": "A two-storey traditional building; the upper floor honours three kings who founded and developed the academy: Ly Thanh Tong, Ly Nhan Tong and Le Thanh Tong."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Tầng dưới thờ thầy Chu Văn An – người thầy tiêu biểu của nền giáo dục Việt Nam, từng làm Tư nghiệp Quốc Tử Giám.",
+                "en": "The ground floor honours Chu Van An, the exemplary teacher of Vietnamese education, who once directed the Academy."
+              }
+            }
           ]
         },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Nhà Thái Học", "en": "Narrated clip: Thai Hoc House" } },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Nhà Thái Học",
+            "en": "Narrated clip: Thai Hoc House"
+          }
+        },
         {
           "type": "audio",
           "size": "md",
           "ambient": "garden",
           "script": {
-            "vi": ["Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.", "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường.", "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."],
-            "en": ["The final stop: Thai Hoc House, once the Imperial Academy itself.", "The ground floor honours teacher Chu Van An; the upper floor, three founding kings.", "Congratulations – you have completed the scholar's journey."]
+            "vi": [
+              "Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.",
+              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường.",
+              "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."
+            ],
+            "en": [
+              "The final stop: Thai Hoc House, once the Imperial Academy itself.",
+              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings.",
+              "Congratulations – you have completed the scholar's journey."
+            ]
           }
         }
       ],
       "sources": [
-        { "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám", "url": "https://vanmieu.gov.vn", "reviewed": false }
+        {
+          "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám",
+          "url": "https://vanmieu.gov.vn",
+          "reviewed": false
+        }
       ],
       "quiz": [
-        { "q": { "vi": "Khu Thái Học xưa là nơi đặt trường nào?", "en": "Which school stood in the Thai Hoc area?" }, "options": [{ "vi": "Trường Sùng Chính", "en": "Sung Chinh school" }, { "vi": "Quốc Tử Giám", "en": "Quoc Tu Giam (Imperial Academy)" }, { "vi": "Trường Giảng võ", "en": "Giang Vo hall" }, { "vi": "Trường Hải đồ", "en": "Hai Dong school" }], "answer": 1, "explain": {"vi": "Khu Thái Học xưa đặt Quốc Tử Giám – trường đại học đầu tiên của Việt Nam, thành lập năm 1076.", "en": "Thai Hoc once housed Quoc Tu Giam – Vietnam's first national university, founded in 1076."} },
-        { "q": { "vi": "Nhà Thái Học hiện nay được xây lại năm nào?", "en": "When was the current Thai Hoc house rebuilt?" }, "options": [{ "vi": "1076", "en": "1076" }, { "vi": "1805", "en": "1805" }, { "vi": "1954", "en": "1954" }, { "vi": "2000", "en": "2000" }], "answer": 3, "explain": {"vi": "Nhà Thái Học hiện nay xây lại năm 1999–2000, đúng kỷ niệm 990 năm Thăng Long – Hà Nội.", "en": "Today's Thai Hoc hall was rebuilt in 1999–2000, for Thang Long–Hanoi's 990th anniversary."} },
-        { "q": { "vi": "Tầng trên nhà Thái Học thờ mấy vị vua?", "en": "How many kings are worshipped upstairs?" }, "options": [{ "vi": "2", "en": "2" }, { "vi": "3", "en": "3" }, { "vi": "4", "en": "4" }, { "vi": "5", "en": "5" }], "answer": 1, "explain": {"vi": "Tầng trên thờ ba vua: Lý Thánh Tông (dựng Văn Miếu), Lý Nhân Tông (lập Quốc Tử Giám), Lê Thánh Tông (dựng bia Tiến sĩ).", "en": "The upper floor honors three kings: Ly Thanh Tong (temple), Ly Nhan Tong (university), Le Thanh Tong (stelae)."} },
-        { "q": { "vi": "Tầng dưới thờ ai – người thầy tiêu biểu của nền giáo dục Việt?", "en": "Who is worshipped downstairs, Vietnam's exemplary teacher?" }, "options": [{ "vi": "Chu Văn An", "en": "Chu Van An" }, { "vi": "Nguyễn Trãi", "en": "Nguyen Trai" }, { "vi": "Lê Quý Đôn", "en": "Le Quy Don" }, { "vi": "Nguyễn Bỉnh Khiêm", "en": "Nguyen Binh Khiem" }], "answer": 0, "explain": {"vi": "Tầng dưới thờ Chu Văn An – vị thầy tiêu biểu được xem như 'vạn thế sư biểu' của giáo dục Việt.", "en": "The lower floor honors Chu Van An – the exemplary teacher of Vietnamese education."} },
-        { "q": { "vi": "Chu Văn An từng giữ chức gì ở Quốc Tử Giám?", "en": "What post did Chu Van An hold at the Imperial Academy?" }, "options": [{ "vi": "Tế tửu", "en": "Libationer (rector)" }, { "vi": "Tư nghiệp", "en": "Director (Tu nghiep)" }, { "vi": "Chưởng ấn", "en": "Seal keeper" }, { "vi": "Hàn lâm", "en": "Hanlin academician" }], "answer": 1, "explain": {"vi": "Chu Văn An giữ chức Tư nghiệp – tương đương giám đốc học vụ của Quốc Tử Giám, thầy dạy vua Trần Minh Tông.", "en": "Chu Van An served as Tu Nghiep – rector of Quoc Tu Giam and teacher to King Tran Minh Tong."} }
+        {
+          "q": {
+            "vi": "Khu Thái Học xưa là nơi đặt trường nào?",
+            "en": "Which school stood in the Thai Hoc area?"
+          },
+          "options": [
+            {
+              "vi": "Trường Sùng Chính",
+              "en": "Sung Chinh school"
+            },
+            {
+              "vi": "Quốc Tử Giám",
+              "en": "Quoc Tu Giam (Imperial Academy)"
+            },
+            {
+              "vi": "Trường Giảng võ",
+              "en": "Giang Vo hall"
+            },
+            {
+              "vi": "Trường Hải đồ",
+              "en": "Hai Dong school"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Khu Thái Học xưa đặt Quốc Tử Giám – trường đại học đầu tiên của Việt Nam, thành lập năm 1076.",
+            "en": "Thai Hoc once housed Quoc Tu Giam – Vietnam's first national university, founded in 1076."
+          }
+        },
+        {
+          "q": {
+            "vi": "Nhà Thái Học hiện nay được xây lại năm nào?",
+            "en": "When was the current Thai Hoc house rebuilt?"
+          },
+          "options": [
+            {
+              "vi": "1076",
+              "en": "1076"
+            },
+            {
+              "vi": "1805",
+              "en": "1805"
+            },
+            {
+              "vi": "1954",
+              "en": "1954"
+            },
+            {
+              "vi": "2000",
+              "en": "2000"
+            }
+          ],
+          "answer": 3,
+          "explain": {
+            "vi": "Nhà Thái Học hiện nay xây lại năm 1999–2000, đúng kỷ niệm 990 năm Thăng Long – Hà Nội.",
+            "en": "Today's Thai Hoc hall was rebuilt in 1999–2000, for Thang Long–Hanoi's 990th anniversary."
+          }
+        },
+        {
+          "q": {
+            "vi": "Tầng trên nhà Thái Học thờ mấy vị vua?",
+            "en": "How many kings are worshipped upstairs?"
+          },
+          "options": [
+            {
+              "vi": "2",
+              "en": "2"
+            },
+            {
+              "vi": "3",
+              "en": "3"
+            },
+            {
+              "vi": "4",
+              "en": "4"
+            },
+            {
+              "vi": "5",
+              "en": "5"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Tầng trên thờ ba vua: Lý Thánh Tông (dựng Văn Miếu), Lý Nhân Tông (lập Quốc Tử Giám), Lê Thánh Tông (dựng bia Tiến sĩ).",
+            "en": "The upper floor honors three kings: Ly Thanh Tong (temple), Ly Nhan Tong (university), Le Thanh Tong (stelae)."
+          }
+        },
+        {
+          "q": {
+            "vi": "Tầng dưới thờ ai – người thầy tiêu biểu của nền giáo dục Việt?",
+            "en": "Who is worshipped downstairs, Vietnam's exemplary teacher?"
+          },
+          "options": [
+            {
+              "vi": "Chu Văn An",
+              "en": "Chu Van An"
+            },
+            {
+              "vi": "Nguyễn Trãi",
+              "en": "Nguyen Trai"
+            },
+            {
+              "vi": "Lê Quý Đôn",
+              "en": "Le Quy Don"
+            },
+            {
+              "vi": "Nguyễn Bỉnh Khiêm",
+              "en": "Nguyen Binh Khiem"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Tầng dưới thờ Chu Văn An – vị thầy tiêu biểu được xem như 'vạn thế sư biểu' của giáo dục Việt.",
+            "en": "The lower floor honors Chu Van An – the exemplary teacher of Vietnamese education."
+          }
+        },
+        {
+          "q": {
+            "vi": "Chu Văn An từng giữ chức gì ở Quốc Tử Giám?",
+            "en": "What post did Chu Van An hold at the Imperial Academy?"
+          },
+          "options": [
+            {
+              "vi": "Tế tửu",
+              "en": "Libationer (rector)"
+            },
+            {
+              "vi": "Tư nghiệp",
+              "en": "Director (Tu nghiep)"
+            },
+            {
+              "vi": "Chưởng ấn",
+              "en": "Seal keeper"
+            },
+            {
+              "vi": "Hàn lâm",
+              "en": "Hanlin academician"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Chu Văn An giữ chức Tư nghiệp – tương đương giám đốc học vụ của Quốc Tử Giám, thầy dạy vua Trần Minh Tông.",
+            "en": "Chu Van An served as Tu Nghiep – rector of Quoc Tu Giam and teacher to King Tran Minh Tong."
+          }
+        }
       ]
     }
-  ]
+  ],
+  "siteMap": {
+    "nodes": {
+      "van-mieu-mon": {
+        "x": 360,
+        "y": 460
+      },
+      "khue-van-cac": {
+        "x": 360,
+        "y": 368
+      },
+      "bia-tien-si": {
+        "x": 478,
+        "y": 276,
+        "labelSide": "left"
+      },
+      "dai-thanh-mon": {
+        "x": 360,
+        "y": 184
+      },
+      "nha-thai-hoc": {
+        "x": 360,
+        "y": 92
+      }
+    },
+    "decor": [
+      {
+        "shape": "rect",
+        "cls": "smap__well",
+        "cx": "center",
+        "cy": "bia-tien-si",
+        "w": 112,
+        "h": 112,
+        "rx": 8
+      },
+      {
+        "shape": "rect",
+        "cls": "smap__well-in",
+        "cx": "center",
+        "cy": "bia-tien-si",
+        "w": 64,
+        "h": 64
+      }
+    ]
+  },
+  "visit": {
+    "address": {
+      "vi": "58 Quốc Tử Giám, Văn Miếu, Đống Đa, Hà Nội",
+      "en": "58 Quoc Tu Giam, Van Mieu, Dong Da, Hanoi"
+    },
+    "hours": {
+      "vi": "8:00–17:00, mở cả tuần",
+      "en": "8:00 AM–5:00 PM, daily"
+    },
+    "tickets": {
+      "vi": "≈70.000đ/người lớn",
+      "en": "≈70,000 VND/adult"
+    }
+  }
 }

@@ -173,8 +173,8 @@
   transition: border-color 120ms ease, background 120ms ease, opacity 160ms ease;
 }
 .quiz__opt.is-correct {
-  border-color: var(--color-accent-primary);
-  background: color-mix(in srgb, var(--color-accent-primary) 18%, var(--color-surface));
+  border-color: var(--color-accent-tertiary);
+  background: color-mix(in srgb, var(--color-accent-tertiary) 18%, var(--color-surface));
   font-weight: 700;
 }
 .quiz__opt.is-wrong {
@@ -195,7 +195,7 @@
   font-size: var(--text-sm);
 }
 .quiz__mark.ok {
-  color: var(--color-accent-primary);
+  color: var(--color-accent-tertiary-text);
 }
 .quiz__mark.bad {
   color: var(--color-danger, #e5484d);

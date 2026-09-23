@@ -3,7 +3,7 @@
 
 Chạy: python3 scripts/gen-qr-sheet.py [base-url]
 Mặc định base = trang GitHub Pages đang deploy.
-Xuất: docs/qr-sheet.html — file tự chứa (SVG vector), in A4 3×3.
+Xuất: public/qr-sheet.html — file tự chứa (SVG vector), in A4 3×3.
 Cần: pip3 install segno
 """
 import glob
@@ -20,7 +20,7 @@ BASE = (
     sys.argv[1] if len(sys.argv) > 1
     else "https://nguyenduyhungnguyen1998-blip.github.io/Bainopkhkt/"
 ).rstrip("/") + "/"
-OUT = "docs/qr-sheet.html"
+OUT = "public/qr-sheet.html"
 
 cards = []
 for path in sorted(glob.glob("src/data/sites/*.json")):

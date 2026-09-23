@@ -286,7 +286,9 @@ export function VietnamMap({
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fly-to: camera "lao" vào điểm theo đường log-k rồi báo xong (mở sơ đồ/điều hướng).
-  const lastFly = useRef(flyRequest);
+  // Seed undefined: remount sau sơ đồ khu mang flyRequest mới đặt cùng batch – phải chạy,
+  // nếu gieo bằng flyRequest hiện tại effect sẽ nuốt mất lượt bay đầu tiên.
+  const lastFly = useRef<typeof flyRequest>(undefined);
   useEffect(() => {
     if (!flyRequest || flyRequest === lastFly.current) return;
     lastFly.current = flyRequest;

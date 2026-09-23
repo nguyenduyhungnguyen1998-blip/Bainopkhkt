@@ -327,7 +327,7 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
 function AudioTextView({ card, lang }: { card: AudioCard; lang: Lang }) {
   return (
     <div class={`dcard dcard--audio dcard--${card.size}`}>
-      <ol class="dcard__script">
+      <ol class="dcard__script dcard__script--show">
         {card.script[lang].map((s, i) => (
           <li key={i}>{s}</li>
         ))}

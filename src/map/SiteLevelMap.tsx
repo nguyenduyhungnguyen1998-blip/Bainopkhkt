@@ -27,29 +27,33 @@ interface SpotNode {
 }
 
 /**
- * Vị trí riêng theo đúng mặt bằng di tích (C1). Văn Miếu: trục Bắc–Nam
- * Môn -> Khuê Văn -> giếng Thiên Quang + vườn bia -> Đại Thành -> Thái Học;
- * vườn bia nằm sườn giếng chứ không nằm trên trục.
+ * Sơ đồ nội khu dữ liệu hoá (C1 + P2): vị trí node + trang trí lấy từ
+ * `site.siteMap` trong JSON — thêm khu mới chỉ cần data, không sửa component.
+ * Nếu không có siteMap, các điểm bố dọc trục giữa mặc định.
  */
-const CUSTOM_POS: Record<string, Record<string, { x: number; y: number; labelSide?: 'left' | 'right' }>> = {
-  'van-mieu': {
-    'van-mieu-mon': { x: W / 2, y: H - 100 },
-    'khue-van-cac': { x: W / 2, y: H - 192 },
-    'bia-tien-si': { x: W / 2 + 118, y: H - 284, labelSide: 'left' },
-    'dai-thanh-mon': { x: W / 2, y: H - 376 },
-    'nha-thai-hoc': { x: W / 2, y: H - 468 },
-  },
-};
 
-/** Khu có sơ đồ mặt bằng riêng (ví dụ giếng Thiên Quang của Văn Miếu). */
+/** Trang trí riêng của khu (giếng, tường phụ, …) – rect, neo theo khung/node. */
 function siteDecors(site: Site, nodes: SpotNode[]) {
-  if (site.entityId !== 'van-mieu' || nodes.length < 4) return null;
-  // Giếng vuông giữa sân thứ ba: tâm trục ngang, mức y của vườn bia.
-  const wellY = nodes[2].y;
+  const decor = site.siteMap?.decor;
+  if (!decor || !decor.length) return null;
+  const nodeBySpot = new Map(nodes.map((n) => [n.spotId, n]));
   return (
     <g aria-hidden="true">
-      <rect class="smap__well" x={W / 2 - 56} y={wellY - 56} width={112} height={112} rx={8} />
-      <rect class="smap__well-in" x={W / 2 - 32} y={wellY - 32} width={64} height={64} />
+      {decor.map((d, i) => {
+        const cx = d.cx === 'center' ? W / 2 : d.cx;
+        const cy = typeof d.cy === 'number' ? d.cy : (nodeBySpot.get(d.cy)?.y ?? 0);
+        return (
+          <rect
+            key={i}
+            class={d.cls}
+            x={cx - d.w / 2}
+            y={cy - d.h / 2}
+            width={d.w}
+            height={d.h}
+            rx={d.rx}
+          />
+        );
+      })}
     </g>
   );
 }
@@ -58,7 +62,7 @@ function siteDecors(site: Site, nodes: SpotNode[]) {
 export function layoutSpots(site: Site, p: Progress): SpotNode[] {
   const n = site.spots.length;
   const firstLocked = site.spots.findIndex((s) => !(`${site.entityId}/${s.spotId}` in p.unlocked));
-  const custom = CUSTOM_POS[site.entityId];
+  const custom = site.siteMap?.nodes;
   return site.spots.map((s, i) => {
     const c = custom?.[s.spotId];
     const ratio = n === 1 ? 0.5 : i / (n - 1); // 0 -> 1 dọc hành trình

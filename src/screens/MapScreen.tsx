@@ -51,6 +51,24 @@ export function MapScreen() {
   });
   const [homeSignal, setHomeSignal] = useState(0);
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
+  const [searchOn, setSearchOn] = useState(false);
+  const [query, setQuery] = useState("");
+  // Tìm kiếm địa danh/tỉnh: khách thường biết tên và muốn đi thẳng – bản đồ không phải đường duy nhất.
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out: { siteId: string; spotId?: string; label: string; sub: string }[] = [];
+    for (const s of SITES) {
+      const siteKey = `${t(s.name, 'vi')} ${t(s.name, 'en')} ${t(s.province, 'vi')} ${t(s.province, 'en')}`.toLowerCase();
+      if (!q || siteKey.includes(q))
+        out.push({ siteId: s.entityId, label: t(s.name, lang), sub: t(s.province, lang) });
+      for (const sp of s.spots) {
+        const spotKey = `${t(sp.name, 'vi')} ${t(sp.name, 'en')}`.toLowerCase();
+        if (q && spotKey.includes(q))
+          out.push({ siteId: s.entityId, spotId: sp.spotId, label: t(sp.name, lang), sub: t(s.name, lang) });
+      }
+    }
+    return out.slice(0, 12);
+  }, [query, lang]);
   const [nextOffscreen, setNextOffscreen] = useState(false);
   const [toast, setToast] = useState<{ xp: number; seq: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -98,8 +116,10 @@ export function MapScreen() {
     }
   };
   // Hint "Chạm điểm sáng" chỉ tắt khi user thật sự tương tác (tap node / bấm ✕) – không chết khi camera hạ cánh.
+  const [obSkip, setObSkip] = useState(false); // bỏ qua onboarding camera
   const dismissHint = () => {
     setHintOn(false);
+    setObSkip(true); // đóng hint = bỏ qua luôn phần hướng dẫn camera
     markSeen();
     try {
       localStorage.setItem(HINT_KEY, '1');
@@ -293,6 +313,9 @@ export function MapScreen() {
             {t(UI[f.label], lang)}
           </button>
         ))}
+        <button class="mdv-chip mscreen__searchbtn" onClick={() => setSearchOn(true)} aria-label={t(UI.search, lang)}>
+          <Icon name="search" size={16} /> {t(UI.search, lang)}
+        </button>
       </div>
 
       <div class="mscreen__map">
@@ -309,7 +332,7 @@ export function MapScreen() {
             selectedId={selectedId}
             focus={focus}
             lang={lang}
-            onboard={cinema}
+            onboard={cinema && !obSkip}
             homeSignal={homeSignal}
             zoomSignal={zoomSignal}
             flyRequest={flyReq}
@@ -347,6 +370,52 @@ export function MapScreen() {
           </button>
         )}
         {levelSite && <div class="mscreen__level-title">{t(levelSite.name, lang)}</div>}
+        {searchOn && (
+          <div class="msearch" role="dialog" aria-label={t(UI.search, lang)}>
+            <div class="msearch__bar">
+              <Icon name="search" size={18} />
+              <input
+                class="msearch__input"
+                value={query}
+                autoFocus
+                placeholder={t(UI.searchPlaceholder, lang)}
+                onInput={(e) => setQuery(e.currentTarget.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') setSearchOn(false); }}
+              />
+              <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={() => setSearchOn(false)}>
+                <Icon name="close" size={16} />
+              </button>
+            </div>
+            <div class="msearch__list">
+              {results.length === 0 && <div class="msearch__empty">{t(UI.noResults, lang)}</div>}
+              {results.map((r) => (
+                <a
+                  key={r.siteId + '/' + (r.spotId ?? '')}
+                  class="msearch__item"
+                  href={routeHref.destination(r.siteId, r.spotId)}
+                  onClick={() => setSearchOn(false)}
+                >
+                  <span class="msearch__name">{r.label}</span>
+                  <span class="msearch__sub">{r.sub}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        {hintOn && (
+          <div class="mhint" role="status">
+            <Icon name="compass" size={18} />
+            <span>{t(UI.hintTap, lang)}</span>
+            {cinema && !obSkip && (
+              <button class="mhint__skip" onClick={dismissHint}>
+                {t(UI.skipOnboard, lang)}
+              </button>
+            )}
+            <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
+              <Icon name="close" size={16} />
+            </button>
+          </div>
+        )}
         {!levelSite && nextOffscreen && (
           <button
             class="mscreen__chipbtn mscreen__chipbtn--home"
@@ -361,15 +430,7 @@ export function MapScreen() {
         )}
       </div>
 
-      {hintOn && (
-        <div class="mhint" role="status">
-          <Icon name="compass" size={18} />
-          <span>{t(UI.hintTap, lang)}</span>
-          <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
-            <Icon name="close" size={16} />
-          </button>
-        </div>
-      )}
+
 
       {toast && (
         <div class="mtoast" key={toast.seq} role="status">

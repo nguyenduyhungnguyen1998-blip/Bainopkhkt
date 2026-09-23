@@ -26,9 +26,11 @@ cards = []
 for path in sorted(glob.glob("src/data/sites/*.json")):
     site = json.load(open(path, encoding="utf-8"))
     for spot in site["spots"]:
+        # Ký theo qrId bất biến (giống src/lib/qr.ts) – đổi slug không vỡ tem đã in.
+        payload = spot.get("qrId", f"{site['entityId']}/{spot['spotId']}")
         sig = hmac.new(
             QR_SECRET,
-            f"{site['entityId']}/{spot['spotId']}".encode(),
+            payload.encode(),
             hashlib.sha256,
         ).hexdigest()[:SIG_LEN]
         url = f"{BASE}#/d/{site['entityId']}/{spot['spotId']}?s={sig}"

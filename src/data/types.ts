@@ -66,6 +66,8 @@ export interface Source {
 
 export interface Spot {
   spotId: string;
+  /** ID check-in bất biến, ký trên tem QR — đổi slug không làm vỡ chữ ký đã in. */
+  qrId?: string;
   name: Localized;
   /** [kinh độ, vĩ độ] – tùy chọn cho sơ đồ cấp 2 */
   coords?: [number, number];
@@ -73,6 +75,33 @@ export interface Spot {
   layoutSchema: Card[];
   sources: Source[];
   quiz?: { q: Localized; options: Localized[]; answer: number; explain?: Localized }[];
+}
+
+/** Vị trí một điểm trên sơ đồ cấp 2 (schematic, không theo toạ độ địa lý). */
+export interface SiteMapNode {
+  x: number;
+  y: number;
+  labelSide?: 'left' | 'right';
+}
+
+/** Trang trí vẽ thêm trên sơ đồ cấp 2 (giếng, tường phụ, …), neo theo khu. */
+export interface SiteMapDecor {
+  shape: 'rect';
+  /** class CSS, vd "smap__well". */
+  cls: string;
+  /** toạ độ tâm theo phương ngang: số, hoặc "center" = giữa khung. */
+  cx: number | 'center';
+  /** toạ độ tâm theo phương dọc: số, hoặc spotId = neo ngang tâm node đó. */
+  cy: number | string;
+  w: number;
+  h: number;
+  rx?: number;
+}
+
+/** Sơ đồ mặt bằng nội khu (dữ liệu hoá, không cần sửa component khi thêm khu). */
+export interface SiteMap {
+  nodes?: Record<string, SiteMapNode>;
+  decor?: SiteMapDecor[];
 }
 
 export interface Site {
@@ -87,6 +116,16 @@ export interface Site {
   /** Thứ tự trên đường hành trình Bắc – Nam (1 = điểm đầu) */
   journeyOrder: number;
   heroImage: string;
+  /** Màu chủ đạo của khu (vd "#7a2e1f") – nhuộm lớp backdrop khi đang xem. */
+  tint?: string;
+  /** Sơ đồ cấp 2 dữ liệu hoá: vị trí node + trang trí riêng của khu. */
+  siteMap?: SiteMap;
+  /** Thông tin tham quan thực tế (địa chỉ, giờ mở cửa, vé) – khách hay hỏi. */
+  visit?: {
+    address?: Localized;
+    hours?: Localized;
+    tickets?: Localized;
+  };
   summary: Localized;
   gamificationConfig: {
     badge: { id: string; name: Localized; icon: string };

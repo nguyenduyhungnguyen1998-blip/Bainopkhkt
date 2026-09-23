@@ -11,6 +11,7 @@ import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
 import { PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
+import { getSite } from './data/content';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
 const DebugHud = lazy(() => import('./debug/hud').then((m) => ({ default: m.DebugHud })));
@@ -59,13 +60,23 @@ export function App() {
     window.scrollTo(0, 0);
   }, [routeKey]);
 
+  // Backdrop nhuộm theo site đang xem (ExperienceBackdrop "lite"): một lớp cố định
+  // dưới nội dung, đổi --site-tint -> transition mượt giữa các site.
+  const site = route.name === 'destination' ? getSite(route.siteId) : undefined;
+  const tint = site?.tint ?? 'transparent';
+  useLayoutEffect(() => {
+    document.documentElement.style.setProperty('--site-tint', tint);
+  }, [tint]);
+
   let screen;
   switch (route.name) {
     case 'map':
       screen = <MapScreen />;
       break;
     case 'destination':
-      screen = <DestinationScreen key={`${route.siteId}/${route.spotId}`} siteId={route.siteId} spotId={route.spotId} query={route.query} />;
+      // Khoá theo siteId: đổi điểm trong cùng khu KHÔNG remount -> không chạy lại
+      // animation vào màn (trước đây giống reload trang mỗi lần đổi điểm).
+      screen = <DestinationScreen key={route.siteId} siteId={route.siteId} spotId={route.spotId} query={route.query} />;
       break;
     case 'passport':
       screen = <PassportScreen />;
@@ -91,6 +102,7 @@ export function App() {
   return (
     <>
       <div class="mdv-bg-pattern" aria-hidden="true" />
+      <div class="mdv-backdrop" aria-hidden="true" />
       {!online && <div class="mdv-offline-bar" role="status">{t(UI.offline, lang)}</div>}
       <ErrorBoundary>{screen}</ErrorBoundary>
       {hasUpdate && (

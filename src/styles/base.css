@@ -86,6 +86,28 @@ figcaption a {
   text-decoration: none;
 }
 
+/* Backdrop nhuộm theo màu chủ đạo của site đang xem (crossfade qua --site-tint).
+   @property để Chrome animate được custom property; browser cũ đổi tức thì. */
+@property --site-tint {
+  syntax: '<color>';
+  initial-value: rgba(0, 0, 0, 0);
+  inherits: true;
+}
+.mdv-backdrop {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(130% 100% at 50% -10%, var(--site-tint) 0%, transparent 58%);
+  opacity: 0.55;
+  transition: --site-tint 700ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mdv-backdrop {
+    transition: none;
+  }
+}
+
 /* Họa tiết trống đồng chìm dưới nền */
 .mdv-bg-pattern {
   position: fixed;
@@ -392,5 +414,30 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Tablet: nới rộng nhẹ bố cục */
+@media (min-width: 600px) {
+  .mdv-screen {
+    max-width: 640px;
+  }
+  .mscreen {
+    max-width: 780px;
+  }
+}
+
+/* Desktop-lite (>=960px): khung trung tâm rộng hơn – tiện trình chiếu cho hội đồng.
+   Giữ nguyên bố cục mobile (sheet dưới, dock nổi), chỉ tăng max-width. */
+@media (min-width: 960px) {
+  .mdv-screen {
+    max-width: 760px;
+  }
+  .mscreen {
+    max-width: 1100px;
+  }
+  .mscreen__map {
+    margin-left: var(--space-5, var(--space-4));
+    margin-right: var(--space-5, var(--space-4));
   }
 }

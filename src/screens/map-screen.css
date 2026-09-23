@@ -94,7 +94,8 @@
   margin: 0 var(--space-3);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  /* không border cứng: biển hòa vào nền + bóng trong rất nhẹ tạo chiều sâu */
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.08);
   background: var(--color-sea);
 }
 .mscreen__legend {
@@ -236,9 +237,9 @@
 
 /* Hint chip onboarding + toast XP + nút nổi trên bản đồ */
 .mhint {
-  position: fixed;
+  position: absolute; /* neo trong khung bản đồ, trên cùng – không đè legend/sheet */
   left: 50%;
-  bottom: calc(104px + env(safe-area-inset-bottom));
+  top: 10px;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -253,6 +254,98 @@
   font-weight: 600;
   z-index: 35;
   animation: mhint-in var(--dur-slow) var(--ease-out);
+}
+/* Tìm kiếm địa danh: sheet nổi trên bản đồ */
+.mscreen__searchbtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.msearch {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  width: min(400px, calc(100% - 20px));
+  max-height: 70%;
+  display: flex;
+  flex-direction: column;
+  z-index: 45;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: mhint-in var(--dur-base) var(--ease-out);
+}
+.msearch__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.msearch__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-base);
+  outline: none;
+}
+.msearch__list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.msearch__item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px;
+  min-height: 44px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.msearch__item:first-child {
+  border-top: 0;
+}
+.msearch__item:hover,
+.msearch__item:focus-visible {
+  background: var(--color-bg);
+}
+.msearch__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.msearch__sub {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.msearch__empty {
+  padding: 18px 14px;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.mhint__skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-accent-secondary);
+  background: transparent;
+  color: var(--color-accent-secondary-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
 }
 .mhint__x {
   display: inline-flex;

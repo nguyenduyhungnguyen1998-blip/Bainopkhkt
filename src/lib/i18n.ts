@@ -74,6 +74,7 @@ export const UI = {
   zoomControls: { vi: 'Nút thu phóng', en: 'Zoom controls' },
   regionFilter: { vi: 'Lọc vùng', en: 'Filter region' },
   dismiss: { vi: 'Đóng', en: 'Dismiss' },
+  skipOnboard: { vi: 'Bỏ qua', en: 'Skip' },
   playbackSpeed: { vi: 'Tốc độ đọc', en: 'Playback speed' },
   audioProgress: { vi: 'Tiến độ nghe', en: 'Listening progress' },
   aspects: { vi: 'Khía cạnh', en: 'Aspects' },
@@ -89,6 +90,10 @@ export const UI = {
   simulateScan: { vi: 'Mô phỏng quét QR (demo)', en: 'Simulate QR scan (demo)' },
   unlockedToast: { vi: 'Đã mở khóa', en: 'Unlocked' },
   hintTap: { vi: 'Chạm điểm sáng để bắt đầu', en: 'Tap the glowing dot to start' },
+  search: { vi: 'Tìm kiếm', en: 'Search' },
+  searchPlaceholder: { vi: 'Tìm địa danh, tỉnh…', en: 'Search a site or province…' },
+  noResults: { vi: 'Không tìm thấy', en: 'No matches' },
+  visitInfo: { vi: 'Thông tin tham quan', en: 'Visitor information' },
   backToJourney: { vi: 'Về hành trình', en: 'Back to journey' },
   yourJourney: { vi: 'Hành trình của bạn', en: 'Your journey' },
   journeyQuote: {

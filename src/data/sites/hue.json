@@ -1,44 +1,215 @@
 {
   "schemaVersion": 1,
   "entityId": "hue",
-  "name": { "vi": "Đại Nội Huế", "en": "Hue Imperial City" },
-  "province": { "vi": "Thừa Thiên Huế", "en": "Thua Thien Hue" },
+  "name": {
+    "vi": "Đại Nội Huế",
+    "en": "Hue Imperial City"
+  },
+  "province": {
+    "vi": "Thừa Thiên Huế",
+    "en": "Thua Thien Hue"
+  },
   "region": "trung",
   "themeContext": "lich-su",
-  "coords": [107.5776, 16.4698],
+  "coords": [
+    107.5776,
+    16.4698
+  ],
   "journeyOrder": 3,
   "heroImage": "/img/hue/hero.svg",
+  "tint": "#3f2a56",
   "summary": {
     "vi": "Kinh đô của triều Nguyễn (1802–1945), Di sản văn hóa thế giới đầu tiên của Việt Nam.",
     "en": "Capital of the Nguyen dynasty (1802–1945) and Vietnam's first UNESCO World Heritage Site."
   },
   "gamificationConfig": {
-    "badge": { "id": "ngu-mon-quan", "name": { "vi": "Ngọ Môn quan", "en": "Keeper of the Noon Gate" }, "icon": "crown" },
+    "badge": {
+      "id": "ngu-mon-quan",
+      "name": {
+        "vi": "Ngọ Môn quan",
+        "en": "Keeper of the Noon Gate"
+      },
+      "icon": "crown"
+    },
     "completionBonusXp": 100
   },
   "spots": [
     {
       "spotId": "ngo-mon",
-      "name": { "vi": "Ngọ Môn", "en": "Noon Gate" },
+      "qrId": "mdvq03",
+      "name": {
+        "vi": "Ngọ Môn",
+        "en": "Noon Gate"
+      },
       "xp": 40,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/hue/hero.svg" },
-        { "type": "aspects", "size": "lg", "aspects": [
-          { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Ngọ Môn là cổng chính phía nam của Hoàng thành, xây năm 1833 dưới triều vua Minh Mạng. Ngày 30/8/1945, vua Bảo Đại đọc chiếu thoái vị tại đây, khép lại chế độ quân chủ Việt Nam.", "en": "The Noon Gate is the southern main gate of the Imperial City, built in 1833 under King Minh Mang. On 30 August 1945 King Bao Dai abdicated here, ending the Vietnamese monarchy." } },
-          { "id": "kien-truc", "title": { "vi": "Kiến trúc", "en": "Architecture" }, "body": { "vi": "Phần nền có năm cửa, phía trên là lầu Ngũ Phụng với 100 cột và mái lợp ngói hoàng lưu ly – màu chỉ dành cho vua.", "en": "The base has five passages; above rises the Five Phoenix Pavilion with 100 columns and yellow glazed tiles – a colour reserved for the emperor." } }
-        ] },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Ngọ Môn", "en": "Narrated clip: Noon Gate" } },
-        { "type": "audio", "size": "md", "ambient": "temple-bell", "script": {
-          "vi": ["Bạn đang đứng trước Ngọ Môn, cổng chính của Hoàng thành Huế.", "Trên cao là lầu Ngũ Phụng với mái ngói vàng chỉ dành cho nhà vua."],
-          "en": ["You are standing before the Noon Gate, the main entrance of the Hue Imperial City.", "Above you is the Five Phoenix Pavilion with yellow tiles reserved for the emperor."]
-        } }
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/hue/hero.svg"
+        },
+        {
+          "type": "aspects",
+          "size": "lg",
+          "aspects": [
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Ngọ Môn là cổng chính phía nam của Hoàng thành, xây năm 1833 dưới triều vua Minh Mạng. Ngày 30/8/1945, vua Bảo Đại đọc chiếu thoái vị tại đây, khép lại chế độ quân chủ Việt Nam.",
+                "en": "The Noon Gate is the southern main gate of the Imperial City, built in 1833 under King Minh Mang. On 30 August 1945 King Bao Dai abdicated here, ending the Vietnamese monarchy."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Phần nền có năm cửa, phía trên là lầu Ngũ Phụng với 100 cột và mái lợp ngói hoàng lưu ly – màu chỉ dành cho vua.",
+                "en": "The base has five passages; above rises the Five Phoenix Pavilion with 100 columns and yellow glazed tiles – a colour reserved for the emperor."
+              }
+            }
+          ]
+        },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Ngọ Môn",
+            "en": "Narrated clip: Noon Gate"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "temple-bell",
+          "script": {
+            "vi": [
+              "Bạn đang đứng trước Ngọ Môn, cổng chính của Hoàng thành Huế.",
+              "Trên cao là lầu Ngũ Phụng với mái ngói vàng chỉ dành cho nhà vua."
+            ],
+            "en": [
+              "You are standing before the Noon Gate, the main entrance of the Hue Imperial City.",
+              "Above you is the Five Phoenix Pavilion with yellow tiles reserved for the emperor."
+            ]
+          }
+        }
       ],
-      "sources": [ { "title": "Trung tâm Bảo tồn Di tích Cố đô Huế", "url": "https://hueworldheritage.org.vn", "reviewed": false } ],
+      "sources": [
+        {
+          "title": "Trung tâm Bảo tồn Di tích Cố đô Huế",
+          "url": "https://hueworldheritage.org.vn",
+          "reviewed": false
+        }
+      ],
       "quiz": [
-        { "q": { "vi": "Ngọ Môn được xây năm nào, dưới triều vua nào?", "en": "When was Ngo Mon built, under which king?" }, "options": [{ "vi": "1802 – Gia Long", "en": "1802 – Gia Long" }, { "vi": "1833 – Minh Mạng", "en": "1833 – Minh Mang" }, { "vi": "1945 – Bảo Đại", "en": "1945 – Bao Dai" }, { "vi": "1070 – Lý Thánh Tông", "en": "1070 – Ly Thanh Tong" }], "answer": 1, "explain": {"vi": "Ngọ Môn xây năm 1833 dưới vua Minh Mạng, là cổng chính phía Nam của Hoàng thành Huế.", "en": "Ngo Mon was built in 1833 under Emperor Minh Mang as the southern main gate of the Hue Citadel."} },
-        { "q": { "vi": "Sự kiện nào diễn ra tại Ngọ Môn ngày 30/8/1945?", "en": "What happened at Ngo Mon on 30 August 1945?" }, "options": [{ "vi": "Vua Bảo Đại đọc chiếu thoái vị", "en": "King Bao Dai read the abdication edict" }, { "vi": "Khánh thành Ngọ Môn", "en": "Inauguration of Ngo Mon" }, { "vi": "Lễ mở hội", "en": "A festival" }, { "vi": "Đăng quang vua mới", "en": "A coronation" }], "answer": 0, "explain": {"vi": "Ngày 30/8/1945 vua Bảo Đại đọc chiếu thoái vị tại Ngọ Môn – kết thúc chế độ quân chủ Việt Nam.", "en": "On 30 August 1945 Emperor Bao Dai read his abdication edict at Ngo Mon – ending Vietnam's monarchy."} },
-        { "q": { "vi": "Lầu Ngũ Phụng trên Ngọ Môn có bao nhiêu cột?", "en": "How many columns does the Five Phoenix Pavilion have?" }, "options": [{ "vi": "50", "en": "50" }, { "vi": "82", "en": "82" }, { "vi": "100", "en": "100" }, { "vi": "120", "en": "120" }], "answer": 2, "explain": {"vi": "Lầu Ngũ Phụng phía trên Ngọ Môn dựng bằng 100 cột gỗ lim theo tư liệu kiến trúc Huế.", "en": "The Ngu Phung pavilion atop Ngo Mon stands on 100 ironwood columns per Hue architectural records."} }
+        {
+          "q": {
+            "vi": "Ngọ Môn được xây năm nào, dưới triều vua nào?",
+            "en": "When was Ngo Mon built, under which king?"
+          },
+          "options": [
+            {
+              "vi": "1802 – Gia Long",
+              "en": "1802 – Gia Long"
+            },
+            {
+              "vi": "1833 – Minh Mạng",
+              "en": "1833 – Minh Mang"
+            },
+            {
+              "vi": "1945 – Bảo Đại",
+              "en": "1945 – Bao Dai"
+            },
+            {
+              "vi": "1070 – Lý Thánh Tông",
+              "en": "1070 – Ly Thanh Tong"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Ngọ Môn xây năm 1833 dưới vua Minh Mạng, là cổng chính phía Nam của Hoàng thành Huế.",
+            "en": "Ngo Mon was built in 1833 under Emperor Minh Mang as the southern main gate of the Hue Citadel."
+          }
+        },
+        {
+          "q": {
+            "vi": "Sự kiện nào diễn ra tại Ngọ Môn ngày 30/8/1945?",
+            "en": "What happened at Ngo Mon on 30 August 1945?"
+          },
+          "options": [
+            {
+              "vi": "Vua Bảo Đại đọc chiếu thoái vị",
+              "en": "King Bao Dai read the abdication edict"
+            },
+            {
+              "vi": "Khánh thành Ngọ Môn",
+              "en": "Inauguration of Ngo Mon"
+            },
+            {
+              "vi": "Lễ mở hội",
+              "en": "A festival"
+            },
+            {
+              "vi": "Đăng quang vua mới",
+              "en": "A coronation"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Ngày 30/8/1945 vua Bảo Đại đọc chiếu thoái vị tại Ngọ Môn – kết thúc chế độ quân chủ Việt Nam.",
+            "en": "On 30 August 1945 Emperor Bao Dai read his abdication edict at Ngo Mon – ending Vietnam's monarchy."
+          }
+        },
+        {
+          "q": {
+            "vi": "Lầu Ngũ Phụng trên Ngọ Môn có bao nhiêu cột?",
+            "en": "How many columns does the Five Phoenix Pavilion have?"
+          },
+          "options": [
+            {
+              "vi": "50",
+              "en": "50"
+            },
+            {
+              "vi": "82",
+              "en": "82"
+            },
+            {
+              "vi": "100",
+              "en": "100"
+            },
+            {
+              "vi": "120",
+              "en": "120"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Lầu Ngũ Phụng phía trên Ngọ Môn dựng bằng 100 cột gỗ lim theo tư liệu kiến trúc Huế.",
+            "en": "The Ngu Phung pavilion atop Ngo Mon stands on 100 ironwood columns per Hue architectural records."
+          }
+        }
       ]
     }
-  ]
+  ],
+  "visit": {
+    "address": {
+      "vi": "Hoàng thành Huế, Phú Hậu, TP. Huế",
+      "en": "Imperial City, Phu Hau, Hue City"
+    },
+    "hours": {
+      "vi": "7:00–17:30, mở cả tuần",
+      "en": "7:00 AM–5:30 PM, daily"
+    },
+    "tickets": {
+      "vi": "≈200.000đ/người lớn",
+      "en": "≈200,000 VND/adult"
+    }
+  }
 }

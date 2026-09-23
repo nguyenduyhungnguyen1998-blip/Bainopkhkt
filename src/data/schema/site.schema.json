@@ -28,6 +28,9 @@
     "coords": { "$ref": "#/definitions/coords" },
     "journeyOrder": { "type": "integer", "minimum": 1 },
     "heroImage": { "$ref": "#/definitions/assetPath" },
+    "tint": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "siteMap": { "$ref": "#/definitions/siteMap" },
+    "visit": { "$ref": "#/definitions/visit" },
     "summary": { "$ref": "#/definitions/localized" },
     "gamificationConfig": {
       "type": "object",
@@ -75,6 +78,51 @@
       ]
     },
     "size": { "enum": ["lg", "md", "sm"] },
+    "siteMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["x", "y"],
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "labelSide": { "enum": ["left", "right"] }
+            }
+          }
+        },
+        "decor": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["shape", "cls", "cx", "cy", "w", "h"],
+            "properties": {
+              "shape": { "enum": ["rect"] },
+              "cls": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+              "cx": { "oneOf": [{ "type": "number" }, { "const": "center" }] },
+              "cy": { "oneOf": [{ "type": "number" }, { "$ref": "#/definitions/slug" }] },
+              "w": { "type": "number", "exclusiveMinimum": 0 },
+              "h": { "type": "number", "exclusiveMinimum": 0 },
+              "rx": { "type": "number", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "visit": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "address": { "$ref": "#/definitions/localized" },
+        "hours": { "$ref": "#/definitions/localized" },
+        "tickets": { "$ref": "#/definitions/localized" }
+      }
+    },
     "source": {
       "type": "object",
       "additionalProperties": false,
@@ -91,6 +139,7 @@
       "required": ["spotId", "name", "xp", "layoutSchema", "sources"],
       "properties": {
         "spotId": { "$ref": "#/definitions/slug" },
+        "qrId": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
         "name": { "$ref": "#/definitions/localized" },
         "coords": { "$ref": "#/definitions/coords" },
         "xp": { "type": "integer", "minimum": 1, "maximum": 500 },

@@ -30,8 +30,8 @@
 .vmap__coast-glow {
   fill: none;
   stroke: var(--color-accent-secondary);
-  stroke-opacity: 0.22;
-  stroke-width: 7;
+  stroke-opacity: 0.14;
+  stroke-width: 4;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
@@ -75,10 +75,10 @@
   pointer-events: none;
 }
 .vmap__journey--all {
-  stroke: var(--color-text-faint);
-  stroke-opacity: 0.55;
+  /* tuyến hành trình: vàng mờ liền mạch (đứt nét xám trông như biên giới hành chính) */
+  stroke: var(--color-accent-secondary);
+  stroke-opacity: 0.3;
   stroke-width: 2;
-  stroke-dasharray: 2 8;
 }
 .vmap__journey--done {
   stroke: var(--color-accent-tertiary);
@@ -137,7 +137,7 @@
   fill: var(--color-text);
   paint-order: stroke;
   stroke: var(--color-bg);
-  stroke-width: 4px;
+  stroke-width: 2.5px;
   stroke-linejoin: round;
   pointer-events: none;
 }

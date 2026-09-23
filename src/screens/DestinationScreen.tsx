@@ -83,6 +83,22 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         ))}
       </div>
 
+      {/* Thông tin tham quan thực tế (địa chỉ/giờ/vé) – trả lời nhanh câu hỏi của khách */}
+      {site.visit && (site.visit.address || site.visit.hours || site.visit.tickets) && (
+        <section class="dvisit" aria-label={t(UI.visitInfo, lang)}>
+          <h2 class="dvisit__h">{t(UI.visitInfo, lang)}</h2>
+          {site.visit.address && (
+            <div class="dvisit__row"><Icon name="locate" size={16} /><span>{t(site.visit.address, lang)}</span></div>
+          )}
+          {site.visit.hours && (
+            <div class="dvisit__row"><Icon name="clock" size={16} /><span>{t(site.visit.hours, lang)}</span></div>
+          )}
+          {site.visit.tickets && (
+            <div class="dvisit__row"><Icon name="qr" size={16} /><span>{t(site.visit.tickets, lang)}</span></div>
+          )}
+        </section>
+      )}
+
       <div class="dest__nav">
         {prev ? (
           <a class="mdv-btn mdv-btn--ghost" href={routeHref.destination(site.entityId, prev.spotId)}>
@@ -109,16 +125,40 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   const [reward, setReward] = useState<number | null>(null);
   const [badgeName, setBadgeName] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [, setLang] = useLang();
+  // Khách quét QR lần đầu chưa từng chọn ngôn ngữ -> hỏi 1 lần, nhớ luôn (mdv.lang).
+  // Tránh rơi thẳng vào nội dung tiếng Việt/audio mặc định cho du khách nước ngoài.
+  const [needLang, setNeedLang] = useState(() => {
+    try {
+      return !localStorage.getItem('mdv.lang');
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     let live = true;
-    void verifySignature(site.entityId, spot.spotId, sig).then((ok) => {
+    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then((ok) => {
       if (live) setState(ok ? 'ok' : 'bad');
     });
     return () => {
       live = false;
     };
   }, [site.entityId, spot.spotId, sig]);
+
+  if (needLang) {
+    const pick = (l: Lang) => {
+      setLang(l);
+      setNeedLang(false);
+    };
+    return (
+      <div class="dscan" role="dialog" aria-label={t(UI.chooseLang, lang)}>
+        <span class="dscan__txt">{t(UI.chooseLang, lang)}</span>
+        <button class="mdv-chip" onClick={() => pick('vi')}>Tiếng Việt</button>
+        <button class="mdv-chip" onClick={() => pick('en')}>English</button>
+      </div>
+    );
+  }
 
   if (dismissed || state === 'checking') return null;
 

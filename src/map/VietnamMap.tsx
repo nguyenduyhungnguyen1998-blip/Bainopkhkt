@@ -197,9 +197,13 @@ export function VietnamMap({
       setOnboardPhase('zoom');
       land();
     };
-    return () => draw.cancel();
+    // Khi 'onboard' tắt giữa chừng (nút Bỏ qua): huỷ vẽ + xoá hiệu ứng đường.
+    return () => {
+      draw.cancel();
+      setOnboardPhase('done');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onboard]);
 
   // Chuỗi ăn mừng: sóng lan tại node vừa mở + đoạn đường mới vẽ dần + rung nhẹ.
   const doneCountRef = useRef(0);
@@ -328,6 +332,11 @@ export function VietnamMap({
         <pattern id="vmap-land-tex" width="14" height="14" patternUnits="userSpaceOnUse">
           <circle cx="7" cy="7" r="0.8" fill="currentColor" fill-opacity="0.12" />
         </pattern>
+        {/* Vignette: láng giềng/nội dung tan vào biển ở rìa khung (không còn cạnh thẳng cắt) */}
+        <radialGradient id="vmap-vignette" cx="50%" cy="50%" r="72%">
+          <stop offset="56%" stop-color="var(--color-sea)" stop-opacity="0" />
+          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="0.8" />
+        </radialGradient>
       </defs>
 
       <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-sea)" />
@@ -457,6 +466,8 @@ export function VietnamMap({
           />
         ))}
       </g>
+      {/* Lớp tan vào biển ở mép khung nhìn – đặt NGOÀI transform để bám mép màn */}
+      <rect class="vmap__vignette" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-vignette)" pointer-events="none" />
     </svg>
   );
 }
@@ -514,7 +525,11 @@ function MapNodeView({
         {status === 'done' ? (
           <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
         ) : status === 'locked' ? (
-          <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
+          // Ghim "chưa ghé" (không phải ổ khóa – nội dung vẫn xem tự do)
+          <path
+            class="vnode__glyph"
+            d="M0-6.5c-3.3 0-5.5 2.4-5.5 5.4C-5.5 3.4-2.2 6.8 0 9c2.2-2.2 5.5-5.6 5.5-10.1C5.5-4.1 3.3-6.5 0-6.5Zm0 7.3a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2Z"
+          />
         ) : null}
         <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
           {t(site.name, lang)}

@@ -16,12 +16,21 @@ async function hmacHex(payload: string): Promise<string> {
   return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function signSpot(siteId: string, spotId: string): Promise<string> {
-  return (await hmacHex(`${siteId}/${spotId}`)).slice(0, SIG_LEN);
+/**
+ * Payload ký = qrId bất biến của điểm (không phụ thuộc slug địa danh).
+ * Đổi slug siteId/spotId vẫn giữ được chữ ký trên tem QR đã in.
+ * Fallback "site/spot" cho điểm cũ chưa khai qrId.
+ */
+export function qrPayload(siteId: string, spotId: string, qrId?: string): string {
+  return qrId ?? `${siteId}/${spotId}`;
+}
+
+export async function signSpot(siteId: string, spotId: string, qrId?: string): Promise<string> {
+  return (await hmacHex(qrPayload(siteId, spotId, qrId))).slice(0, SIG_LEN);
 }
 
 /** So khớp không timing-safe (client-side tĩnh, chấp nhận được) — chỉ kiểm chuỗi khớp. */
-export async function verifySignature(siteId: string, spotId: string, sig: string): Promise<boolean> {
+export async function verifySignature(siteId: string, spotId: string, sig: string, qrId?: string): Promise<boolean> {
   if (!/^[0-9a-f]+$/i.test(sig) || sig.length !== SIG_LEN) return false;
-  return (await signSpot(siteId, spotId)) === sig.toLowerCase();
+  return (await signSpot(siteId, spotId, qrId)) === sig.toLowerCase();
 }

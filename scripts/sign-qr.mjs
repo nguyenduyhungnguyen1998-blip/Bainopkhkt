@@ -19,7 +19,9 @@ const rows = [];
 for (const f of readdirSync(dir).filter((x) => x.endsWith('.json'))) {
   const site = JSON.parse(readFileSync(join(dir, f), 'utf8'));
   for (const spot of site.spots) {
-    const sig = createHmac('sha256', QR_SECRET).update(`${site.entityId}/${spot.spotId}`).digest('hex').slice(0, SIG_LEN);
+    // Ký theo qrId bất biến (giống src/lib/qr.ts) – đổi slug không vỡ tem đã in.
+    const payload = spot.qrId ?? `${site.entityId}/${spot.spotId}`;
+    const sig = createHmac('sha256', QR_SECRET).update(payload).digest('hex').slice(0, SIG_LEN);
     rows.push({ site: site.entityId, spot: spot.spotId, sig, url: `${base}${base.endsWith('/') ? '' : '/'}#/d/${site.entityId}/${spot.spotId}?s=${sig}` });
   }
 }

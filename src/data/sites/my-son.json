@@ -1,44 +1,215 @@
 {
   "schemaVersion": 1,
   "entityId": "my-son",
-  "name": { "vi": "Thánh địa Mỹ Sơn", "en": "My Son Sanctuary" },
-  "province": { "vi": "Quảng Nam", "en": "Quang Nam" },
+  "name": {
+    "vi": "Thánh địa Mỹ Sơn",
+    "en": "My Son Sanctuary"
+  },
+  "province": {
+    "vi": "Quảng Nam",
+    "en": "Quang Nam"
+  },
   "region": "trung",
   "themeContext": "tam-linh",
-  "coords": [108.124, 15.764],
+  "coords": [
+    108.124,
+    15.764
+  ],
   "journeyOrder": 4,
   "heroImage": "/img/my-son/hero.svg",
+  "tint": "#5e3418",
   "summary": {
     "vi": "Quần thể đền tháp Chăm Pa xây từ thế kỷ IV đến XIII, Di sản văn hóa thế giới từ năm 1999.",
     "en": "A complex of Champa temple-towers built from the 4th to 13th century, World Heritage since 1999."
   },
   "gamificationConfig": {
-    "badge": { "id": "thap-cham", "name": { "vi": "Người giữ tháp Chăm", "en": "Keeper of the Cham Towers" }, "icon": "tower" },
+    "badge": {
+      "id": "thap-cham",
+      "name": {
+        "vi": "Người giữ tháp Chăm",
+        "en": "Keeper of the Cham Towers"
+      },
+      "icon": "tower"
+    },
     "completionBonusXp": 100
   },
   "spots": [
     {
       "spotId": "nhom-thap-b",
-      "name": { "vi": "Nhóm tháp B–C–D", "en": "Tower groups B–C–D" },
+      "qrId": "mdvq04",
+      "name": {
+        "vi": "Nhóm tháp B–C–D",
+        "en": "Tower groups B–C–D"
+      },
       "xp": 40,
       "layoutSchema": [
-        { "type": "hero", "size": "lg", "image": "/img/my-son/hero.svg" },
-        { "type": "aspects", "size": "lg", "aspects": [
-          { "id": "lich-su", "title": { "vi": "Lịch sử", "en": "History" }, "body": { "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc Chăm Pa trong gần một nghìn năm, thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.", "en": "My Son was the religious centre of the Champa kingdom for nearly a millennium, dedicated to Shiva as Bhadresvara, protector of the Cham kings." } },
-          { "id": "kien-truc", "title": { "vi": "Kỹ thuật", "en": "Technique" }, "body": { "vi": "Các tháp xây bằng gạch nung không thấy mạch vữa – kỹ thuật kết dính của người Chăm đến nay vẫn là đề tài nghiên cứu.", "en": "The towers are built of fired brick with no visible mortar joints – a Cham bonding technique still studied today." } }
-        ] },
-        { "type": "video", "size": "md", "title": { "vi": "Clip thuyết minh Mỹ Sơn", "en": "Narrated clip: My Son" } },
-        { "type": "audio", "size": "md", "ambient": "wind-water", "script": {
-          "vi": ["Bạn đang ở giữa thung lũng Mỹ Sơn, thánh địa của vương quốc Chăm Pa.", "Những viên gạch quanh bạn đã đứng vững hơn một nghìn năm mà không thấy mạch vữa."],
-          "en": ["You are in the My Son valley, sanctuary of the Champa kingdom.", "The bricks around you have stood for over a thousand years with no visible mortar."]
-        } }
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/my-son/hero.svg"
+        },
+        {
+          "type": "aspects",
+          "size": "lg",
+          "aspects": [
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc Chăm Pa trong gần một nghìn năm, thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.",
+                "en": "My Son was the religious centre of the Champa kingdom for nearly a millennium, dedicated to Shiva as Bhadresvara, protector of the Cham kings."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kỹ thuật",
+                "en": "Technique"
+              },
+              "body": {
+                "vi": "Các tháp xây bằng gạch nung không thấy mạch vữa – kỹ thuật kết dính của người Chăm đến nay vẫn là đề tài nghiên cứu.",
+                "en": "The towers are built of fired brick with no visible mortar joints – a Cham bonding technique still studied today."
+              }
+            }
+          ]
+        },
+        {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Clip thuyết minh Mỹ Sơn",
+            "en": "Narrated clip: My Son"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "wind-water",
+          "script": {
+            "vi": [
+              "Bạn đang ở giữa thung lũng Mỹ Sơn, thánh địa của vương quốc Chăm Pa.",
+              "Những viên gạch quanh bạn đã đứng vững hơn một nghìn năm mà không thấy mạch vữa."
+            ],
+            "en": [
+              "You are in the My Son valley, sanctuary of the Champa kingdom.",
+              "The bricks around you have stood for over a thousand years with no visible mortar."
+            ]
+          }
+        }
       ],
-      "sources": [ { "title": "UNESCO World Heritage Centre – My Son Sanctuary", "url": "https://whc.unesco.org/en/list/949", "reviewed": false } ],
+      "sources": [
+        {
+          "title": "UNESCO World Heritage Centre – My Son Sanctuary",
+          "url": "https://whc.unesco.org/en/list/949",
+          "reviewed": false
+        }
+      ],
       "quiz": [
-        { "q": { "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc nào?", "en": "My Son was the religious centre of which kingdom?" }, "options": [{ "vi": "Chăm Pa", "en": "Champa" }, { "vi": "Khmer", "en": "Khmer Empire" }, { "vi": "Đại Việt", "en": "Dai Viet" }, { "vi": "Phù Nam", "en": "Funan" }], "answer": 0, "explain": {"vi": "Mỹ Sơn là trung tâm tôn giáo quan trọng nhất của vương quốc Chăm Pa từ thế kỷ IV đến XIII.", "en": "My Son was the most important religious center of the Champa kingdom from the 4th to 13th century."} },
-        { "q": { "vi": "Các tháp Mỹ Sơn thờ thần nào?", "en": "Which deity are the My Son towers dedicated to?" }, "options": [{ "vi": "Vishnu", "en": "Vishnu" }, { "vi": "Shiva (Bhadresvara)", "en": "Shiva (Bhadresvara)" }, { "vi": "Phật", "en": "Buddha" }, { "vi": "Brahma", "en": "Brahma" }], "answer": 1, "explain": {"vi": "Các tháp thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.", "en": "The towers worship Shiva as Bhadresvara – the protector deity of the Cham kings."} },
-        { "q": { "vi": "Điều đặc biệt trong kỹ thuật xây tháp Mỹ Sơn là gì?", "en": "What is special about My Son's construction technique?" }, "options": [{ "vi": "Gạch nung không thấy mạch vữa", "en": "Fired bricks with invisible mortar" }, { "vi": "Toàn đá ong", "en": "All basalt stone" }, { "vi": "Toàn gỗ lim", "en": "All ironwood" }, { "vi": "Cột đồng", "en": "Bronze pillars" }], "answer": 0, "explain": {"vi": "Người Chăm xếp gạch khít đến mức không thấy mạch vữa – chất kết dính của họ vẫn là đề tài nghiên cứu.", "en": "Cham builders fitted bricks so tightly no mortar joint shows – their bonding technique is still studied."} }
+        {
+          "q": {
+            "vi": "Mỹ Sơn là trung tâm tôn giáo của vương quốc nào?",
+            "en": "My Son was the religious centre of which kingdom?"
+          },
+          "options": [
+            {
+              "vi": "Chăm Pa",
+              "en": "Champa"
+            },
+            {
+              "vi": "Khmer",
+              "en": "Khmer Empire"
+            },
+            {
+              "vi": "Đại Việt",
+              "en": "Dai Viet"
+            },
+            {
+              "vi": "Phù Nam",
+              "en": "Funan"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Mỹ Sơn là trung tâm tôn giáo quan trọng nhất của vương quốc Chăm Pa từ thế kỷ IV đến XIII.",
+            "en": "My Son was the most important religious center of the Champa kingdom from the 4th to 13th century."
+          }
+        },
+        {
+          "q": {
+            "vi": "Các tháp Mỹ Sơn thờ thần nào?",
+            "en": "Which deity are the My Son towers dedicated to?"
+          },
+          "options": [
+            {
+              "vi": "Vishnu",
+              "en": "Vishnu"
+            },
+            {
+              "vi": "Shiva (Bhadresvara)",
+              "en": "Shiva (Bhadresvara)"
+            },
+            {
+              "vi": "Phật",
+              "en": "Buddha"
+            },
+            {
+              "vi": "Brahma",
+              "en": "Brahma"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Các tháp thờ thần Shiva dưới danh hiệu Bhadresvara – vị thần bảo hộ của các vua Chăm.",
+            "en": "The towers worship Shiva as Bhadresvara – the protector deity of the Cham kings."
+          }
+        },
+        {
+          "q": {
+            "vi": "Điều đặc biệt trong kỹ thuật xây tháp Mỹ Sơn là gì?",
+            "en": "What is special about My Son's construction technique?"
+          },
+          "options": [
+            {
+              "vi": "Gạch nung không thấy mạch vữa",
+              "en": "Fired bricks with invisible mortar"
+            },
+            {
+              "vi": "Toàn đá ong",
+              "en": "All basalt stone"
+            },
+            {
+              "vi": "Toàn gỗ lim",
+              "en": "All ironwood"
+            },
+            {
+              "vi": "Cột đồng",
+              "en": "Bronze pillars"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Người Chăm xếp gạch khít đến mức không thấy mạch vữa – chất kết dính của họ vẫn là đề tài nghiên cứu.",
+            "en": "Cham builders fitted bricks so tightly no mortar joint shows – their bonding technique is still studied."
+          }
+        }
       ]
     }
-  ]
+  ],
+  "visit": {
+    "address": {
+      "vi": "Thánh địa Mỹ Sơn, Duy Phú, Duy Xuyên, Quảng Nam",
+      "en": "My Son Sanctuary, Duy Phu, Duy Xuyen, Quang Nam"
+    },
+    "hours": {
+      "vi": "6:00–17:00, mở cả tuần",
+      "en": "6:00 AM–5:00 PM, daily"
+    },
+    "tickets": {
+      "vi": "≈150.000đ/người",
+      "en": "≈150,000 VND/person"
+    }
+  }
 }

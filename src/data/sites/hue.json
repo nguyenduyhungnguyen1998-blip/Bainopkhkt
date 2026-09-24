@@ -103,7 +103,7 @@
       "sources": [
         {
           "title": "Trung tâm Bảo tồn Di tích Cố đô Huế",
-          "url": "https://hueworldheritage.org.vn",
+          "url": "https://eticket.hueworldheritage.org.vn",
           "reviewed": false
         }
       ],
@@ -204,8 +204,8 @@
       "en": "Imperial City, Phu Hau, Hue City"
     },
     "hours": {
-      "vi": "7:00–17:30, mở cả tuần",
-      "en": "7:00 AM–5:30 PM, daily"
+      "vi": "6:30–18:00 mùa hè; 7:00–17:30 mùa đông; mở cả tuần",
+      "en": "6:30 AM–6:00 PM summer; 7:00 AM–5:30 PM winter; daily"
     },
     "tickets": {
       "vi": "≈200.000đ/người lớn",

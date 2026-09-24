@@ -417,13 +417,11 @@ html {
   }
 }
 
-/* Tablet: nới rộng nhẹ bố cục */
+/* Tablet: nới rộng nhẹ bố cục. (.mscreen breakpoints nằm ở map-screen.css —
+   file đó load sau base.css nên rule ở đây sẽ thua cascade.) */
 @media (min-width: 600px) {
   .mdv-screen {
     max-width: 640px;
-  }
-  .mscreen {
-    max-width: 780px;
   }
 }
 
@@ -432,12 +430,5 @@ html {
 @media (min-width: 960px) {
   .mdv-screen {
     max-width: 760px;
-  }
-  .mscreen {
-    max-width: 1100px;
-  }
-  .mscreen__map {
-    margin-left: var(--space-5, var(--space-4));
-    margin-right: var(--space-5, var(--space-4));
   }
 }

@@ -494,3 +494,21 @@
   color: var(--color-accent-secondary-text);
   flex: none;
 }
+
+/* Tablet + desktop-lite cho màn bản đồ — PHẢI ở file này (load sau base.css),
+   nếu để ở base.css thì rule .mscreen{max-width:640px} bên trên thắng cascade. */
+@media (min-width: 600px) {
+  .mscreen {
+    max-width: 780px;
+  }
+}
+
+@media (min-width: 960px) {
+  .mscreen {
+    max-width: 1100px;
+  }
+  .mscreen__map {
+    margin-left: var(--space-5, var(--space-4));
+    margin-right: var(--space-5, var(--space-4));
+  }
+}

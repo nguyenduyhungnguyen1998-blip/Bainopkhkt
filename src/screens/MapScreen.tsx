@@ -53,6 +53,11 @@ export function MapScreen() {
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
   const [searchOn, setSearchOn] = useState(false);
   const [query, setQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (searchOn) searchInputRef.current?.focus();
+  }, [searchOn]);
   // Tìm kiếm địa danh/tỉnh: khách thường biết tên và muốn đi thẳng – bản đồ không phải đường duy nhất.
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -108,15 +113,16 @@ export function MapScreen() {
   const unlockedSpots = Object.keys(progress.unlocked).length;
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
 
+  const [obSkip, setObSkip] = useState(false); // bỏ qua onboarding camera
   const markSeen = () => {
     try {
       localStorage.setItem(SEEN_KEY, '1');
     } catch {
       /* bộ nhớ riêng tư */
     }
+    setObSkip(true); // tour đã xong → giấu nút Bỏ qua
   };
   // Hint "Chạm điểm sáng" chỉ tắt khi user thật sự tương tác (tap node / bấm ✕) – không chết khi camera hạ cánh.
-  const [obSkip, setObSkip] = useState(false); // bỏ qua onboarding camera
   const dismissHint = () => {
     setHintOn(false);
     setObSkip(true); // đóng hint = bỏ qua luôn phần hướng dẫn camera
@@ -371,16 +377,15 @@ export function MapScreen() {
         )}
         {levelSite && <div class="mscreen__level-title">{t(levelSite.name, lang)}</div>}
         {searchOn && (
-          <div class="msearch" role="dialog" aria-label={t(UI.search, lang)}>
+          <div class="msearch" role="dialog" aria-label={t(UI.search, lang)} onKeyDown={(e) => { if (e.key === 'Escape') setSearchOn(false); }}>
             <div class="msearch__bar">
               <Icon name="search" size={18} />
               <input
+                ref={searchInputRef}
                 class="msearch__input"
                 value={query}
-                autoFocus
                 placeholder={t(UI.searchPlaceholder, lang)}
                 onInput={(e) => setQuery(e.currentTarget.value)}
-                onKeyDown={(e) => { if (e.key === 'Escape') setSearchOn(false); }}
               />
               <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={() => setSearchOn(false)}>
                 <Icon name="close" size={16} />

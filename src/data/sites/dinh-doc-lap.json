@@ -204,12 +204,12 @@
       "en": "135 Nam Ky Khoi Nghia, Ben Thanh, District 1, HCMC"
     },
     "hours": {
-      "vi": "8:00–16:30, mở cả tuần",
-      "en": "8:00 AM–4:30 PM, daily"
+      "vi": "7:00–18:00, mở cả tuần",
+      "en": "7:00 AM–6:00 PM, daily"
     },
     "tickets": {
-      "vi": "≈40.000đ/người lớn",
-      "en": "≈40,000 VND/adult"
+      "vi": "≈80.000đ toàn bộ; 40.000đ chỉ Dinh",
+      "en": "≈80,000 VND full; 40,000 VND palace only"
     }
   }
 }

@@ -204,12 +204,12 @@
       "en": "My Son Sanctuary, Duy Phu, Duy Xuyen, Quang Nam"
     },
     "hours": {
-      "vi": "6:00–17:00, mở cả tuần",
-      "en": "6:00 AM–5:00 PM, daily"
+      "vi": "6:00–18:00 (bán vé đến 17:00), mở cả tuần",
+      "en": "6:00 AM–6:00 PM (ticket sales to 5:00 PM), daily"
     },
     "tickets": {
-      "vi": "≈150.000đ/người",
-      "en": "≈150,000 VND/person"
+      "vi": "100.000đ khách Việt; 150.000đ khách quốc tế",
+      "en": "100,000 VND domestic; 150,000 VND international"
     }
   }
 }

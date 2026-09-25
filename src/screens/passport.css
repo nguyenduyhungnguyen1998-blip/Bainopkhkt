@@ -312,3 +312,28 @@
   font-size: var(--text-sm);
   text-align: center;
 }
+
+/* Hàng dấu từng điểm trong hộ chiếu – chấm đầy = đã ghé */
+.pstamp {
+  display: inline-flex;
+  gap: 5px;
+  margin-top: 6px;
+}
+.pstamp__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px dashed color-mix(in srgb, var(--color-muted) 55%, transparent);
+  color: var(--color-muted);
+  font-size: 9.5px;
+  font-weight: 700;
+  font-style: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pstamp__dot--on {
+  border: 1.5px solid var(--color-accent);
+  background: var(--color-accent);
+  color: #1b1409;
+}

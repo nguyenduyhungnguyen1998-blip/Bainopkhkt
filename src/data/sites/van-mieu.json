@@ -41,6 +41,10 @@
         "vi": "Văn Miếu Môn",
         "en": "Great Portico"
       },
+      "hook": {
+        "vi": "Cổng giữa năm xưa chỉ dành cho vua đi — quan lại và học trò phải đi hai cổng bên.",
+        "en": "The middle gate was once reserved for the king — mandarins and students used the side gates."
+      },
       "coords": [
         105.8352,
         21.0262
@@ -54,6 +58,23 @@
           "caption": {
             "vi": "Cổng tam quan hai tầng dẫn vào khu di tích",
             "en": "The two-storey triple gate at the entrance"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Chào mừng bạn đến Văn Miếu Quốc Tử Giám.",
+              "Cổng tam quan trước mặt bạn được dựng lại từ thời Lê, với ba lối đi mà lối giữa xưa chỉ dành cho nhà vua.",
+              "Hãy đi qua lối bên và bắt đầu hành trình của một sĩ tử."
+            ],
+            "en": [
+              "Welcome to the Temple of Literature.",
+              "The triple gate before you dates from the Le dynasty; its central passage was once reserved for the king.",
+              "Take a side passage and begin your journey as a scholar."
+            ]
           }
         },
         {
@@ -101,23 +122,6 @@
           "title": {
             "vi": "Clip thuyết minh Văn Miếu Môn",
             "en": "Narrated clip: Great Portico"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "garden",
-          "script": {
-            "vi": [
-              "Chào mừng bạn đến Văn Miếu Quốc Tử Giám.",
-              "Cổng tam quan trước mặt bạn được dựng lại từ thời Lê, với ba lối đi mà lối giữa xưa chỉ dành cho nhà vua.",
-              "Hãy đi qua lối bên và bắt đầu hành trình của một sĩ tử."
-            ],
-            "en": [
-              "Welcome to the Temple of Literature.",
-              "The triple gate before you dates from the Le dynasty; its central passage was once reserved for the king.",
-              "Take a side passage and begin your journey as a scholar."
-            ]
           }
         },
         {
@@ -292,6 +296,10 @@
         "vi": "Khuê Văn Các",
         "en": "Constellation of Literature Pavilion"
       },
+      "hook": {
+        "vi": "Đây chính là ngôi gác in trên tờ 100.000 đồng đang nằm trong ví bạn.",
+        "en": "This is the pavilion printed on the 100,000-dong note in your pocket."
+      },
       "coords": [
         105.8355,
         21.027
@@ -305,6 +313,23 @@
           "caption": {
             "vi": "Gác Khuê Văn – biểu tượng của Thủ đô Hà Nội",
             "en": "Khue Van Pavilion – the symbol of Hanoi"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "wind-water",
+          "script": {
+            "vi": [
+              "Bạn đang đứng trước Khuê Văn Các, biểu tượng của Hà Nội.",
+              "Bốn cửa sổ tròn trên gác tượng trưng cho ánh sao Khuê, ánh sáng của tri thức tỏa ra bốn phương.",
+              "Phía sau là giếng Thiên Quang, nơi trời và đất soi vào nhau."
+            ],
+            "en": [
+              "You are standing before the Khue Van Pavilion, the symbol of Hanoi.",
+              "Its four round windows represent the light of the Khue star, knowledge radiating in all directions.",
+              "Behind it lies the Well of Heavenly Clarity, where sky and earth reflect one another."
+            ]
           }
         },
         {
@@ -352,23 +377,6 @@
           "title": {
             "vi": "Clip thuyết minh Khuê Văn Các",
             "en": "Narrated clip: Khue Van Pavilion"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "wind-water",
-          "script": {
-            "vi": [
-              "Bạn đang đứng trước Khuê Văn Các, biểu tượng của Hà Nội.",
-              "Bốn cửa sổ tròn trên gác tượng trưng cho ánh sao Khuê, ánh sáng của tri thức tỏa ra bốn phương.",
-              "Phía sau là giếng Thiên Quang, nơi trời và đất soi vào nhau."
-            ],
-            "en": [
-              "You are standing before the Khue Van Pavilion, the symbol of Hanoi.",
-              "Its four round windows represent the light of the Khue star, knowledge radiating in all directions.",
-              "Behind it lies the Well of Heavenly Clarity, where sky and earth reflect one another."
-            ]
           }
         },
         {
@@ -543,6 +551,10 @@
         "vi": "Vườn bia Tiến sĩ",
         "en": "Garden of Doctoral Steles"
       },
+      "hook": {
+        "vi": "82 tấm bia trên lưng rùa này là 'sổ danh sách' 700 năm các tiến sĩ Việt Nam — được UNESCO công nhận Tư liệu Thế giới.",
+        "en": "These 82 turtle-borne stelae are a 700-year roll of Vietnam's doctors — a UNESCO Memory of the World entry."
+      },
       "coords": [
         105.8356,
         21.0274
@@ -556,6 +568,23 @@
           "caption": {
             "vi": "82 bia đá đặt trên lưng rùa quanh giếng Thiên Quang",
             "en": "82 stone steles on tortoise backs around the Well of Heavenly Clarity"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Trước mặt bạn là 82 tấm bia đá ghi danh hơn một nghìn ba trăm tiến sĩ.",
+              "Mỗi tấm bia đặt trên lưng một con rùa, biểu tượng của sự trường tồn.",
+              "Đây là Di sản tư liệu thế giới được UNESCO công nhận."
+            ],
+            "en": [
+              "Before you stand 82 stone steles naming more than thirteen hundred doctoral laureates.",
+              "Each rests on the back of a tortoise, the symbol of longevity.",
+              "They are inscribed on UNESCO's Memory of the World Register."
+            ]
           }
         },
         {
@@ -603,23 +632,6 @@
           "title": {
             "vi": "Clip thuyết minh Vườn bia",
             "en": "Narrated clip: Garden of Steles"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "garden",
-          "script": {
-            "vi": [
-              "Trước mặt bạn là 82 tấm bia đá ghi danh hơn một nghìn ba trăm tiến sĩ.",
-              "Mỗi tấm bia đặt trên lưng một con rùa, biểu tượng của sự trường tồn.",
-              "Đây là Di sản tư liệu thế giới được UNESCO công nhận."
-            ],
-            "en": [
-              "Before you stand 82 stone steles naming more than thirteen hundred doctoral laureates.",
-              "Each rests on the back of a tortoise, the symbol of longevity.",
-              "They are inscribed on UNESCO's Memory of the World Register."
-            ]
           }
         },
         {
@@ -790,6 +802,10 @@
         "vi": "Đại Thành Môn & Điện Đại Thành",
         "en": "Gate and Hall of Great Success"
       },
+      "hook": {
+        "vi": "Phía sau cánh cổng này là nơi thờ Khổng Tử — trái tim của cả Văn Miếu.",
+        "en": "Beyond this gate stands the sanctuary of Confucius — the heart of the entire Temple of Literature."
+      },
       "coords": [
         105.8357,
         21.0279
@@ -800,6 +816,23 @@
           "type": "hero",
           "size": "lg",
           "image": "/img/van-mieu/dai-thanh.svg"
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "temple-bell",
+          "script": {
+            "vi": [
+              "Bạn đã bước vào sân Đại Thành, không gian thiêng nhất của Văn Miếu.",
+              "Điện thờ Khổng Tử và các bậc hiền triết nằm ngay trước mặt.",
+              "Hãy giữ yên lặng và cảm nhận nhịp thời gian gần một nghìn năm."
+            ],
+            "en": [
+              "You have entered the Great Success courtyard, the most sacred space of the temple.",
+              "The hall honouring Confucius and the sages lies straight ahead.",
+              "Keep quiet and feel the rhythm of nearly a thousand years."
+            ]
+          }
         },
         {
           "type": "aspects",
@@ -846,23 +879,6 @@
           "title": {
             "vi": "Clip thuyết minh Điện Đại Thành",
             "en": "Narrated clip: Hall of Great Success"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "temple-bell",
-          "script": {
-            "vi": [
-              "Bạn đã bước vào sân Đại Thành, không gian thiêng nhất của Văn Miếu.",
-              "Điện thờ Khổng Tử và các bậc hiền triết nằm ngay trước mặt.",
-              "Hãy giữ yên lặng và cảm nhận nhịp thời gian gần một nghìn năm."
-            ],
-            "en": [
-              "You have entered the Great Success courtyard, the most sacred space of the temple.",
-              "The hall honouring Confucius and the sages lies straight ahead.",
-              "Keep quiet and feel the rhythm of nearly a thousand years."
-            ]
           }
         }
       ],
@@ -1028,6 +1044,10 @@
         "vi": "Nhà Thái Học",
         "en": "Thai Hoc House"
       },
+      "hook": {
+        "vi": "Nơi bạn đứng từng là trường đại học đầu tiên của nước ta — mở cửa từ năm 1076.",
+        "en": "You stand on the grounds of Vietnam's first national university — opened in 1076."
+      },
       "coords": [
         105.8358,
         21.0285
@@ -1038,6 +1058,23 @@
           "type": "hero",
           "size": "lg",
           "image": "/img/van-mieu/thai-hoc.svg"
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.",
+              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường.",
+              "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."
+            ],
+            "en": [
+              "The final stop: Thai Hoc House, once the Imperial Academy itself.",
+              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings.",
+              "Congratulations – you have completed the scholar's journey."
+            ]
+          }
         },
         {
           "type": "aspects",
@@ -1084,23 +1121,6 @@
           "title": {
             "vi": "Clip thuyết minh Nhà Thái Học",
             "en": "Narrated clip: Thai Hoc House"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "garden",
-          "script": {
-            "vi": [
-              "Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.",
-              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường.",
-              "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."
-            ],
-            "en": [
-              "The final stop: Thai Hoc House, once the Imperial Academy itself.",
-              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings.",
-              "Congratulations – you have completed the scholar's journey."
-            ]
           }
         }
       ],

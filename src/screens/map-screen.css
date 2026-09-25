@@ -542,3 +542,11 @@
   font-size: var(--text-xs);
   color: var(--color-danger);
 }
+
+/* Dòng "Kế tiếp: <điểm>" dưới tên khu ở sơ đồ nội khu */
+.mscreen__level-next {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}

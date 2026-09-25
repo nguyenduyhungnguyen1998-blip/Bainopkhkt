@@ -71,6 +71,8 @@ export interface Spot {
   name: Localized;
   /** [kinh độ, vĩ độ] – tùy chọn cho sơ đồ cấp 2 */
   coords?: [number, number];
+  /** Một câu mời quan sát/đáng nhớ đặt đầu trang — khiến khách nhìn lại vật thật. */
+  hook?: Localized;
   xp: number;
   layoutSchema: Card[];
   sources: Source[];

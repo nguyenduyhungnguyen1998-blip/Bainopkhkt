@@ -82,7 +82,9 @@ export function App() {
       screen = <PassportScreen />;
       break;
     case 'quiz':
-      screen = <QuizScreen />;
+      // key theo `at`: CTA "thử tài tại đây" đổi điểm phải remount QuizScreen,
+      // nếu không `active` state cũ giữ điểm trước.
+      screen = <QuizScreen key={route.at ?? ''} at={route.at} />;
       break;
     case 'settings':
       screen = <SettingsScreen />;

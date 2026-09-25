@@ -320,23 +320,25 @@ export function MapScreen() {
       </header>
 
       <div class="mscreen__filters" role="group" aria-label={t(UI.regionFilter, lang)}>
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            class="mdv-chip"
-            aria-pressed={focus === f.id}
-            onClick={() => {
-              setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
-              deepExit.current = true;
-              setMountT(undefined); // remount cảnh toàn quốc rồi focus-anim bay tới vùng
-              setFlyReq(undefined); // flyReq cũ không được tái chạy trên remount
-              setSiteLevel(null);
-              setFocus(f.id);
-            }}
-          >
-            {t(UI[f.label], lang)}
-          </button>
-        ))}
+        {/* Ở sơ đồ nội khu: ẩn lọc vùng – hai quy mô (quốc gia / nội khu) không trộn nhau */}
+        {!levelSite &&
+          FILTERS.map((f) => (
+            <button
+              key={f.id}
+              class="mdv-chip"
+              aria-pressed={focus === f.id}
+              onClick={() => {
+                setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
+                deepExit.current = true;
+                setMountT(undefined); // remount cảnh toàn quốc rồi focus-anim bay tới vùng
+                setFlyReq(undefined); // flyReq cũ không được tái chạy trên remount
+                setSiteLevel(null);
+                setFocus(f.id);
+              }}
+            >
+              {t(UI[f.label], lang)}
+            </button>
+          ))}
         <button class="mdv-chip mscreen__searchbtn" onClick={() => setSearchOn(true)} aria-label={t(UI.search, lang)}>
           <Icon name="search" size={16} /> {t(UI.search, lang)}
         </button>
@@ -376,7 +378,7 @@ export function MapScreen() {
           <span class="lg lg--locked" /> {t(UI.locked, lang)}
         </div>
         <div class="mscreen__counter">
-          {unlockedSpots}/{totalSpots} {t(UI.spots, lang)}
+          {levelSite ? `${siteUnlockedCount(levelSite)}/${levelSite.spots.length}` : `${unlockedSpots}/${totalSpots}`} {t(UI.spots, lang)}
         </div>
         {!levelSite && (
           <div class="mscreen__zoomctl" role="group" aria-label={t(UI.zoomControls, lang)}>
@@ -393,7 +395,21 @@ export function MapScreen() {
             <Icon name="map" size={16} /> {t(UI.countryMap, lang)}
           </button>
         )}
-        {levelSite && <div class="mscreen__level-title">{t(levelSite.name, lang)}</div>}
+        {levelSite && (
+          <div class="mscreen__level-title">
+            {t(levelSite.name, lang)}
+            {(() => {
+              // "Kế tiếp" trong ngữ cảnh nội khu: điểm chưa ghé đầu tiên của khu này,
+              // không nhầm với điểm kế tiếp quốc gia trên bản đồ toàn cảnh.
+              const nxt = levelSite.spots.find((sp) => !isSpotUnlocked(levelSite.entityId, sp.spotId));
+              return nxt ? (
+                <span class="mscreen__level-next">
+                  {t(UI.nextInSite, lang)}: {t(nxt.name, lang)}
+                </span>
+              ) : null;
+            })()}
+          </div>
+        )}
         {searchOn && (
           <div class="msearch" role="dialog" aria-label={t(UI.search, lang)} onKeyDown={(e) => { if (e.key === 'Escape') setSearchOn(false); }}>
             <div class="msearch__bar">

@@ -18,6 +18,7 @@ import type { Region, Site } from '../data/types';
 import type { NodeStatus, UnlockResult } from '../lib/progress';
 import { inspector, useInspector } from '../debug/inspector';
 import { t, type Lang } from '../lib/i18n';
+import { iconPath } from '../components/Icon';
 import './map.css';
 
 export type MapFocus = 'all' | Region | 'journey';
@@ -454,11 +455,10 @@ export function VietnamMap({
         })}
 
         {/* Node */}
-        {nodes.map((n, i) => (
+        {nodes.map((n) => (
           <MapNodeView
             key={n.site.entityId}
             node={n}
-            index={i + 1}
             lang={lang}
             dimmed={dim !== null && n.site.region !== dim}
             selected={selectedId === n.site.entityId}
@@ -474,14 +474,12 @@ export function VietnamMap({
 
 function MapNodeView({
   node,
-  index,
   lang,
   selected,
   dimmed,
   onSelect,
 }: {
   node: MapNode;
-  index: number;
   lang: Lang;
   selected: boolean;
   dimmed: boolean;
@@ -522,24 +520,18 @@ function MapNodeView({
           />
         )}
         <circle class="vnode__body" r={NODE_R} />
-        {status === 'done' ? (
-          <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
-        ) : status === 'locked' ? (
-          // Ghim "chưa ghé" (không phải ổ khóa – nội dung vẫn xem tự do)
-          <path
-            class="vnode__glyph"
-            d="M0-6.5c-3.3 0-5.5 2.4-5.5 5.4C-5.5 3.4-2.2 6.8 0 9c2.2-2.2 5.5-5.6 5.5-10.1C5.5-4.1 3.3-6.5 0-6.5Zm0 7.3a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2Z"
-          />
-        ) : null}
+        {/* Icon nhận diện của từng khu (stele/thuyền/vương miện/tháp/cờ) – nét chính của node. */}
+        <path class="vnode__glyph" d={iconPath(site.gamificationConfig.badge.icon)} transform="translate(-9.4 -9.4) scale(0.78)" />
+        {status === 'done' && (
+          <g class="vnode__donebadge" transform="translate(11 10.5)">
+            <circle r="6.4" />
+            <path d="M-2.9 .4l2 2 3.6-3.8" />
+          </g>
+        )}
         <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
           {t(site.name, lang)}
         </text>
       </g>
-      {(status === 'next' || status === 'active') && (
-        <text class="vnode__num" text-anchor="middle" dominant-baseline="central" aria-hidden="true" pointer-events="none">
-          {index}
-        </text>
-      )}
     </g>
   );
 }

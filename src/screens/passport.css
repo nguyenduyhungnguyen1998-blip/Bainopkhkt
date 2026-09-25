@@ -337,3 +337,24 @@
   background: var(--color-accent);
   color: #1b1409;
 }
+
+/* Bảng điều khiển demo (#/admin): hàng điểm + nút mở/khóa/đặt quiz */
+.adm__rows {
+  display: grid;
+  gap: 8px;
+}
+.adm__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.adm__name {
+  flex: 1 1 140px;
+  font-size: 0.86rem;
+  color: var(--color-muted);
+}
+.adm__name--on {
+  color: var(--color-fg);
+  font-weight: 600;
+}

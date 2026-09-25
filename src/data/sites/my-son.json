@@ -41,6 +41,10 @@
         "vi": "Nhóm tháp B–C–D",
         "en": "Tower groups B–C–D"
       },
+      "hook": {
+        "vi": "Nhìn kỹ mạch gạch: gạch Chăm dính chặt gần nghìn năm mà không lộ chất kết dính — bí ẩn tới nay.",
+        "en": "Look closely at the brick joints: Cham bricks have bonded for nearly a millennium with no visible mortar — a mystery to this day."
+      },
       "xp": 40,
       "layoutSchema": [
         {

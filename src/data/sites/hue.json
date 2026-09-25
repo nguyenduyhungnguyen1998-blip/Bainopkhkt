@@ -41,6 +41,10 @@
         "vi": "Ngọ Môn",
         "en": "Noon Gate"
       },
+      "hook": {
+        "vi": "Cổng giữa chỉ dành cho vua đi; trên nóc là Ngũ Phụng Lầu — nơi vua ngự các lễ lớn.",
+        "en": "The middle passage was for the emperor alone; on the roof sits Ngu Phung Pavilion where he presided over grand ceremonies."
+      },
       "xp": 40,
       "layoutSchema": [
         {

@@ -478,3 +478,50 @@ a.dest__crumb--link:active {
   color: var(--color-muted);
   font-size: 0.78rem;
 }
+
+/* Câu hook mở điểm – mời khách nhìn lại vật thật trước khi đọc lịch sử */
+.dest__hook {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 var(--space-3);
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+.dest__hook svg {
+  flex: none;
+  align-self: center;
+  color: var(--color-accent);
+}
+
+/* Chuỗi hành động cuối nội dung: thử tài điểm này -> xem dấu -> điểm tiếp trong khu */
+.dchain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin-top: var(--space-4);
+}
+.dchain__quiz {
+  flex: 1 1 220px;
+  justify-content: center;
+}
+.dchain__pass {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+.dchain__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}

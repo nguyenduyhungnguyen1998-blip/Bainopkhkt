@@ -79,6 +79,14 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         ))}
       </nav>
 
+      {/* Một câu mời quan sát – khiến khách nhìn lại vật thật trước khi đọc lịch sử */}
+      {spot.hook && (
+        <p class="dest__hook">
+          <Icon name="spark" size={15} aria-hidden="true" />
+          {t(spot.hook, lang)}
+        </p>
+      )}
+
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
           <CardView key={i} card={card} lang={lang} mode={mode} />
@@ -100,6 +108,24 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
           )}
         </section>
       )}
+
+      {/* Chuỗi hành động cuối nội dung: thử tài đúng điểm → xem dấu → tiếp trong khu (nav dưới) */}
+      <footer class="dchain">
+        {spot.quiz?.length ? (
+          <a class="mdv-btn mdv-btn--primary dchain__quiz" href={routeHref.quizAt(site.entityId, spot.spotId)}>
+            <Icon name="quiz" size={18} /> {t(UI.quizAtSpot, lang)} · {spot.quiz.length} {lang === 'vi' ? 'câu' : 'qs'}
+          </a>
+        ) : null}
+        {unlocked ? (
+          <a class="dchain__pass" href={routeHref.passport}>
+            <Icon name="passport" size={15} /> {t(UI.viewStamp, lang)}
+          </a>
+        ) : (
+          <span class="dchain__hint">
+            <Icon name="qr" size={14} /> {t(UI.stampHint, lang)} (+{spot.xp} XP)
+          </span>
+        )}
+      </footer>
 
       <div class="dest__nav">
         {prev ? (

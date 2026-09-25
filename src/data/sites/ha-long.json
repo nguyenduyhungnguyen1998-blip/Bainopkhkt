@@ -41,6 +41,10 @@
         "vi": "Hang Sửng Sốt",
         "en": "Surprise Cave"
       },
+      "hook": {
+        "vi": "Đừng quên ngửa lên: trần khoang cuối cao như một nhà hát tự nhiên giữa vịnh.",
+        "en": "Don't forget to look up: the last chamber's ceiling soars like a natural theatre over the bay."
+      },
       "xp": 40,
       "layoutSchema": [
         {

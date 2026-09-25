@@ -93,6 +93,14 @@ export function PassportScreen() {
                 <div class="mdv-muted" style="font-size:var(--text-sm)">
                   {n}/{s.spots.length} {t(UI.spots, lang)}
                 </div>
+                {/* Hàng dấu từng điểm – kỷ niệm nhìn được thay vì chỉ con số */}
+                <span class="pstamp" aria-hidden="true">
+                  {s.spots.map((sp, i) => (
+                    <i key={sp.spotId} class={`pstamp__dot ${isSpotUnlocked(s.entityId, sp.spotId) ? 'pstamp__dot--on' : ''}`}>
+                      {i + 1}
+                    </i>
+                  ))}
+                </span>
               </div>
               {done ? (
                 <span class="mdv-badge mdv-badge--unlocked">
@@ -219,10 +227,14 @@ function BackupCard({ lang }: { lang: Lang }) {
   );
 }
 
-export function QuizScreen() {
+export function QuizScreen({ at }: { at?: string }) {
   const [lang] = useLang();
   useProgress();
-  const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(null);
+  const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(() => {
+    // Deep link #/quiz?at=<site>/<spot> từ CTA "thử tài tại đây" — validate trước khi mở.
+    const [siteId, spotId] = at?.split('/') ?? [];
+    return siteId && spotId && getSpot(siteId, spotId)?.spot.quiz?.length ? { siteId, spotId } : null;
+  });
   const spotsWithQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz && sp.quiz.length > 0).map((sp) => ({ site: s, spot: sp })));
 
   if (active) {

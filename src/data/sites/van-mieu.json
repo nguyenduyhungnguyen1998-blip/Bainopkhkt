@@ -41,6 +41,10 @@
         "vi": "Văn Miếu Môn",
         "en": "Great Portico"
       },
+      "hook": {
+        "vi": "Cổng giữa năm xưa chỉ dành cho vua đi — quan lại và học trò phải đi hai cổng bên.",
+        "en": "The middle gate was once reserved for the king — mandarins and students used the side gates."
+      },
       "coords": [
         105.8352,
         21.0262
@@ -291,6 +295,10 @@
       "name": {
         "vi": "Khuê Văn Các",
         "en": "Constellation of Literature Pavilion"
+      },
+      "hook": {
+        "vi": "Đây chính là ngôi gác in trên tờ 100.000 đồng đang nằm trong ví bạn.",
+        "en": "This is the pavilion printed on the 100,000-dong note in your pocket."
       },
       "coords": [
         105.8355,
@@ -543,6 +551,10 @@
         "vi": "Vườn bia Tiến sĩ",
         "en": "Garden of Doctoral Steles"
       },
+      "hook": {
+        "vi": "82 tấm bia trên lưng rùa này là 'sổ danh sách' 700 năm các tiến sĩ Việt Nam — được UNESCO công nhận Tư liệu Thế giới.",
+        "en": "These 82 turtle-borne stelae are a 700-year roll of Vietnam's doctors — a UNESCO Memory of the World entry."
+      },
       "coords": [
         105.8356,
         21.0274
@@ -790,6 +802,10 @@
         "vi": "Đại Thành Môn & Điện Đại Thành",
         "en": "Gate and Hall of Great Success"
       },
+      "hook": {
+        "vi": "Phía sau cánh cổng này là nơi thờ Khổng Tử — trái tim của cả Văn Miếu.",
+        "en": "Beyond this gate stands the sanctuary of Confucius — the heart of the entire Temple of Literature."
+      },
       "coords": [
         105.8357,
         21.0279
@@ -1027,6 +1043,10 @@
       "name": {
         "vi": "Nhà Thái Học",
         "en": "Thai Hoc House"
+      },
+      "hook": {
+        "vi": "Nơi bạn đứng từng là trường đại học đầu tiên của nước ta — mở cửa từ năm 1076.",
+        "en": "You stand on the grounds of Vietnam's first national university — opened in 1076."
       },
       "coords": [
         105.8358,

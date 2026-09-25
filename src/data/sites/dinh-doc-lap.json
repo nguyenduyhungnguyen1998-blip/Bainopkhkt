@@ -41,6 +41,10 @@
         "vi": "Cổng chính & bãi cỏ",
         "en": "Main gate and lawn"
       },
+      "hook": {
+        "vi": "Trưa 30/4/1975, xe tăng 843 và 390 đâm qua cánh cổng này — kết thúc một cuộc chiến.",
+        "en": "At noon on 30 April 1975, tanks 843 and 390 crashed through this gate — ending a war."
+      },
       "xp": 40,
       "layoutSchema": [
         {

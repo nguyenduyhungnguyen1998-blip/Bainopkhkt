@@ -10,6 +10,7 @@ import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
 import { routeHref } from '../lib/router';
+import { enableDemoDock } from '../components/DemoDock';
 
 export function PassportScreen() {
   const [lang] = useLang();
@@ -495,6 +496,8 @@ export function SettingsScreen() {
 export function AdminScreen() {
   const p = useProgress();
   const [, forceTick] = useState(0); // re-render sau thao tác cục bộ (finale flags)
+  // Mở trang admin = có ý định demo -> bật luôn nút điều khiển nổi (DemoDock).
+  useEffect(() => enableDemoDock(), []);
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
 
@@ -588,6 +591,9 @@ export function AdminScreen() {
       <section class="mdv-card">
         <h2 style="font-size:var(--text-md);margin:0 0 10px">Tiện ích</h2>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--primary" onClick={() => enableDemoDock()}>
+            <Icon name="spark" size={16} /> Hiện nút điều khiển nổi (góc phải màn)
+          </button>
           <a class="mdv-chip" href="qr-sheet.html" target="_blank" rel="noreferrer">
             Trang in tem QR
           </a>

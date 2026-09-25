@@ -1,0 +1,148 @@
+/* DemoDock – bảng điều khiển nổi kiểu cheat menu, góc phải trên dock. */
+.demodock {
+  position: fixed;
+  right: 12px;
+  bottom: calc(var(--dock-h, 76px) + 14px);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none; /* chỉ các con mới nhận chạm */
+}
+.demodock > * {
+  pointer-events: auto;
+}
+
+.demodock__fab {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background: color-mix(in srgb, var(--color-surface, #1c1a16) 82%, transparent);
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
+  opacity: 0.75;
+  transition: opacity 0.15s ease;
+}
+.demodock__fab:hover,
+.demodock--open .demodock__fab {
+  opacity: 1;
+}
+
+.demodock__panel {
+  width: 252px;
+  max-height: min(66vh, 480px);
+  overflow-y: auto;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--color-surface, #1c1a16) 94%, transparent);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  font-size: 0.8rem;
+  backdrop-filter: blur(10px);
+}
+
+.demodock__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.demodock__stat {
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+
+.demodock__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.demodock__lbl {
+  display: grid;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--color-muted);
+}
+.dd__sel {
+  font: inherit;
+  padding: 5px 8px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 40%, transparent);
+  background: transparent;
+  color: var(--color-fg);
+}
+
+.demodock__spots {
+  display: grid;
+  gap: 5px;
+}
+.dd__spot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dd__chip {
+  flex: 1;
+  text-align: left;
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 5px 9px;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
+  background: transparent;
+  color: var(--color-fg);
+}
+.dd__chip--on {
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+  color: var(--color-accent);
+}
+.dd__mini {
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 5px 7px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
+  background: transparent;
+  color: var(--color-muted);
+}
+.dd__mini--on {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+
+.dd__btn {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 9px;
+  border: 1px solid color-mix(in srgb, var(--color-muted) 40%, transparent);
+  background: transparent;
+  color: var(--color-fg);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.dd__btn--go {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+.dd__btn--warn {
+  color: var(--color-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 50%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demodock__fab {
+    transition: none;
+  }
+}

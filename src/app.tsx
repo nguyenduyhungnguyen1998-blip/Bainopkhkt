@@ -6,6 +6,7 @@ import { UI, t, useLang } from './lib/i18n';
 import { Dock } from './components/Dock';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Celebrate } from './components/Celebrate';
+import { DemoDock } from './components/DemoDock';
 import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
@@ -119,6 +120,7 @@ export function App() {
         </div>
       )}
       <Celebrate />
+      <DemoDock />
       <Dock route={route} />
       {debug && (
         <Suspense fallback={null}>

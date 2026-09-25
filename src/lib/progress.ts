@@ -147,6 +147,16 @@ export function relockSpot(siteId: string, spotId: string): void {
   commit({ ...state, unlocked });
 }
 
+/** Công cụ demo: gỡ dấu mọi điểm (giữ XP/huy hiệu/điểm quiz) — dựng lại hành trình từ đầu. */
+export function relockAll(): void {
+  commit({ ...state, unlocked: {} });
+}
+
+/** Công cụ demo: xóa mọi điểm quiz (giữ dấu + XP) — để giám khảo chơi lại và thấy XP thưởng thật. */
+export function clearQuizResults(): void {
+  commit({ ...state, quizDone: {} });
+}
+
 export const QUIZ_XP_PER_CORRECT = 5;
 
 /**

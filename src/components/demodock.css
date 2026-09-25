@@ -1,13 +1,9 @@
-/* DemoDock – bảng điều khiển nổi kiểu cheat menu, góc phải trên dock. */
+/* DemoDock – bảng điều khiển nổi kiểu cheat menu; kéo-thả được, panel có tab. */
 .demodock {
   position: fixed;
   right: 12px;
   bottom: calc(var(--dock-h, 76px) + 14px);
   z-index: 60;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
   pointer-events: none; /* chỉ các con mới nhận chạm */
 }
 .demodock > * {
@@ -15,8 +11,8 @@
 }
 
 .demodock__fab {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
   background: color-mix(in srgb, var(--color-surface, #1c1a16) 82%, transparent);
@@ -27,91 +23,184 @@
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.35);
   opacity: 0.75;
   transition: opacity 0.15s ease;
+  touch-action: none; /* giữ ngón để kéo, không cuộn trang */
+  cursor: grab;
 }
-.demodock__fab:hover,
-.demodock--open .demodock__fab {
+.demodock__fab:hover {
+  opacity: 1;
+}
+.demodock__fab--drag {
+  cursor: grabbing;
   opacity: 1;
 }
 
 .demodock__panel {
-  width: 252px;
-  max-height: min(66vh, 480px);
-  overflow-y: auto;
-  padding: 10px;
+  position: absolute; /* neo theo nút – bố trí lệnh bằng inline style trong component */
+  width: min(336px, calc(100vw - 16px));
+  max-height: min(72vh, 560px);
   border-radius: 14px;
   border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
   background: color-mix(in srgb, var(--color-surface, #1c1a16) 94%, transparent);
   box-shadow: 0 12px 34px rgb(0 0 0 / 0.45);
   display: flex;
   flex-direction: column;
-  gap: 9px;
   font-size: 0.8rem;
   backdrop-filter: blur(10px);
+  overflow: hidden;
 }
 
 .demodock__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-muted) 20%, transparent);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.dd__grip {
+  color: var(--color-muted);
+  letter-spacing: -2px;
+  font-size: 0.9rem;
 }
 .demodock__stat {
+  margin-left: auto;
   font-size: 0.72rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.dd__x {
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
   color: var(--color-muted);
 }
 
-.demodock__row {
+.demodock__tabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px 0;
+}
+.dd__tab {
+  flex: 1;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 6px 4px;
+  border-radius: 9px 9px 0 0;
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--color-muted);
+}
+.dd__tab--on {
+  color: var(--color-accent);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.demodock__body {
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+.demodock__row,
+.dd__row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.demodock__lbl {
-  display: grid;
-  gap: 4px;
+.dd__big {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+.dd__note {
+  margin: 0;
   font-size: 0.72rem;
   color: var(--color-muted);
 }
-.dd__sel {
-  font: inherit;
-  padding: 5px 8px;
-  border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--color-muted) 40%, transparent);
-  background: transparent;
-  color: var(--color-fg);
-}
 
-.demodock__spots {
+.dd__site {
   display: grid;
   gap: 5px;
 }
-.dd__spot {
+.dd__sitehead {
   display: flex;
   align-items: center;
   gap: 6px;
+  justify-content: space-between;
 }
+.dd__sitehead--row {
+  border-bottom: 1px dashed color-mix(in srgb, var(--color-muted) 20%, transparent);
+  padding-bottom: 6px;
+}
+.dd__sitename {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+.dd__sitename i {
+  font-style: normal;
+  font-weight: 400;
+  color: var(--color-muted);
+  font-size: 0.72rem;
+}
+.dd__siteact {
+  display: flex;
+  gap: 5px;
+}
+
+.dd__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
 .dd__chip {
-  flex: 1;
   text-align: left;
   font: inherit;
-  font-size: 0.78rem;
-  padding: 5px 9px;
+  font-size: 0.74rem;
+  padding: 5px 8px;
   border-radius: 9px;
   border: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
   background: transparent;
   color: var(--color-fg);
 }
+.dd__chip i {
+  font-style: normal;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+}
 .dd__chip--on {
   border-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
   color: var(--color-accent);
 }
+.dd__chip--on i {
+  color: var(--color-accent);
+}
+.dd__chip--static {
+  cursor: default;
+}
 .dd__mini {
   font: inherit;
-  font-size: 0.72rem;
-  padding: 5px 7px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 8px;
   border-radius: 8px;
   border: 1px solid color-mix(in srgb, var(--color-muted) 35%, transparent);
   background: transparent;
   color: var(--color-muted);
+  white-space: nowrap;
 }
 .dd__mini--on {
   color: var(--color-accent);

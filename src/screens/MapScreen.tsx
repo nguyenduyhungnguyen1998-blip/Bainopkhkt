@@ -9,6 +9,7 @@ import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
 import { asset } from '../lib/asset';
+import { verifySignature } from '../lib/qr';
 import { isDebug } from '../lib/debug';
 import './map-screen.css';
 
@@ -54,10 +55,27 @@ export function MapScreen() {
   const [searchOn, setSearchOn] = useState(false);
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [codeIn, setCodeIn] = useState('');
+  const [codeErr, setCodeErr] = useState(false);
 
   useEffect(() => {
     if (searchOn) searchInputRef.current?.focus();
   }, [searchOn]);
+
+  // Đường cứu demo: mã 16-ký-tự in trên tem QR (= chữ ký). Thử verify với mọi điểm
+  // (offline vẫn chạy vì cùng secret HMAC) — khớp thì mở điểm qua cổng check-in thật.
+  const useCode = async () => {
+    const c = codeIn.trim().toLowerCase();
+    if (!c) return;
+    for (const s of SITES)
+      for (const sp of s.spots)
+        if (await verifySignature(s.entityId, sp.spotId, c, sp.qrId)) {
+          setSearchOn(false);
+          navigate(`d/${s.entityId}/${sp.spotId}?s=${c}`);
+          return;
+        }
+    setCodeErr(true);
+  };
   // Tìm kiếm địa danh/tỉnh: khách thường biết tên và muốn đi thẳng – bản đồ không phải đường duy nhất.
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -404,6 +422,25 @@ export function MapScreen() {
                   <span class="msearch__sub">{r.sub}</span>
                 </a>
               ))}
+            </div>
+            <div class="msearch__manual">
+              <label class="msearch__mlabel" htmlFor="mcode">{t(UI.manualCode, lang)}</label>
+              <div class="msearch__mrow">
+                <input
+                  id="mcode"
+                  class="msearch__input msearch__code"
+                  value={codeIn}
+                  placeholder="c9f200…"
+                  inputMode="text"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellcheck={false}
+                  onInput={(e) => { setCodeIn(e.currentTarget.value); setCodeErr(false); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') void useCode(); }}
+                />
+                <button class="mdv-chip" onClick={() => void useCode()}>{t(UI.manualCodeUse, lang)}</button>
+              </div>
+              {codeErr && <span class="msearch__cerr">{t(UI.codeInvalid, lang)}</span>}
             </div>
           </div>
         )}

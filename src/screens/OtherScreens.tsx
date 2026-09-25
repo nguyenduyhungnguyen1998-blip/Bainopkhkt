@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, previewPassportJson, applyPassportImport, isSpotUnlocked } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
 import type { Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
@@ -473,10 +473,137 @@ export function SettingsScreen() {
             {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
           </button>
         </section>
+        <section class="mdv-card">
+          <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dành cho trình diễn' : 'For demo'}</h2>
+          <a class="mdv-btn mdv-btn--ghost" href={routeHref.admin}>
+            <Icon name="spark" size={16} /> {lang === 'vi' ? 'Bảng điều khiển demo' : 'Demo control panel'}
+          </a>
+        </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
           Mở Dấu Việt v{__APP_VERSION__} · {lang === 'vi' ? 'Thêm ?debug=1 vào địa chỉ để mở Debug HUD' : 'Append ?debug=1 to open the Debug HUD'}
         </p>
       </div>
+    </main>
+  );
+}
+
+/**
+ * Bảng điều khiển demo (#/admin) – dựng kịch bản trình diễn mà không cần quét QR thật:
+ * mở/khóa từng điểm, mở cả khu, đặt điểm quiz, cộng XP, reset cờ finale.
+ * Mở khóa đi qua unlockSpot thật nên confetti + finale cấp khu tự chạy -> demo được cả màn ăn mừng.
+ */
+export function AdminScreen() {
+  const p = useProgress();
+  const [, forceTick] = useState(0); // re-render sau thao tác cục bộ (finale flags)
+  const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
+  const doneSpots = Object.keys(p.unlocked).length;
+
+  const unlockSite = (site: Site) => site.spots.forEach((sp) => unlockSpot(site.entityId, sp.spotId));
+  const unlockAll = () => SITES.forEach(unlockSite);
+  const clearFinaleFlags = () => {
+    try {
+      localStorage.removeItem('mdv.finale.v1');
+      for (const k of Object.keys(localStorage)) {
+        if (k.startsWith('mdv.sitefin.')) localStorage.removeItem(k);
+      }
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    forceTick((n) => n + 1);
+  };
+
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">Demo admin</span>
+          <h1>Bảng điều khiển trình diễn</h1>
+        </div>
+      </header>
+      <p class="mdv-muted">
+        Dựng kịch bản cho giám khảo: mở khóa từng điểm/khu, đặt điểm thử tài, cộng XP. Mọi thao tác đi qua hệ
+        tiến độ thật — confetti và finale cấp khu tự hiện. Trang này không nằm trong điều hướng; mở qua{' '}
+        <code>#/admin</code>. Đang có {doneSpots}/{totalSpots} điểm · {p.xp} XP.
+      </p>
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">Mở khóa nhanh</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--primary" onClick={unlockAll}>
+            <Icon name="check" size={16} /> Mở hết {totalSpots} điểm
+          </button>
+          {SITES.map((s) => (
+            <button key={s.entityId} class="mdv-chip" onClick={() => unlockSite(s)}>
+              Mở hết {t(s.name)} ({siteUnlockedCount(s, p)}/{s.spots.length})
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {SITES.map((s) => (
+        <section key={s.entityId} class="mdv-card">
+          <h2 style="font-size:var(--text-md);margin:0 0 10px">
+            {t(s.name)} <span class="mdv-muted" style="font-weight:400">({siteUnlockedCount(s, p)}/{s.spots.length})</span>
+          </h2>
+          <div class="adm__rows">
+            {s.spots.map((sp) => {
+              const on = isSpotUnlocked(s.entityId, sp.spotId);
+              const best = quizBest(s.entityId, sp.spotId);
+              return (
+                <div key={sp.spotId} class="adm__row">
+                  <span class={`adm__name ${on ? 'adm__name--on' : ''}`}>{t(sp.name)}</span>
+                  <button class="mdv-chip" aria-pressed={on} onClick={() => (on ? relockSpot(s.entityId, sp.spotId) : unlockSpot(s.entityId, sp.spotId))}>
+                    {on ? 'Đã nhận dấu — gỡ lại' : `Mở (+${sp.xp} XP)`}
+                  </button>
+                  {sp.quiz?.length ? (
+                    <button
+                      class="mdv-chip"
+                      aria-pressed={best === sp.quiz.length}
+                      onClick={() => recordQuizResult(s.entityId, sp.spotId, sp.quiz!.length, sp.quiz!.length)}
+                    >
+                      Quiz {best ?? '–'}/{sp.quiz.length} → đặt đủ
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">XP &amp; cờ ăn mừng</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          {[30, 100, 500].map((x) => (
+            <button key={x} class="mdv-chip" onClick={() => grantXp(x)}>
+              +{x} XP
+            </button>
+          ))}
+          <button class="mdv-chip" onClick={clearFinaleFlags}>
+            Cho xem lại finale (reset cờ)
+          </button>
+        </div>
+      </section>
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">Tiện ích</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a class="mdv-chip" href="qr-sheet.html" target="_blank" rel="noreferrer">
+            Trang in tem QR
+          </a>
+          <a class="mdv-chip" href={routeHref.map}>
+            Về bản đồ
+          </a>
+          <button
+            class="mdv-btn mdv-btn--ghost"
+            onClick={() => {
+              if (confirm('Xóa toàn bộ tiến độ hành trình?')) resetProgress();
+            }}
+          >
+            Reset hành trình
+          </button>
+        </div>
+      </section>
     </main>
   );
 }

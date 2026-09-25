@@ -132,6 +132,21 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   return result;
 }
 
+/** Công cụ demo (#/admin): cộng XP trực tiếp để dựng kịch bản trình diễn. */
+export function grantXp(amount: number): void {
+  if (!Number.isFinite(amount) || amount === 0) return;
+  commit({ ...state, xp: Math.max(0, state.xp + amount) });
+}
+
+/** Công cụ demo (#/admin): gỡ dấu một điểm để diễn lại check-in (giữ XP/huy hiệu đã nhận). */
+export function relockSpot(siteId: string, spotId: string): void {
+  const key = `${siteId}/${spotId}`;
+  if (!(key in state.unlocked)) return;
+  const unlocked = { ...state.unlocked };
+  delete unlocked[key];
+  commit({ ...state, unlocked });
+}
+
 export const QUIZ_XP_PER_CORRECT = 5;
 
 /**

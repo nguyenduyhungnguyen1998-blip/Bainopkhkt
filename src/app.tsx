@@ -10,7 +10,7 @@ import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
-import { PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
+import { AdminScreen, PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
@@ -85,6 +85,9 @@ export function App() {
       // key theo `at`: CTA "thử tài tại đây" đổi điểm phải remount QuizScreen,
       // nếu không `active` state cũ giữ điểm trước.
       screen = <QuizScreen key={route.at ?? ''} at={route.at} />;
+      break;
+    case 'admin':
+      screen = <AdminScreen />;
       break;
     case 'settings':
       screen = <SettingsScreen />;

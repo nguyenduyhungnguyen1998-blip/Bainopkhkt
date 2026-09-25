@@ -316,10 +316,13 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   };
 
   if (done) {
-    // Gợi ý điểm có quiz kế tiếp chưa làm – tránh màn kết quả thành ngõ cụt.
-    const nextQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ site: s, spot: sp }))).find(
-      ({ site: s, spot: sp }) => quizBest(s.entityId, sp.spotId) === undefined
-    );
+    // Gợi ý điểm có quiz kế tiếp chưa làm — ưu tiên cùng khu (đang đứng trong khu),
+    // loại chính điểm vừa chơi (chơi thử không ghi best nên sẽ bị gợi lại nếu không lọc).
+    const quizSpots = (s: (typeof SITES)[number]) =>
+      s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ site: s, spot: sp }));
+    const isUnplayed = ({ site: s, spot: sp }: { site: Site; spot: Spot }) =>
+      !(s.entityId === site.entityId && sp.spotId === spot.spotId) && quizBest(s.entityId, sp.spotId) === undefined;
+    const nextQuiz = quizSpots(site).find(isUnplayed) ?? SITES.flatMap(quizSpots).find(isUnplayed);
     return (
       <main class="mdv-screen">
         <div class="mdv-card quiz__result">
@@ -370,6 +373,8 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
           </h1>
         </div>
       </header>
+      {/* Báo chơi thử NGAY câu đầu — không để khách bỏ công xong mới biết không có XP. */}
+      {locked && <p class="quiz__trialnote">{t(UI.quizTrial, lang)}</p>}
       <div class="mdv-card">
         <div
           class="quiz__prog"

@@ -512,3 +512,33 @@
     margin-right: var(--space-5, var(--space-4));
   }
 }
+
+/* Ô nhập mã dự phòng (mã in trên tem QR = chữ ký) — đường cứu khi camera không quét được. */
+.msearch__manual {
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--color-border);
+}
+.msearch__mlabel {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+.msearch__mrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.msearch__code {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 8px 12px;
+}
+.msearch__cerr {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+}

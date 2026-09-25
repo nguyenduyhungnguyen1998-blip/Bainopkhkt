@@ -59,7 +59,9 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         </span>
       </header>
 
-      {sig && <ScanConfirm site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
+      {/* key spot+sig: remount mỗi QR mới — nếu không, reward/state của điểm trước
+          sống sót khi đổi điểm cùng khu (component cha key theo siteId) và che nút xác nhận mới. */}
+      {sig && <ScanConfirm key={`${spot.spotId}:${sig}`} site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
 
       {/* Dải điểm QR trong khu – điều hướng nhanh giữa các điểm */}
       <nav class="dest__spots" aria-label="Các điểm trong khu">

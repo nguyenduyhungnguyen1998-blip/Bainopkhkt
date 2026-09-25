@@ -300,3 +300,15 @@
 .ppass__share {
   width: fit-content;
 }
+
+/* Báo "chơi thử" ngay từ câu đầu — không để khách làm xong mới biết không có XP. */
+.quiz__trialnote {
+  margin: 0 auto var(--space-3);
+  max-width: 560px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-accent-secondary) 12%, transparent);
+  color: var(--color-accent-secondary);
+  font-size: var(--text-sm);
+  text-align: center;
+}

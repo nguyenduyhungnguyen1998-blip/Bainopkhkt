@@ -8,7 +8,7 @@
  * hoặc localStorage mdv.admin=1. Khách thường không bao giờ thấy.
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { SITES } from '../data/content';
+import { SITES, getSite, getSpot } from '../data/content';
 import type { Site } from '../data/types';
 import { t, useLang } from '../lib/i18n';
 import { useTheme } from '../lib/theme';
@@ -26,7 +26,7 @@ import {
   unlockSpot,
   useProgress,
 } from '../lib/progress';
-import { routeHref } from '../lib/router';
+import { routeHref, useRoute } from '../lib/router';
 import { Icon } from './Icon';
 import './demodock.css';
 
@@ -97,6 +97,7 @@ export function DemoDock() {
   const [, tick] = useState(0);
   const [lang, setLang] = useLang();
   const [theme, setTheme] = useTheme();
+  const route = useRoute();
   const p = useProgress();
   const drag = useRef<{ sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
@@ -206,6 +207,31 @@ export function DemoDock() {
 
   const achievements = computeAchievements(p);
 
+  /* Ngữ cảnh màn hình: panel "ăn theo" trang đang mở – hiện đúng điểm/khu và hành động liên quan. */
+  const ctx = (() => {
+    if (route.name === 'destination') {
+      if (route.spotId) {
+        const found = getSpot(route.siteId, route.spotId);
+        if (found) return { kind: 'spot' as const, ...found };
+      }
+      const site = getSite(route.siteId);
+      if (site) return { kind: 'site' as const, site };
+    }
+    if (route.name === 'quiz' && route.at) {
+      const [sid, spid] = route.at.split('/');
+      const found = getSpot(sid, spid);
+      if (found) return { kind: 'spot' as const, ...found };
+    }
+    if (route.name === 'map') {
+      // Điểm kế tiếp = điểm chưa mở đầu tiên theo thứ tự hành trình.
+      for (const s of SITES)
+        for (const sp of s.spots) if (!isSpotUnlocked(s.entityId, sp.spotId)) return { kind: 'next' as const, site: s, spot: sp };
+      return { kind: 'all-done' as const };
+    }
+    if (route.name === 'passport') return { kind: 'passport' as const };
+    return undefined;
+  })();
+
   return (
     <div class="demodock" style={pos ? { left: `${pos.x}px`, top: `${pos.y}px`, right: 'auto', bottom: 'auto' } : undefined}>
       {open && (
@@ -224,6 +250,98 @@ export function DemoDock() {
               ×
             </button>
           </div>
+
+          {ctx && (
+            <div class="dd__ctx">
+              {ctx.kind === 'spot' && (
+                <>
+                  <div class="dd__ctxtop">
+                    <b>{t(ctx.spot.name, lang)}</b>
+                    <span>
+                      {t(ctx.site.name, lang)} · {isSpotUnlocked(ctx.site.entityId, ctx.spot.spotId) ? '● đã ghé' : '○ chưa ghé'} · quiz{' '}
+                      {quizBest(ctx.site.entityId, ctx.spot.spotId) ?? '–'}/{ctx.spot.quiz?.length ?? 0}
+                    </span>
+                  </div>
+                  <div class="dd__row">
+                    {isSpotUnlocked(ctx.site.entityId, ctx.spot.spotId) ? (
+                      <button class="dd__btn" onClick={() => relockSpot(ctx.site.entityId, ctx.spot.spotId)}>
+                        Gỡ dấu
+                      </button>
+                    ) : (
+                      <button class="dd__btn dd__btn--go" onClick={() => unlockSpot(ctx.site.entityId, ctx.spot.spotId)}>
+                        ✓ Nhận dấu +{ctx.spot.xp}
+                      </button>
+                    )}
+                    {ctx.spot.quiz?.length ? (
+                      <button
+                        class="dd__btn"
+                        onClick={() => recordQuizResult(ctx.site.entityId, ctx.spot.spotId, ctx.spot.quiz!.length, ctx.spot.quiz!.length)}
+                      >
+                        Đủ quiz
+                      </button>
+                    ) : null}
+                    <a class="dd__btn" href={routeHref.quizAt(ctx.site.entityId, ctx.spot.spotId)} onClick={() => setOpen(false)}>
+                      Quiz ▸
+                    </a>
+                    <button class="dd__btn" onClick={() => replaySiteFinale(ctx.site)}>
+                      Finale khu
+                    </button>
+                  </div>
+                </>
+              )}
+              {ctx.kind === 'site' && (
+                <>
+                  <div class="dd__ctxtop">
+                    <b>{t(ctx.site.name, lang)}</b>
+                    <span>
+                      {siteUnlockedCount(ctx.site, p)}/{ctx.site.spots.length} điểm
+                    </span>
+                  </div>
+                  <div class="dd__row">
+                    <button class="dd__btn dd__btn--go" onClick={() => ctx.site.spots.forEach((sp) => unlockSpot(ctx.site.entityId, sp.spotId))}>
+                      Mở hết khu
+                    </button>
+                    <button class="dd__btn" onClick={() => ctx.site.spots.forEach((sp) => relockSpot(ctx.site.entityId, sp.spotId))}>
+                      Gỡ hết
+                    </button>
+                    <button class="dd__btn" onClick={() => replaySiteFinale(ctx.site)}>
+                      Diễn finale
+                    </button>
+                  </div>
+                </>
+              )}
+              {ctx.kind === 'next' && (
+                <>
+                  <div class="dd__ctxtop">
+                    <b>Bản đồ · điểm kế tiếp</b>
+                    <span>
+                      {t(ctx.spot.name, lang)} · {t(ctx.site.name, lang)}
+                    </span>
+                  </div>
+                  <div class="dd__row">
+                    <button class="dd__btn dd__btn--go" onClick={() => unlockSpot(ctx.site.entityId, ctx.spot.spotId)}>
+                      ✓ Mở điểm này +{ctx.spot.xp}
+                    </button>
+                    <a class="dd__btn" href={routeHref.destination(ctx.site.entityId, ctx.spot.spotId)} onClick={() => setOpen(false)}>
+                      Xem điểm ▸
+                    </a>
+                  </div>
+                </>
+              )}
+              {ctx.kind === 'all-done' && (
+                <div class="dd__ctxtop">
+                  <b>Bản đồ · 9/9</b>
+                  <span>Hành trình hoàn tất — diễn lại finale ở tab Finale.</span>
+                </div>
+              )}
+              {ctx.kind === 'passport' && (
+                <div class="dd__ctxtop">
+                  <b>Hộ chiếu · {doneSpots}/{totalSpots}</b>
+                  <span>{p.xp} XP · {p.badges.length} huy hiệu khu</span>
+                </div>
+              )}
+            </div>
+          )}
 
           <div class="demodock__tabs" role="tablist">
             {(

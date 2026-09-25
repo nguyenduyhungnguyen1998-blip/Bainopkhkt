@@ -138,18 +138,28 @@ export function grantXp(amount: number): void {
   commit({ ...state, xp: Math.max(0, state.xp + amount) });
 }
 
-/** Công cụ demo (#/admin): gỡ dấu một điểm để diễn lại check-in (giữ XP/huy hiệu đã nhận). */
+/**
+ * Công cụ demo (#/admin): gỡ dấu một điểm để diễn lại check-in.
+ * Hoàn lại XP của điểm — nếu không, mở lại sẽ cộng XP lần nữa và XP bị thổi phồng
+ * (huy hiệu khu + điểm quiz giữ nguyên).
+ */
 export function relockSpot(siteId: string, spotId: string): void {
   const key = `${siteId}/${spotId}`;
   if (!(key in state.unlocked)) return;
+  const spot = SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId);
   const unlocked = { ...state.unlocked };
   delete unlocked[key];
-  commit({ ...state, unlocked });
+  commit({ ...state, unlocked, xp: Math.max(0, state.xp - (spot?.xp ?? 0)) });
 }
 
-/** Công cụ demo: gỡ dấu mọi điểm (giữ XP/huy hiệu/điểm quiz) — dựng lại hành trình từ đầu. */
+/** Công cụ demo: gỡ dấu mọi điểm + hoàn XP của các điểm đó (huy hiệu/quiz giữ nguyên). */
 export function relockAll(): void {
-  commit({ ...state, unlocked: {} });
+  let refund = 0;
+  for (const key of Object.keys(state.unlocked)) {
+    const [siteId, spotId] = key.split('/');
+    refund += SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId)?.xp ?? 0;
+  }
+  commit({ ...state, unlocked: {}, xp: Math.max(0, state.xp - refund) });
 }
 
 /** Công cụ demo: xóa mọi điểm quiz (giữ dấu + XP) — để giám khảo chơi lại và thấy XP thưởng thật. */

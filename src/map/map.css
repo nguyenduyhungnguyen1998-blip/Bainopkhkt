@@ -150,6 +150,9 @@
 .vnode--locked .vnode__glyph {
   stroke: var(--color-locked);
 }
+.vnode--next .vnode__glyph {
+  stroke: var(--color-on-secondary);
+}
 .vnode--locked .vnode__label {
   fill: var(--color-text-muted);
   font-weight: 600;
@@ -191,13 +194,21 @@
   fill: var(--color-accent-tertiary);
   stroke: var(--color-bg);
 }
-.vnode--active .vnode__num,
+.vnode--active .vnode__glyph,
 .vnode--done .vnode__glyph {
-  fill: var(--color-on-tertiary);
   stroke: var(--color-on-tertiary);
 }
-.vnode--active .vnode__num {
-  stroke: none;
+.vnode__donebadge circle {
+  fill: var(--color-surface-solid);
+  stroke: var(--color-bg);
+  stroke-width: 1.6;
+}
+.vnode__donebadge path {
+  fill: none;
+  stroke: var(--color-accent-tertiary);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .vnode__progress {
   fill: none;

@@ -29,7 +29,17 @@ const PATHS: Record<string, string> = {
   leaf: 'M5 19c0-9 5-13 14-14-1 9-5 14-14 14Zm0 0c3-5 6-8 9-9',
   clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-14v6l4 2',
   share: 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13',
+  /* Icon nhận diện từng khu di sản (dùng trên node bản đồ + huy hiệu). */
+  scroll: 'M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 4h4m-4 4h4m-4 4h6', // Văn Miếu – bia tiến sĩ
+  wave: 'M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 4v7m0-7c2.4 0 4.3 1.9 4.8 4.4H12m0-4.4C9.6 4 7.7 5.9 7.2 8.4H12', // Hạ Long – thuyền trên sóng
+  crown: 'M4 17h16M5 16l-1.6-8 4.6 4L12 5l4 7 4.6-4L19 16H5Z', // Huế – vương miện
+  tower: 'M12 3c-2 2-3 3.6-3 6h6c0-2.4-1-4-3-6Zm-4 9h8l-1.2 9H9.2L8 12Zm2.2 5h3.6', // Mỹ Sơn – tháp Chăm
 };
+
+/** Tra path theo tên (rơi về spark) – dùng cho SVG vẽ tay như node bản đồ. */
+export function iconPath(name: string): string {
+  return PATHS[name] ?? PATHS.spark;
+}
 
 export function Icon({ name, size = 24, class: cls }: { name: string; size?: number; class?: string }) {
   return (

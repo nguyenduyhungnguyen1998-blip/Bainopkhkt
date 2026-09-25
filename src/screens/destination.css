@@ -468,3 +468,13 @@ a.dest__crumb--link:active {
     animation: none;
   }
 }
+
+/* Chưa có video: chỉ một gạch chú nhỏ — không để placeholder chiến màn hình. */
+.dcard__vsoon {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+}

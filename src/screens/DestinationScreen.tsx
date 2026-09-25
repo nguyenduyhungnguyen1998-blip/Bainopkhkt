@@ -341,26 +341,19 @@ function CardView({ card, lang, mode }: { card: Card; lang: Lang; mode: ExploreM
   }
 }
 
-/** Thẻ video: embed khi có link; poster + gợi ý khi chưa. Offline → báo rõ video cần mạng, gợi nghe audio. */
+/** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
 function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   const online = useOnline();
+  if (!card.src || !online) {
+    return (
+      <p class="dcard__vsoon">
+        <Icon name="play" size={14} /> {card.src ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}
+      </p>
+    );
+  }
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
-      {card.src && online ? (
-        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
-      ) : (
-        <div
-          class={`dcard__video-ph${online ? '' : ' dcard__video-ph--off'}`}
-          style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}
-        >
-          <span class="dcard__play">
-            <Icon name="play" size={28} />
-          </span>
-          <b>{t(card.title, lang)}</b>
-          <small>{online ? t(UI.videoSoon, lang) : t(UI.videoOffline, lang)}</small>
-          <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
-        </div>
-      )}
+      <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
     </div>
   );
 }

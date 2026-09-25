@@ -49,6 +49,21 @@
           "image": "/img/dinh-doc-lap/hero.svg"
         },
         {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Bạn đang đứng trước cổng Dinh Độc Lập, nơi lịch sử Việt Nam sang trang ngày 30 tháng 4 năm 1975.",
+              "Phía trước là tòa dinh do kiến trúc sư Ngô Viết Thụ thiết kế."
+            ],
+            "en": [
+              "You stand before the gate of the Independence Palace, where Vietnam's history turned a page on 30 April 1975.",
+              "Ahead is the palace designed by architect Ngo Viet Thu."
+            ]
+          }
+        },
+        {
           "type": "aspects",
           "size": "lg",
           "aspects": [
@@ -82,21 +97,6 @@
           "title": {
             "vi": "Clip thuyết minh Dinh Độc Lập",
             "en": "Narrated clip: Independence Palace"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "garden",
-          "script": {
-            "vi": [
-              "Bạn đang đứng trước cổng Dinh Độc Lập, nơi lịch sử Việt Nam sang trang ngày 30 tháng 4 năm 1975.",
-              "Phía trước là tòa dinh do kiến trúc sư Ngô Viết Thụ thiết kế."
-            ],
-            "en": [
-              "You stand before the gate of the Independence Palace, where Vietnam's history turned a page on 30 April 1975.",
-              "Ahead is the palace designed by architect Ngo Viet Thu."
-            ]
           }
         }
       ],

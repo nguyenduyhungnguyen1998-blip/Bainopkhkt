@@ -49,6 +49,21 @@
           "image": "/img/my-son/hero.svg"
         },
         {
+          "type": "audio",
+          "size": "md",
+          "ambient": "wind-water",
+          "script": {
+            "vi": [
+              "Bạn đang ở giữa thung lũng Mỹ Sơn, thánh địa của vương quốc Chăm Pa.",
+              "Những viên gạch quanh bạn đã đứng vững hơn một nghìn năm mà không thấy mạch vữa."
+            ],
+            "en": [
+              "You are in the My Son valley, sanctuary of the Champa kingdom.",
+              "The bricks around you have stood for over a thousand years with no visible mortar."
+            ]
+          }
+        },
+        {
           "type": "aspects",
           "size": "lg",
           "aspects": [
@@ -82,21 +97,6 @@
           "title": {
             "vi": "Clip thuyết minh Mỹ Sơn",
             "en": "Narrated clip: My Son"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "wind-water",
-          "script": {
-            "vi": [
-              "Bạn đang ở giữa thung lũng Mỹ Sơn, thánh địa của vương quốc Chăm Pa.",
-              "Những viên gạch quanh bạn đã đứng vững hơn một nghìn năm mà không thấy mạch vữa."
-            ],
-            "en": [
-              "You are in the My Son valley, sanctuary of the Champa kingdom.",
-              "The bricks around you have stood for over a thousand years with no visible mortar."
-            ]
           }
         }
       ],

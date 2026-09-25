@@ -49,6 +49,21 @@
           "image": "/img/ha-long/hero.svg"
         },
         {
+          "type": "audio",
+          "size": "md",
+          "ambient": "wind-water",
+          "script": {
+            "vi": [
+              "Bạn đang ở giữa vịnh Hạ Long, nơi gần hai nghìn đảo đá vôi nhô lên từ biển.",
+              "Hang Sửng Sốt là một trong những hang đẹp nhất của vịnh."
+            ],
+            "en": [
+              "You are in the heart of Ha Long Bay, where nearly two thousand limestone islands rise from the sea.",
+              "Surprise Cave is among the most beautiful caves of the bay."
+            ]
+          }
+        },
+        {
           "type": "aspects",
           "size": "lg",
           "aspects": [
@@ -59,8 +74,8 @@
                 "en": "Nature"
               },
               "body": {
-                "vi": "Hang nằm trên đảo Bồ Hòn, rộng hơn 10.000 m², với hai ngăn lớn và trần hang cao như một nhà hát tự nhiên.",
-                "en": "Located on Bo Hon Island, the cave spans over 10,000 m² with two vast chambers and a ceiling as high as a natural theatre."
+                "vi": "Hang nằm trên đảo Bồ Hòn, rộng hơn 10.000 m², với ba khoang lần lượt và trần hang cao như một nhà hát tự nhiên.",
+                "en": "Located on Bo Hon Island, the cave spans over 10,000 m² with three successive chambers and a ceiling as high as a natural theatre."
               }
             },
             {
@@ -82,21 +97,6 @@
           "title": {
             "vi": "Clip thuyết minh Hang Sửng Sốt",
             "en": "Narrated clip: Surprise Cave"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "wind-water",
-          "script": {
-            "vi": [
-              "Bạn đang ở giữa vịnh Hạ Long, nơi gần hai nghìn đảo đá vôi nhô lên từ biển.",
-              "Hang Sửng Sốt là một trong những hang đẹp nhất của vịnh."
-            ],
-            "en": [
-              "You are in the heart of Ha Long Bay, where nearly two thousand limestone islands rise from the sea.",
-              "Surprise Cave is among the most beautiful caves of the bay."
-            ]
           }
         }
       ],

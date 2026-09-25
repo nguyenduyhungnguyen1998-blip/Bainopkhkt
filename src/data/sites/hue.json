@@ -41,12 +41,31 @@
         "vi": "Ngọ Môn",
         "en": "Noon Gate"
       },
+      "hook": {
+        "vi": "Cổng giữa chỉ dành cho vua đi; trên nóc là Ngũ Phụng Lầu — nơi vua ngự các lễ lớn.",
+        "en": "The middle passage was for the emperor alone; on the roof sits Ngu Phung Pavilion where he presided over grand ceremonies."
+      },
       "xp": 40,
       "layoutSchema": [
         {
           "type": "hero",
           "size": "lg",
           "image": "/img/hue/hero.svg"
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "temple-bell",
+          "script": {
+            "vi": [
+              "Bạn đang đứng trước Ngọ Môn, cổng chính của Hoàng thành Huế.",
+              "Trên cao là lầu Ngũ Phụng với mái ngói vàng chỉ dành cho nhà vua."
+            ],
+            "en": [
+              "You are standing before the Noon Gate, the main entrance of the Hue Imperial City.",
+              "Above you is the Five Phoenix Pavilion with yellow tiles reserved for the emperor."
+            ]
+          }
         },
         {
           "type": "aspects",
@@ -82,21 +101,6 @@
           "title": {
             "vi": "Clip thuyết minh Ngọ Môn",
             "en": "Narrated clip: Noon Gate"
-          }
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "temple-bell",
-          "script": {
-            "vi": [
-              "Bạn đang đứng trước Ngọ Môn, cổng chính của Hoàng thành Huế.",
-              "Trên cao là lầu Ngũ Phụng với mái ngói vàng chỉ dành cho nhà vua."
-            ],
-            "en": [
-              "You are standing before the Noon Gate, the main entrance of the Hue Imperial City.",
-              "Above you is the Five Phoenix Pavilion with yellow tiles reserved for the emperor."
-            ]
           }
         }
       ],

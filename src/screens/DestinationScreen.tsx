@@ -79,6 +79,14 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         ))}
       </nav>
 
+      {/* Một câu mời quan sát – khiến khách nhìn lại vật thật trước khi đọc lịch sử */}
+      {spot.hook && (
+        <p class="dest__hook">
+          <Icon name="spark" size={15} aria-hidden="true" />
+          {t(spot.hook, lang)}
+        </p>
+      )}
+
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
           <CardView key={i} card={card} lang={lang} mode={mode} />
@@ -100,6 +108,24 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
           )}
         </section>
       )}
+
+      {/* Chuỗi hành động cuối nội dung: thử tài đúng điểm → xem dấu → tiếp trong khu (nav dưới) */}
+      <footer class="dchain">
+        {spot.quiz?.length ? (
+          <a class="mdv-btn mdv-btn--primary dchain__quiz" href={routeHref.quizAt(site.entityId, spot.spotId)}>
+            <Icon name="quiz" size={18} /> {t(UI.quizAtSpot, lang)} · {spot.quiz.length} {lang === 'vi' ? 'câu' : 'qs'}
+          </a>
+        ) : null}
+        {unlocked ? (
+          <a class="dchain__pass" href={routeHref.passport}>
+            <Icon name="passport" size={15} /> {t(UI.viewStamp, lang)}
+          </a>
+        ) : (
+          <span class="dchain__hint">
+            <Icon name="qr" size={14} /> {t(UI.stampHint, lang)} (+{spot.xp} XP)
+          </span>
+        )}
+      </footer>
 
       <div class="dest__nav">
         {prev ? (
@@ -341,26 +367,19 @@ function CardView({ card, lang, mode }: { card: Card; lang: Lang; mode: ExploreM
   }
 }
 
-/** Thẻ video: embed khi có link; poster + gợi ý khi chưa. Offline → báo rõ video cần mạng, gợi nghe audio. */
+/** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
 function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   const online = useOnline();
+  if (!card.src || !online) {
+    return (
+      <p class="dcard__vsoon">
+        <Icon name="play" size={14} /> {card.src ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}
+      </p>
+    );
+  }
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
-      {card.src && online ? (
-        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
-      ) : (
-        <div
-          class={`dcard__video-ph${online ? '' : ' dcard__video-ph--off'}`}
-          style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}
-        >
-          <span class="dcard__play">
-            <Icon name="play" size={28} />
-          </span>
-          <b>{t(card.title, lang)}</b>
-          <small>{online ? t(UI.videoSoon, lang) : t(UI.videoOffline, lang)}</small>
-          <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
-        </div>
-      )}
+      <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
     </div>
   );
 }

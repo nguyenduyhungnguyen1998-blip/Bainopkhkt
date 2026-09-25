@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES } from '../data/content';
+import type { Site } from '../data/types';
 import { UI, t } from '../lib/i18n';
 import { routeHref } from '../lib/router';
 import { getProgress, type UnlockResult } from '../lib/progress';
@@ -59,6 +60,23 @@ export function markFinaleSeen() {
     /* bộ nhớ riêng tư */
   }
 }
+
+/** Finale cấp khu (ví dụ đủ 5/5 Văn Miếu) — một lần mỗi khu, mỗi hành trình. */
+const siteFinKey = (siteId: string) => `mdv.sitefin.${siteId}`;
+function siteFinSeen(siteId: string): boolean {
+  try {
+    return localStorage.getItem(siteFinKey(siteId)) === '1';
+  } catch {
+    return true;
+  }
+}
+function markSiteFinSeen(siteId: string) {
+  try {
+    localStorage.setItem(siteFinKey(siteId), '1');
+  } catch {
+    /* bộ nhớ riêng tư */
+  }
+}
 export function clearFinaleSeen() {
   try {
     localStorage.removeItem(FINALE_KEY);
@@ -71,12 +89,14 @@ export function Celebrate() {
   const [burst, setBurst] = useState(0);
   const [badge, setBadge] = useState<{ name: string; seq: number } | null>(null);
   const [finale, setFinale] = useState(false);
+  const [siteFin, setSiteFin] = useState<Site | null>(null);
   const badgeTimer = useRef(0);
   const finaleCardRef = useRef<HTMLDivElement>(null);
+  const siteCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onUnlock = (e: Event) => {
-      const d = (e as CustomEvent<UnlockResult>).detail;
+      const d = (e as CustomEvent<UnlockResult & { siteId?: string; spotId?: string }>).detail;
       if (d.gainedXp <= 0) return;
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setBurst(Date.now());
       if (d.newBadge) {
@@ -87,6 +107,11 @@ export function Celebrate() {
       if (Object.keys(getProgress().unlocked).length >= TOTAL_SPOTS && !finaleSeen()) {
         markFinaleSeen();
         setFinale(true);
+      } else if (d.siteCompleted && d.siteId && !siteFinSeen(d.siteId)) {
+        // Đủ dấu một khu (nhưng chưa 9/9 toàn bộ) -> khoảnh khắc kết hành trình khu riêng.
+        markSiteFinSeen(d.siteId);
+        const s = SITES.find((x) => x.entityId === d.siteId);
+        if (s) setSiteFin(s);
       }
     };
     window.addEventListener('mdv:unlock', onUnlock);
@@ -110,6 +135,17 @@ export function Celebrate() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [finale]);
+
+  // Site finale: focus thẻ + Esc đóng.
+  useEffect(() => {
+    if (!siteFin) return;
+    siteCardRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSiteFin(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [siteFin]);
 
   return (
     <>
@@ -138,6 +174,31 @@ export function Celebrate() {
           <span>
             {t(UI.badgeEarned)}: <b>{badge.name}</b>
           </span>
+        </div>
+      )}
+      {siteFin && (
+        <div class="finale" role="dialog" aria-modal="true" aria-label={t(UI.siteDoneTitle)}>
+          <div class="finale__card finale__card--site" ref={siteCardRef} tabIndex={-1}>
+            <div class="finale__icon">
+              <Icon name="award" size={46} />
+            </div>
+            <h2>{t(UI.siteDoneTitle)}</h2>
+            <p class="mdv-muted">
+              {t(siteFin.name)} — {t(UI.siteDoneBody)}
+            </p>
+            <div class="finale__stats">
+              <b>{siteFin.spots.length}/{siteFin.spots.length}</b>
+              <span>{t(UI.spots)}</span>
+              <i />
+              <b>{t(siteFin.gamificationConfig.badge.name)}</b>
+            </div>
+            <a class="mdv-btn mdv-btn--primary finale__cta" href={routeHref.passport} onClick={() => setSiteFin(null)}>
+              <Icon name="passport" size={18} /> {t(UI.viewStamp)}
+            </a>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => setSiteFin(null)}>
+              {t(UI.dismiss)}
+            </button>
+          </div>
         </div>
       )}
       {finale && (

@@ -62,6 +62,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
       {/* key spot+sig: remount mỗi QR mới — nếu không, reward/state của điểm trước
           sống sót khi đổi điểm cùng khu (component cha key theo siteId) và che nút xác nhận mới. */}
       {sig && <ScanConfirm key={`${spot.spotId}:${sig}`} site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
+      {/* Không có sig -> vào bằng điều hướng thường: không hiện panel chọn mục (chỉ áp dụng cho QR/link direct). */}
 
       {/* Dải điểm QR trong khu – điều hướng nhanh giữa các điểm */}
       <nav class="dest__spots" aria-label="Các điểm trong khu">
@@ -89,7 +90,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} mode={mode} />
+          <CardView key={i} card={card} lang={lang} mode={mode} initialAspect={query?.get('a')} />
         ))}
       </div>
 
@@ -221,29 +222,61 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (unlocked) {
-    return (
-      <div class="dscan dscan--done" role="status">
-        <Icon name="check" size={18} />
-        <span>{t(UI.unlockedDone, lang)}</span>
-      </div>
-    );
-  }
+  // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
+  const doUnlock = () => {
+    if (unlocked) return;
+    const r = unlockSpot(site.entityId, spot.spotId);
+    setReward(r.gainedXp);
+    setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+    if (navigator.vibrate) navigator.vibrate(30);
+  };
+  const goAspect = (aspectId: string) => {
+    doUnlock();
+    // replace: back không quay lại panel chọn — khách đã vào điểm.
+    navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
+  };
+
+  // Mọi khía cạnh của điểm (một điểm có thể nhiều thẻ aspects) — data-driven,
+  // di tích nào nhiều tính chất tự liệt kê hết, không hard-code.
+  const aspects = spot.layoutSchema
+    .filter((c): c is AspectsCard => c.type === 'aspects')
+    .flatMap((c) => c.aspects)
+    .filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
 
   return (
-    <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
-      <Icon name="check" size={18} />
-      <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
-      <button
-        class="mdv-btn mdv-btn--primary dscan__cta"
-        onClick={() => {
-          const r = unlockSpot(site.entityId, spot.spotId);
-          setReward(r.gainedXp);
-          setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
-          if (navigator.vibrate) navigator.vibrate(30);
-        }}
-      >
-        {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
+    <div class="dscan dscan--pick" role="dialog" aria-label={t(UI.scanValid, lang)}>
+      <div class="dscan__langs">
+        <span class="dscan__langlbl">{t(UI.chooseLangShort, lang)}</span>
+        <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
+          Tiếng Việt
+        </button>
+        <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+          English
+        </button>
+      </div>
+      <header class="dscan__head">
+        <span class="mdv-eyebrow">{t(site.name, lang)}</span>
+        <b class="dscan__spot">{t(spot.name, lang)}</b>
+        {site.visit?.address && (
+          <span class="dscan__addr">
+            <Icon name="locate" size={13} /> {t(site.visit.address, lang)}
+          </span>
+        )}
+      </header>
+      {aspects.length > 0 && (
+        <>
+          <p class="dscan__ask">{t(UI.exploreWhat, lang)}</p>
+          <div class="dscan__aspects">
+            {aspects.map((a) => (
+              <button key={a.id} class="dscan__aspect" onClick={() => goAspect(a.id)}>
+                {t(a.title, lang)}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={() => { doUnlock(); setDismissed(true); navigate(`d/${site.entityId}/${spot.spotId}`, true); }}>
+        {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
       </button>
     </div>
   );
@@ -333,7 +366,7 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang, mode }: { card: Card; lang: Lang; mode: ExploreMode }) {
+function CardView({ card, lang, mode, initialAspect }: { card: Card; lang: Lang; mode: ExploreMode; initialAspect?: string | null }) {
   switch (card.type) {
     case 'hero':
       return (
@@ -343,7 +376,7 @@ function CardView({ card, lang, mode }: { card: Card; lang: Lang; mode: ExploreM
         </figure>
       );
     case 'aspects':
-      return <AspectsCardView card={card} lang={lang} />;
+      return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
       // "Văn bản + Hình ảnh": không render thẻ video – lựa chọn hình thức phải thật.
       return mode === 'text' ? null : <VideoCardView card={card} lang={lang} />;
@@ -486,8 +519,11 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
 
 const SWIPE_PX = 40;
 
-function AspectsCardView({ card, lang }: { card: AspectsCard; lang: Lang }) {
-  const [active, setActive] = useState(card.aspects[0].id);
+function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lang; initial?: string | null }) {
+  // Tab mở đầu theo lựa chọn từ panel quét QR (?a=<aspectId>); fallback tab đầu.
+  const [active, setActive] = useState(() =>
+    initial && card.aspects.some((a) => a.id === initial) ? initial : card.aspects[0].id
+  );
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
   const idx = card.aspects.indexOf(cur);
   const startX = useRef<number | null>(null);

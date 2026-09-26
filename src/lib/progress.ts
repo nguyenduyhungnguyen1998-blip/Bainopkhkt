@@ -167,6 +167,12 @@ export function clearQuizResults(): void {
   commit({ ...state, quizDone: {} });
 }
 
+/** Công cụ demo: tước huy hiệu khu + hoàn XP thưởng hoàn thành — diễn lại khoảnh khắc nhận huy hiệu. */
+export function revokeBadge(badgeId: string, refundXp = 0): void {
+  if (!state.badges.includes(badgeId)) return;
+  commit({ ...state, badges: state.badges.filter((b) => b !== badgeId), xp: Math.max(0, state.xp - refundXp) });
+}
+
 export const QUIZ_XP_PER_CORRECT = 5;
 
 /**

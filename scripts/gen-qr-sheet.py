@@ -46,8 +46,12 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
         if not url:
             m = re.fullmatch(r"mdvq(\d+)", payload)
             url = f"{BASE}?q={m.group(1)}.{sig}" if m else f"{BASE}?d={key}&s={sig}"
-        svg = segno.make(url, error="m").svg_inline(
-            scale=8, border=2, dark="#1b2434", light="#ffffff"
+        # error='l' (sửa lỗi thấp) → mã thưa nhất; bản in sạch không cần chịu
+        # mòn. border=4 = quiet zone tối thiểu theo chuẩn QR — border=2 trước
+        # đây thiếu dải trắng nên scanner yếu (Zalo, camera SoftBank) không
+        # định vị được góc mã. Đây là nguyên nhân quét không ra.
+        svg = segno.make(url, error="l").svg_inline(
+            scale=8, border=4, dark="#1b2434", light="#ffffff"
         )
         full = f"{BASE}?d={key}&s={sig}"
         cards.append({"site": site["name"]["vi"], "spot": spot["name"]["vi"], "sig": sig, "url": url, "full": full, "svg": svg})
@@ -78,9 +82,9 @@ html = f"""<!doctype html>
   h1 b {{ color:var(--brand) }}
   .sub {{ text-align:center; font-size:12px; color:var(--muted); margin:6px 0 20px }}
   .grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:190mm; margin:0 auto }}
-  .card {{ border:1.6px dashed #b9a77f; border-radius:12px; padding:12px 10px 14px; text-align:center; break-inside:avoid; background:#fffdf8 }}
+  .card {{ border:1.6px dashed #b9a77f; border-radius:12px; padding:14px 12px 14px; text-align:center; break-inside:avoid; background:#fff }}
   .site {{ font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--brand); margin-bottom:8px }}
-  .card svg {{ width:100%; max-width:175px; height:auto; display:block; margin:0 auto }}
+  .card svg {{ width:100%; max-width:185px; height:auto; display:block; margin:0 auto }}
   .spot {{ display:block; font-size:13px; font-weight:700; margin-top:8px; line-height:1.3 }}
   .sig {{ display:block; font-size:10px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:4px }}
   .url {{ display:block; font-size:7px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:2px; word-break:break-all }}

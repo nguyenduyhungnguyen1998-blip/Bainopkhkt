@@ -10,6 +10,7 @@ import glob
 import hashlib
 import hmac
 import json
+import re
 import sys
 
 import segno
@@ -33,9 +34,14 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
             payload.encode(),
             hashlib.sha256,
         ).hexdigest()[:SIG_LEN]
-        # URL không-fragment (?d=...&s=...): một số camera/scanner cắt phần sau '#'.
-        # App (main.tsx) đổi ?d= thành hash route khi khởi động.
-        url = f"{BASE}?d={site['entityId']}/{spot['spotId']}&s={sig}"
+        # URL ngắn gọn không-fragment: ?q=<nn>.<sig> với nn = số trong qrId mdvqNN.
+        # Link càng ngắn QR càng thưa → camera/Zalo quét dễ (vấn đề quét trên dt).
+        # Fallback ?d=site/spot&s= cho điểm chưa khai qrId. App đổi cả hai sang hash route.
+        m = re.fullmatch(r"mdvq(\d+)", payload)
+        if m:
+            url = f"{BASE}?q={m.group(1)}.{sig}"
+        else:
+            url = f"{BASE}?d={site['entityId']}/{spot['spotId']}&s={sig}"
         svg = segno.make(url, error="m").svg_inline(
             scale=8, border=2, dark="#1b2434", light="#ffffff"
         )
@@ -69,7 +75,7 @@ html = f"""<!doctype html>
   .grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:190mm; margin:0 auto }}
   .card {{ border:1.6px dashed #b9a77f; border-radius:12px; padding:12px 10px 14px; text-align:center; break-inside:avoid; background:#fffdf8 }}
   .site {{ font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--brand); margin-bottom:8px }}
-  .card svg {{ width:100%; max-width:150px; height:auto; display:block; margin:0 auto }}
+  .card svg {{ width:100%; max-width:175px; height:auto; display:block; margin:0 auto }}
   .spot {{ display:block; font-size:13px; font-weight:700; margin-top:8px; line-height:1.3 }}
   .sig {{ display:block; font-size:10px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:4px }}
   .url {{ display:block; font-size:7px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:2px; word-break:break-all }}

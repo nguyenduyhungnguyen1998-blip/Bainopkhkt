@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#07111F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)" />
+    <meta name="description" content="Mở Dấu Việt – hành trình di sản qua mã QR, không cần cài ứng dụng." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="img/icon-192.png" />
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Mở Dấu Việt" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Mở Dấu Việt</title>
+    <script>
+      // Áp theme trước khi vẽ để tránh nháy màu
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search).get('theme'); // ?theme=dark|light cho demo/chụp ảnh
+          var t = q === 'dark' || q === 'light' ? q : localStorage.getItem('mdv.theme');
+          if (q) localStorage.setItem('mdv.theme', q);
+          if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/Bainopkhkt/assets/index-Czz85tmj.js"></script>
+    <link rel="stylesheet" crossorigin href="/Bainopkhkt/assets/index--_eLYBVW.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

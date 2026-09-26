@@ -355,6 +355,68 @@ a.dest__crumb--link:active {
   cursor: pointer;
 }
 
+/* Panel chọn mục ngay sau khi quét QR (chỉ hiện với link có chữ ký). */
+.dscan--pick {
+  display: block;
+  padding: 14px;
+}
+.dscan__langs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dscan__langlbl {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+.dscan__head {
+  margin-top: 10px;
+  display: block;
+}
+.dscan__spot {
+  display: block;
+  font-size: var(--text-md);
+}
+.dscan__addr {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.dscan__ask {
+  margin: 12px 0 8px;
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+.dscan__aspects {
+  display: grid;
+  gap: 8px;
+}
+.dscan__aspect {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--color-accent-secondary) 45%, transparent);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.dscan__aspect:active {
+  border-color: var(--color-accent-primary);
+}
+.dscan--pick .dscan__cta {
+  width: 100%;
+  margin-top: 12px;
+  min-height: 44px;
+}
+
 .dcard__audio-ctrl {
   display: flex;
   gap: 8px;

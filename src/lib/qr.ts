@@ -29,8 +29,13 @@ export async function signSpot(siteId: string, spotId: string, qrId?: string): P
   return (await hmacHex(qrPayload(siteId, spotId, qrId))).slice(0, SIG_LEN);
 }
 
-/** So khớp không timing-safe (client-side tĩnh, chấp nhận được) — chỉ kiểm chuỗi khớp. */
+/**
+ * So khớp không timing-safe (client-side tĩnh, chấp nhận được) — chỉ kiểm chuỗi khớp.
+ * Chấp nhận cả chữ ký payload cũ "site/spot": tem QR in trước khi có qrId vẫn mở được.
+ */
 export async function verifySignature(siteId: string, spotId: string, sig: string, qrId?: string): Promise<boolean> {
   if (!/^[0-9a-f]+$/i.test(sig) || sig.length !== SIG_LEN) return false;
-  return (await signSpot(siteId, spotId, qrId)) === sig.toLowerCase();
+  const s = sig.toLowerCase();
+  if ((await signSpot(siteId, spotId, qrId)) === s) return true;
+  return qrId != null && (await signSpot(siteId, spotId)) === s;
 }

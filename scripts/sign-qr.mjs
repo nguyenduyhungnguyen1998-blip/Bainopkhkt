@@ -22,7 +22,8 @@ for (const f of readdirSync(dir).filter((x) => x.endsWith('.json'))) {
     // Ký theo qrId bất biến (giống src/lib/qr.ts) – đổi slug không vỡ tem đã in.
     const payload = spot.qrId ?? `${site.entityId}/${spot.spotId}`;
     const sig = createHmac('sha256', QR_SECRET).update(payload).digest('hex').slice(0, SIG_LEN);
-    rows.push({ site: site.entityId, spot: spot.spotId, sig, url: `${base}${base.endsWith('/') ? '' : '/'}#/d/${site.entityId}/${spot.spotId}?s=${sig}` });
+    // Cùng format tem in: ?d=site/spot&s=sig (không dùng '#' — scanner an toàn).
+    rows.push({ site: site.entityId, spot: spot.spotId, sig, url: `${base}${base.endsWith('/') ? '' : '/'}?d=${site.entityId}/${spot.spotId}&s=${sig}` });
   }
 }
 const w = Math.max(...rows.map((r) => r.spot.length));

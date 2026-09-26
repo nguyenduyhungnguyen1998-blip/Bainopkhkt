@@ -68,7 +68,9 @@ export function MapScreen() {
   const useCode = async () => {
     const c = codeIn.trim().toLowerCase();
     if (!c) return;
-    const link = c.match(/d\/([\w-]+)\/([\w-]+)\?[^\s]*?s=([0-9a-f]{16})/);
+    const link =
+      c.match(/[?&]d=([\w-]+)\/([\w-]+)[^\s]*?s=([0-9a-f]{16})/) ??
+      c.match(/d\/([\w-]+)\/([\w-]+)\?[^\s]*?s=([0-9a-f]{16})/);
     if (link) {
       setSearchOn(false);
       navigate(`d/${link[1]}/${link[2]}?s=${link[3]}`);

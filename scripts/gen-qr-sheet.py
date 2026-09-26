@@ -23,8 +23,6 @@ BASE = (
     else "https://nguyenduyhungnguyen1998-blip.github.io/Bainopkhkt/"
 ).rstrip("/") + "/"
 OUT = "public/qr-sheet.html"
-SHORT_PATH = "scripts/qr-shortlinks.json"
-SHORT = json.load(open(SHORT_PATH, encoding="utf-8")) if os.path.exists(SHORT_PATH) else {}
 
 cards = []
 for path in sorted(glob.glob("src/data/sites/*.json")):
@@ -37,15 +35,13 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
             payload.encode(),
             hashlib.sha256,
         ).hexdigest()[:SIG_LEN]
-        # Tem encode SHORTLINK (scripts/qr-shortlinks.json — tinyurl redirect về
-        # URL app): link ~28 ký tự → QR thưa (~37×37), quét dễ trên mọi scanner.
-        # Dòng chữ dưới tem vẫn in URL app đầy đủ + mã dự phòng. Fallback khi
-        # chưa có shortlink: ?q=<nn>.<sig> compact (qrId mdvqNN) rồi ?d=site/spot.
+        # Encode URL app trực tiếp dạng compact ?q=<nn>.<sig> (~80 ký tự).
+        # KHÔNG dùng shortlink bên thứ ba: Zalo và nhiều scanner chặn redirect
+        # ẩn (tinyurl bị Zalo gắn cờ "không phù hợp chính sách bảo mật").
+        # Độ dày mã không còn là vấn đề kể từ khi viewBox sửa lỗi clip QR.
         key = f"{site['entityId']}/{spot['spotId']}"
-        url = SHORT.get(key)
-        if not url:
-            m = re.fullmatch(r"mdvq(\d+)", payload)
-            url = f"{BASE}?q={m.group(1)}.{sig}" if m else f"{BASE}?d={key}&s={sig}"
+        m = re.fullmatch(r"mdvq(\d+)", payload)
+        url = f"{BASE}?q={m.group(1)}.{sig}" if m else f"{BASE}?d={key}&s={sig}"
         # error='l' (sửa lỗi thấp) → mã thưa nhất; bản in sạch không cần chịu
         # mòn. border=4 = quiet zone tối thiểu theo chuẩn QR.
         svg = segno.make(url, error="l").svg_inline(

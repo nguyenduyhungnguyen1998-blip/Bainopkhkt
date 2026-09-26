@@ -76,7 +76,8 @@ export function MapScreen() {
       navigate(`d/${link[1]}/${link[2]}?s=${link[3]}`);
       return;
     }
-    const sig = c.match(/[0-9a-f]{16}/)?.[0] ?? c;
+    // Link tem compact ?q=<nn>.<sig>: vòng verify phía dưới tự tìm đúng điểm.
+    const sig = c.match(/[?&]q=\d+\.([0-9a-f]{16})/)?.[1] ?? c.match(/[0-9a-f]{16}/)?.[0] ?? c;
     for (const s of SITES)
       for (const sp of s.spots)
         if (await verifySignature(s.entityId, sp.spotId, sig, sp.qrId)) {

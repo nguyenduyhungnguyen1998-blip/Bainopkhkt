@@ -815,7 +815,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/dai-thanh.svg"
+          "image": "/img/van-mieu/khong-tu.webp"
         },
         {
           "type": "audio",
@@ -870,8 +870,37 @@
                 "vi": "Trước mỗi mùa thi, học sinh Hà Nội vẫn đến đây dâng hương cầu may – truyền thống hiếu học được nối tiếp tới hôm nay.",
                 "en": "Before each exam season, Hanoi students still come to offer incense – a living tradition of reverence for learning."
               }
+            },
+            {
+              "id": "nhan-vat",
+              "title": {
+                "vi": "Người được thờ",
+                "en": "Who is honoured"
+              },
+              "body": {
+                "vi": "Chính giữa thờ Đức Khổng Tử (551–479 TCN) – nhà giáo dục vĩ đại mở trường dạy cho mọi tầng lớp, san định Kinh Thi, Thư, Lễ, Nhạc, Dịch và Xuân Thu. Trung tâm học thuyết của ông là chữ 'Nhân' gắn với 'Lễ', cùng Tam cương – Ngũ thường (Nhân, Lễ, Nghĩa, Trí, Tín). Tượng gỗ mít sơn son thếp vàng, ngồi hướng Nam theo ý 'Thánh nhân nam diện nhi thính thiên hạ'. Hai bên thờ Tứ Phối – bốn đại tử phối hưởng cùng Khổng Tử: Nhan Hồi (Phục thánh) – học trò 'nghe một biết mười', an bần lạc đạo; Tăng Sâm (Tông thánh) – giữ tinh tuý thuyết Khổng môn với lời 'Mỗi nhật tam tỉnh ngô thân'; Tử Tư (Thuật thánh) – cháu nội Khổng Tử, soạn sách Trung dung; Mạnh Tử (Á thánh) – đề cao thuyết 'Dân vi quý', chê 'hà chính bạo ư hổ', tác giả kinh điển Mạnh Tử.",
+                "en": "At the centre sits Confucius (551–479 BCE) – the great educator who taught disciples of every class and edited the Books of Songs, Documents, Rites, Music, Changes and the Spring and Autumn Annals. The heart of his teaching is 'Nhan' (benevolence) bound with 'Le' (ritual propriety), together with the Three Bonds and Five Constants (benevolence, propriety, righteousness, wisdom, faithfulness). His jackwood statue, red-lacquered and gilded, faces south – 'the sage faces south to hear all under heaven'. Flanking him stand the Four Correlates (Tu Phoi), disciples honoured alongside him: Yan Hui (Phuc Thanh), the pupil who 'hears one thing and knows ten', content in poverty; Zengzi (Tong Thanh), keeper of the doctrine's essence, famed for 'examining himself thrice daily'; Zisi (Shu Sheng), Confucius' grandson and compiler of the Doctrine of the Mean; and Mencius (A Thanh), champion of 'the people are most precious', who called harsh rule 'fiercer than tigers'."
+              }
             }
           ]
+        },
+        {
+          "type": "image",
+          "size": "lg",
+          "image": "/img/van-mieu/tu-phoi-1.webp",
+          "caption": {
+            "vi": "Tứ Phối: Phục thánh Nhan Tử (513–482 TCN) và Tông thánh Tăng Tử (505–436 TCN).",
+            "en": "The Four Correlates: Yan Hui (513–482 BCE) and Zengzi (505–436 BCE)."
+          }
+        },
+        {
+          "type": "image",
+          "size": "lg",
+          "image": "/img/van-mieu/tu-phoi-2.webp",
+          "caption": {
+            "vi": "Tứ Phối: Á thánh Mạnh Tử (371–289 TCN) và Thuật thánh Tử Tư (492–431 TCN).",
+            "en": "The Four Correlates: Mencius (371–289 BCE) and Zisi (492–431 BCE)."
+          }
         },
         {
           "type": "video",
@@ -1057,7 +1086,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/thai-hoc.svg"
+          "image": "/img/van-mieu/nha-thai-hoc-altar.webp"
         },
         {
           "type": "audio",
@@ -1112,8 +1141,28 @@
                 "vi": "Tầng dưới thờ thầy Chu Văn An – người thầy tiêu biểu của nền giáo dục Việt Nam, từng làm Tư nghiệp Quốc Tử Giám.",
                 "en": "The ground floor honours Chu Van An, the exemplary teacher of Vietnamese education, who once directed the Academy."
               }
+            },
+            {
+              "id": "nhan-vat",
+              "title": {
+                "vi": "Người được thờ",
+                "en": "Who is honoured"
+              },
+              "body": {
+                "vi": "Tầng trên thờ ba vua có công lập trường. Lý Thánh Tông (trị vì 1054–1072) đặt quốc hiệu Đại Việt và mùa thu năm 1070 cho dựng Văn Miếu, thờ Khổng Tử cùng các bậc hiền Nho – sự kiện được Ngô Sĩ Liên chép trong Đại Việt sử ký toàn thư. Con trưởng của ông, Lý Nhân Tông (1072–1128), là học trò đầu tiên của Văn Miếu; năm 1075 mở khoa thi đầu tiên trong lịch sử khoa cử nước ta, năm 1076 lập Quốc Tử Giám. Lê Thánh Tông (1460–1497) mở 12 khoa thi chọn 502 tiến sĩ; năm 1483 tu sửa Văn Miếu, 1484 cho dựng những bia tiến sĩ đầu tiên để biểu dương người hiền tài. Tầng dưới thờ Chu Văn An (1292–1370) – từng làm Tư nghiệp Quốc Tử Giám, thầy của hai vua Trần, người dâng 'Thất trảm sớ' xin chém bảy gian thần; năm 2019 UNESCO tôn vinh ông là nhà giáo dục tiêu biểu của Việt Nam. Tượng thờ bằng đồng do nghệ nhân làng Ngũ Xã đúc năm 2003; riêng tượng Chu Văn An nặng khoảng 3 tấn.",
+                "en": "The upper floor honours the academy's three founding kings. Ly Thanh Tong (r. 1054–1072) gave the nation the name Dai Viet and built Van Mieu in autumn 1070, enshrining Confucius and the Confucian sages – an event recorded by Ngo Si Lien in Dai Viet su ky toan thu. His eldest son Ly Nhan Tong (r. 1072–1128) was Van Mieu's first student; in 1075 he held Vietnam's first imperial examination and in 1076 founded Quoc Tu Giam. Le Thanh Tong (r. 1460–1497) held 12 examinations selecting 502 doctoral laureates; he restored Van Mieu in 1483 and in 1484 erected the first doctors' stelae to honour the talented. The ground floor honours Chu Van An (1292–1370) – once Director of Quoc Tu Giam and tutor to two Tran kings, who submitted the 'Seven Executions' petition demanding the removal of seven corrupt courtiers; UNESCO honoured him in 2019 as a model educator of Vietnam. The bronze statues were cast by artisans of Ngu Xa village in 2003; Chu Van An's alone weighs about 3 tonnes."
+              }
             }
           ]
+        },
+        {
+          "type": "image",
+          "size": "lg",
+          "image": "/img/van-mieu/chu-van-an.webp",
+          "caption": {
+            "vi": "Tượng thầy Chu Văn An ở tầng dưới nhà Thái Học – đúc năm 2003, nặng khoảng 3 tấn.",
+            "en": "The statue of teacher Chu Van An on the ground floor – cast in 2003, weighing about 3 tonnes."
+          }
         },
         {
           "type": "video",

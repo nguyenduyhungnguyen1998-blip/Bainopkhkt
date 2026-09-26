@@ -199,9 +199,12 @@ export function DemoDock() {
   };
 
   // Bố trí panel theo phía còn chỗ: gần mép phải -> mở sang trái, nửa dưới màn -> mở lên trên.
+  // Ngang: kẹp trong [4, innerWidth - PW - 4] để FAB sát mép trái/phải cũng không tràn màn.
   const panelStyle: Record<string, string> = {};
-  if (eff.x + FAB > window.innerWidth - 350) panelStyle.right = '0';
-  else panelStyle.left = '0';
+  const PW = Math.min(336, window.innerWidth - 16);
+  const wantLeft = eff.x + FAB > window.innerWidth - 350 ? eff.x + FAB - PW : eff.x;
+  const panelLeft = Math.min(Math.max(4, wantLeft), Math.max(4, window.innerWidth - PW - 4));
+  panelStyle.left = `${panelLeft - eff.x}px`;
   if (eff.y > window.innerHeight * 0.55) panelStyle.bottom = 'calc(100% + 8px)';
   else panelStyle.top = 'calc(100% + 8px)';
 

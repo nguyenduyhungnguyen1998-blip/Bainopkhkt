@@ -125,8 +125,8 @@ export const UI = {
   // P3 – quét QR & hộ chiếu
   scanValid: { vi: 'Mã QR hợp lệ', en: 'Valid QR code' },
   scanInvalid: { vi: 'Mã QR không đúng – có thể đã bị sửa. Bạn vẫn xem được nội dung.', en: 'QR signature mismatch – the code may be tampered. Content is still readable.' },
-  confirmUnlock: { vi: 'Xác nhận mở khóa điểm này', en: 'Confirm unlock this spot' },
-  unlockedDone: { vi: 'Đã mở khóa rồi', en: 'Already unlocked' },
+  confirmUnlock: { vi: 'Nhận dấu điểm này', en: 'Collect this stamp' },
+  unlockedDone: { vi: 'Điểm này đã có dấu', en: 'Stamp already collected' },
   exportPassport: { vi: 'Sao lưu tiến độ', en: 'Back up progress' },
   importPassport: { vi: 'Khôi phục bản sao', en: 'Restore a backup' },
   importOk: { vi: 'Đã khôi phục tiến độ', en: 'Progress restored' },

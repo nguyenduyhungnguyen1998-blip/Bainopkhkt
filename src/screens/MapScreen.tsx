@@ -62,16 +62,24 @@ export function MapScreen() {
     if (searchOn) searchInputRef.current?.focus();
   }, [searchOn]);
 
-  // Đường cứu demo: mã 16-ký-tự in trên tem QR (= chữ ký). Thử verify với mọi điểm
-  // (offline vẫn chạy vì cùng secret HMAC) — khớp thì mở điểm qua cổng check-in thật.
+  // Đường cứu demo: mã 16-ký-tự in trên tem QR (= chữ ký). Chấp nhận cả link QR
+  // dán nguyên (tách s= ra luôn). Thử verify với mọi điểm — khớp thì mở điểm qua
+  // cổng check-in thật (offline vẫn chạy vì cùng secret HMAC).
   const useCode = async () => {
     const c = codeIn.trim().toLowerCase();
     if (!c) return;
+    const link = c.match(/d\/([\w-]+)\/([\w-]+)\?[^\s]*?s=([0-9a-f]{16})/);
+    if (link) {
+      setSearchOn(false);
+      navigate(`d/${link[1]}/${link[2]}?s=${link[3]}`);
+      return;
+    }
+    const sig = c.match(/[0-9a-f]{16}/)?.[0] ?? c;
     for (const s of SITES)
       for (const sp of s.spots)
-        if (await verifySignature(s.entityId, sp.spotId, c, sp.qrId)) {
+        if (await verifySignature(s.entityId, sp.spotId, sig, sp.qrId)) {
           setSearchOn(false);
-          navigate(`d/${s.entityId}/${sp.spotId}?s=${c}`);
+          navigate(`d/${s.entityId}/${sp.spotId}?s=${sig}`);
           return;
         }
     setCodeErr(true);

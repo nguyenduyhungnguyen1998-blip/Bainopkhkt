@@ -22,6 +22,7 @@ import {
   relockAll,
   relockSpot,
   resetProgress,
+  revokeBadge,
   siteUnlockedCount,
   unlockSpot,
   useProgress,
@@ -157,6 +158,53 @@ export function DemoDock() {
   const unlockAll = () => SITES.forEach((s) => s.spots.forEach((sp) => unlockSpot(s.entityId, sp.spotId)));
   const maxQuizAll = () =>
     SITES.forEach((s) => s.spots.forEach((sp) => sp.quiz?.length && recordQuizResult(s.entityId, sp.spotId, sp.quiz.length, sp.quiz.length)));
+
+  /**
+   * Huy hiệu khu: chưa có -> mở hết điểm của khu (nhận huy hiệu + XP thưởng thật);
+   * đã có -> gỡ hết điểm + tước huy hiệu và hoàn XP thưởng, để diễn lại từ đầu.
+   */
+  const toggleSiteBadge = (s: Site) => {
+    if (p.badges.includes(s.gamificationConfig.badge.id)) {
+      s.spots.forEach((sp) => relockSpot(s.entityId, sp.spotId));
+      revokeBadge(s.gamificationConfig.badge.id, s.gamificationConfig.completionBonusXp);
+    } else {
+      s.spots.forEach((sp) => unlockSpot(s.entityId, sp.spotId));
+    }
+  };
+
+  /**
+   * Danh hiệu thành tích là hàm của trạng thái thật (không lưu riêng) nên "Đạt luôn"
+   * = làm đúng điều kiện thật: mở điểm đầu tiên / chạm 3 khu / làm 3 bộ quiz / mở hết.
+   */
+  const earnAchievement = (id: string) => {
+    if (id === 'khoi-hanh') {
+      const next = SITES.flatMap((s) => s.spots.map((sp) => [s, sp] as const)).find(
+        ([s, sp]) => !isSpotUnlocked(s.entityId, sp.spotId)
+      );
+      if (next) unlockSpot(next[0].entityId, next[1].spotId);
+      return;
+    }
+    if (id === 'tham-hiem') {
+      for (const s of SITES) {
+        if (SITES.filter((x) => siteUnlockedCount(x) > 0).length >= 3) break;
+        if (siteUnlockedCount(s) === 0 && s.spots[0]) unlockSpot(s.entityId, s.spots[0].spotId);
+      }
+      return;
+    }
+    if (id === 'si-tu') {
+      let done = Object.keys(p.quizDone).length;
+      for (const s of SITES)
+        for (const sp of s.spots) {
+          if (done >= 3) return;
+          if (sp.quiz?.length && quizBest(s.entityId, sp.spotId) === undefined) {
+            recordQuizResult(s.entityId, sp.spotId, sp.quiz.length, sp.quiz.length);
+            done++;
+          }
+        }
+      return;
+    }
+    if (id === 'hoc-gia') unlockAll();
+  };
 
   /**
    * Diễn lại finale: đảm bảo mọi điểm đã mở -> xóa cờ "đã xem" -> gỡ 1 điểm cuối
@@ -486,25 +534,36 @@ export function DemoDock() {
                     −100
                   </button>
                 </div>
-                <p class="dd__note">Huy hiệu khu ({p.badges.length}):</p>
+                <p class="dd__note">Huy hiệu khu ({p.badges.length}) — bấm để mở/gỡ cả khu:</p>
                 <div class="dd__chips">
                   {SITES.map((s) => {
                     const got = p.badges.includes(s.gamificationConfig.badge.id);
                     return (
-                      <span key={s.entityId} class={`dd__chip dd__chip--static ${got ? 'dd__chip--on' : ''}`}>
+                      <button
+                        key={s.entityId}
+                        class={`dd__chip ${got ? 'dd__chip--on' : ''}`}
+                        title={got ? 'Đang có — bấm để gỡ cả khu và tước huy hiệu (diễn lại)' : 'Bấm để mở hết điểm của khu này'}
+                        onClick={() => toggleSiteBadge(s)}
+                      >
                         {got ? '●' : '○'} {t(s.gamificationConfig.badge.name, lang)}
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
-                <p class="dd__note">Huy hiệu thành tích:</p>
-                <div class="dd__chips">
-                  {achievements.map((a) => (
-                    <span key={a.id} class={`dd__chip dd__chip--static ${a.unlocked ? 'dd__chip--on' : ''}`} title={t(a.need, lang)}>
+                <p class="dd__note">Danh hiệu — "Đạt luôn" làm đúng điều kiện thật:</p>
+                {achievements.map((a) => (
+                  <div key={a.id} class="dd__ach">
+                    <span class={`dd__chip dd__chip--static ${a.unlocked ? 'dd__chip--on' : ''}`}>
                       {a.unlocked ? '●' : '○'} {t(a.name, lang)}
                     </span>
-                  ))}
-                </div>
+                    <span class="dd__achneed">{t(a.need, lang)}</span>
+                    {!a.unlocked && (
+                      <button class="dd__mini dd__mini--on" onClick={() => earnAchievement(a.id)}>
+                        Đạt luôn
+                      </button>
+                    )}
+                  </div>
+                ))}
               </>
             )}
 

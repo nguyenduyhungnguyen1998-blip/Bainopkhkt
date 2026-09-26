@@ -189,7 +189,29 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (dismissed || state === 'checking') return null;
+  if (state === 'checking') return null;
+  // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
+  // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
+  if (dismissed) {
+    if (unlocked) return null;
+    return (
+      <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
+        <Icon name="check" size={18} />
+        <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
+        <button
+          class="mdv-btn mdv-btn--primary dscan__cta"
+          onClick={() => {
+            const r = unlockSpot(site.entityId, spot.spotId);
+            setReward(r.gainedXp);
+            setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+            if (navigator.vibrate) navigator.vibrate(30);
+          }}
+        >
+          {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
+        </button>
+      </div>
+    );
+  }
 
   if (state === 'bad') {
     return (
@@ -243,41 +265,49 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     .flatMap((c) => c.aspects)
     .filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
 
+  // Modal chặn đầu sau khi quét QR: nền mờ phủ toàn màn, chỉ panel nổi bật;
+  // khách buộc tương tác trước khi vào nội dung. ✕ = bỏ qua (về trang điểm).
   return (
-    <div class="dscan dscan--pick" role="dialog" aria-label={t(UI.scanValid, lang)}>
-      <div class="dscan__langs">
-        <span class="dscan__langlbl">{t(UI.chooseLangShort, lang)}</span>
-        <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
-          Tiếng Việt
+    <div class="dpick" role="presentation">
+      <div class="dpick__backdrop" onClick={() => setDismissed(true)} aria-hidden="true" />
+      <div class="dpick__panel" role="dialog" aria-modal="true" aria-label={t(UI.scanValid, lang)}>
+        <button class="dscan__x dpick__x" onClick={() => setDismissed(true)} aria-label={t(UI.dismiss, lang)}>
+          ✕
         </button>
-        <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
-          English
+        <div class="dscan__langs">
+          <span class="dscan__langlbl">{t(UI.chooseLangShort, lang)}</span>
+          <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
+            Tiếng Việt
+          </button>
+          <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+            English
+          </button>
+        </div>
+        <header class="dscan__head">
+          <span class="mdv-eyebrow">{t(site.name, lang)}</span>
+          <b class="dscan__spot">{t(spot.name, lang)}</b>
+          {site.visit?.address && (
+            <span class="dscan__addr">
+              <Icon name="locate" size={13} /> {t(site.visit.address, lang)}
+            </span>
+          )}
+        </header>
+        {aspects.length > 0 && (
+          <>
+            <p class="dscan__ask">{t(UI.exploreWhat, lang)}</p>
+            <div class="dscan__aspects">
+              {aspects.map((a) => (
+                <button key={a.id} class="dscan__aspect" onClick={() => goAspect(a.id)}>
+                  {t(a.title, lang)}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={() => { doUnlock(); setDismissed(true); navigate(`d/${site.entityId}/${spot.spotId}`, true); }}>
+          {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
         </button>
       </div>
-      <header class="dscan__head">
-        <span class="mdv-eyebrow">{t(site.name, lang)}</span>
-        <b class="dscan__spot">{t(spot.name, lang)}</b>
-        {site.visit?.address && (
-          <span class="dscan__addr">
-            <Icon name="locate" size={13} /> {t(site.visit.address, lang)}
-          </span>
-        )}
-      </header>
-      {aspects.length > 0 && (
-        <>
-          <p class="dscan__ask">{t(UI.exploreWhat, lang)}</p>
-          <div class="dscan__aspects">
-            {aspects.map((a) => (
-              <button key={a.id} class="dscan__aspect" onClick={() => goAspect(a.id)}>
-                {t(a.title, lang)}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-      <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={() => { doUnlock(); setDismissed(true); navigate(`d/${site.entityId}/${spot.spotId}`, true); }}>
-        {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
-      </button>
     </div>
   );
 }

@@ -33,7 +33,9 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
             payload.encode(),
             hashlib.sha256,
         ).hexdigest()[:SIG_LEN]
-        url = f"{BASE}#/d/{site['entityId']}/{spot['spotId']}?s={sig}"
+        # URL không-fragment (?d=...&s=...): một số camera/scanner cắt phần sau '#'.
+        # App (main.tsx) đổi ?d= thành hash route khi khởi động.
+        url = f"{BASE}?d={site['entityId']}/{spot['spotId']}&s={sig}"
         svg = segno.make(url, error="m").svg_inline(
             scale=8, border=2, dark="#1b2434", light="#ffffff"
         )
@@ -45,6 +47,7 @@ body = "\n".join(
         {c['svg']}
         <figcaption class="spot">{c['spot']}</figcaption>
         <span class="sig">Mã: {c['sig']}</span>
+        <span class="url">{c['url']}</span>
         <span class="cta">Quét để mở khóa điểm này</span>
       </figure>"""
     for c in cards
@@ -69,6 +72,7 @@ html = f"""<!doctype html>
   .card svg {{ width:100%; max-width:150px; height:auto; display:block; margin:0 auto }}
   .spot {{ display:block; font-size:13px; font-weight:700; margin-top:8px; line-height:1.3 }}
   .sig {{ display:block; font-size:10px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:4px }}
+  .url {{ display:block; font-size:7px; color:var(--muted); font-family:ui-monospace,monospace; margin-top:2px; word-break:break-all }}
   .cta {{ display:block; font-size:10px; color:var(--ink); margin-top:6px }}
   @media print {{ body {{ padding:0 }} .grid {{ gap:10px }} }}
 </style>

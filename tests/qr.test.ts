@@ -20,4 +20,11 @@ describe('chữ ký QR HMAC', () => {
     expect(await verifySignature('van-mieu', 'khue-van-cac', sig + 'ab')).toBe(false);
     expect(await verifySignature('van-mieu', 'khue-van-cac', 'xyz!!')).toBe(false);
   });
+  it('chấp nhận chữ ký payload cũ "site/spot" trên tem in trước qrId', async () => {
+    // Tem in cũ ký theo "site/spot"; spot nay có qrId vẫn phải mở được.
+    const legacy = createHmac('sha256', QR_SECRET).update('van-mieu/khue-van-cac').digest('hex').slice(0, 16);
+    const spot = SITES.flatMap((s) => s.spots).find((sp) => sp.spotId === 'khue-van-cac')!;
+    expect(spot.qrId).toBeTruthy();
+    expect(await verifySignature('van-mieu', 'khue-van-cac', legacy, spot.qrId)).toBe(true);
+  });
 });

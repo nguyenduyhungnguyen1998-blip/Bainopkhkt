@@ -4,8 +4,8 @@
  * (mở/khóa điểm, đặt quiz, cộng XP, diễn lại finale, reset) mà không rời màn hình đang demo.
  * Kéo-thả: giữ nút (hoặc tay cầm đầu panel) rồi kéo tới vị trí thuận tay – lưu vị trí trên máy.
  *
- * Nút chỉ hiện khi đã bật: thêm ?admin=1 vào URL (tự lưu), vào trang #/admin (tự bật),
- * hoặc localStorage mdv.admin=1. Khách thường không bao giờ thấy.
+ * Nút chỉ hiện trên máy đã bật: vào trang #/admin một lần (lưu mdv.admin=1 trên máy đó).
+ * Máy khách mở app/QR không bao giờ thấy.
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSite, getSpot } from '../data/content';
@@ -55,12 +55,9 @@ function disableDemoDock() {
   window.dispatchEvent(new Event('mdv:demo-dock'));
 }
 
+/** Chỉ hiện trên máy đã bật qua trang #/admin (enableDemoDock) — link chia sẻ không tự lộ dock. */
 function dockEnabled(): boolean {
   try {
-    if (new URLSearchParams(location.search).get('admin') === '1') {
-      enableDemoDock();
-      return true;
-    }
     return localStorage.getItem(FLAG) === '1';
   } catch {
     return false;
@@ -651,7 +648,7 @@ export function DemoDock() {
                     Reset hành trình
                   </button>
                 </div>
-                <p class="dd__note">Giữ nút tròn rồi kéo để đổi vị trí. Bật lại sau khi ẩn: thêm ?admin=1 vào URL hoặc vào #/admin.</p>
+                <p class="dd__note">Giữ nút tròn rồi kéo để đổi vị trí. Bật lại sau khi ẩn: vào #/admin.</p>
               </>
             )}
           </div>

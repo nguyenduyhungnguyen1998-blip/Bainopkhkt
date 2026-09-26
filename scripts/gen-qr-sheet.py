@@ -47,12 +47,16 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
             m = re.fullmatch(r"mdvq(\d+)", payload)
             url = f"{BASE}?q={m.group(1)}.{sig}" if m else f"{BASE}?d={key}&s={sig}"
         # error='l' (sửa lỗi thấp) → mã thưa nhất; bản in sạch không cần chịu
-        # mòn. border=4 = quiet zone tối thiểu theo chuẩn QR — border=2 trước
-        # đây thiếu dải trắng nên scanner yếu (Zalo, camera SoftBank) không
-        # định vị được góc mã. Đây là nguyên nhân quét không ra.
+        # mòn. border=4 = quiet zone tối thiểu theo chuẩn QR.
         svg = segno.make(url, error="l").svg_inline(
             scale=8, border=4, dark="#1b2434", light="#ffffff"
         )
+        # segno svg_inline chỉ đặt width/height cố định, KHÔNG có viewBox → CSS
+        # width:100% co viewport nhưng nội dung vẫn vẽ cỡ gốc → trình duyệt CẮT
+        # QR chỉ còn ~70% góc trên-trái (mất finder góc dưới) = không quét được.
+        # Đây là nguyên nhân gốc tem không đọc được từ trước tới nay.
+        dim = re.search(r'width="(\d+)"', svg).group(1)
+        svg = re.sub(r"<svg ", f'<svg viewBox="0 0 {dim} {dim}" ', svg, count=1)
         full = f"{BASE}?d={key}&s={sig}"
         cards.append({"site": site["name"]["vi"], "spot": spot["name"]["vi"], "sig": sig, "url": url, "full": full, "svg": svg})
 

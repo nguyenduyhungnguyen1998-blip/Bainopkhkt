@@ -551,9 +551,14 @@ const SWIPE_PX = 40;
 
 function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lang; initial?: string | null }) {
   // Tab mở đầu theo lựa chọn từ panel quét QR (?a=<aspectId>); fallback tab đầu.
-  const [active, setActive] = useState(() =>
-    initial && card.aspects.some((a) => a.id === initial) ? initial : card.aspects[0].id
-  );
+  // Phải sync theo param — navigate ?a= đổi query không remount component,
+  // useState khởi tạo chỉ chạy lần đầu nên tab sẽ kẹt ở mục đầu tiên.
+  const valid = (v?: string | null) => (v && card.aspects.some((a) => a.id === v) ? v : card.aspects[0].id);
+  const [active, setActive] = useState(() => valid(initial));
+  useEffect(() => {
+    setActive(valid(initial));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
   const idx = card.aspects.indexOf(cur);
   const startX = useRef<number | null>(null);

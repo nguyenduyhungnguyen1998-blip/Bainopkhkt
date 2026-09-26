@@ -10,6 +10,7 @@ import glob
 import hashlib
 import hmac
 import json
+import os
 import re
 import sys
 
@@ -22,6 +23,8 @@ BASE = (
     else "https://nguyenduyhungnguyen1998-blip.github.io/Bainopkhkt/"
 ).rstrip("/") + "/"
 OUT = "public/qr-sheet.html"
+SHORT_PATH = "scripts/qr-shortlinks.json"
+SHORT = json.load(open(SHORT_PATH, encoding="utf-8")) if os.path.exists(SHORT_PATH) else {}
 
 cards = []
 for path in sorted(glob.glob("src/data/sites/*.json")):
@@ -34,18 +37,20 @@ for path in sorted(glob.glob("src/data/sites/*.json")):
             payload.encode(),
             hashlib.sha256,
         ).hexdigest()[:SIG_LEN]
-        # URL ngắn gọn không-fragment: ?q=<nn>.<sig> với nn = số trong qrId mdvqNN.
-        # Link càng ngắn QR càng thưa → camera/Zalo quét dễ (vấn đề quét trên dt).
-        # Fallback ?d=site/spot&s= cho điểm chưa khai qrId. App đổi cả hai sang hash route.
-        m = re.fullmatch(r"mdvq(\d+)", payload)
-        if m:
-            url = f"{BASE}?q={m.group(1)}.{sig}"
-        else:
-            url = f"{BASE}?d={site['entityId']}/{spot['spotId']}&s={sig}"
+        # Tem encode SHORTLINK (scripts/qr-shortlinks.json — tinyurl redirect về
+        # URL app): link ~28 ký tự → QR thưa (~37×37), quét dễ trên mọi scanner.
+        # Dòng chữ dưới tem vẫn in URL app đầy đủ + mã dự phòng. Fallback khi
+        # chưa có shortlink: ?q=<nn>.<sig> compact (qrId mdvqNN) rồi ?d=site/spot.
+        key = f"{site['entityId']}/{spot['spotId']}"
+        url = SHORT.get(key)
+        if not url:
+            m = re.fullmatch(r"mdvq(\d+)", payload)
+            url = f"{BASE}?q={m.group(1)}.{sig}" if m else f"{BASE}?d={key}&s={sig}"
         svg = segno.make(url, error="m").svg_inline(
             scale=8, border=2, dark="#1b2434", light="#ffffff"
         )
-        cards.append({"site": site["name"]["vi"], "spot": spot["name"]["vi"], "sig": sig, "url": url, "svg": svg})
+        full = f"{BASE}?d={key}&s={sig}"
+        cards.append({"site": site["name"]["vi"], "spot": spot["name"]["vi"], "sig": sig, "url": url, "full": full, "svg": svg})
 
 body = "\n".join(
     f"""      <figure class="card">
@@ -53,7 +58,7 @@ body = "\n".join(
         {c['svg']}
         <figcaption class="spot">{c['spot']}</figcaption>
         <span class="sig">Mã: {c['sig']}</span>
-        <span class="url">{c['url']}</span>
+        <span class="url">{c['full']}</span>
         <span class="cta">Quét để mở khóa điểm này</span>
       </figure>"""
     for c in cards

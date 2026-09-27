@@ -210,7 +210,7 @@
           "properties": {
             "type": { "const": "video" },
             "size": { "$ref": "#/definitions/size" },
-            "src": { "type": "string", "format": "uri" },
+            "src": { "type": "string", "format": "uri-reference" },
             "poster": { "$ref": "#/definitions/assetPath" },
             "title": { "$ref": "#/definitions/localized" }
           }

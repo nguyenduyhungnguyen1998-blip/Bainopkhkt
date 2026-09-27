@@ -30,7 +30,8 @@ const walk = (dir) => {
 walk(dist);
 
 const version = createHash('sha256').update(files.sort().join('|')).digest('hex').slice(0, 12);
-const precache = files.sort().map((f) => `${base}/${f}`);
+// Không precache media nặng (video thuyết minh): tải theo nhu cầu, runtime cache giữ lại sau lần phát đầu.
+const precache = files.sort().filter((f) => !f.startsWith('media/')).map((f) => `${base}/${f}`);
 
 const sw = `// Mở Dấu Việt service worker – sinh tự động bởi scripts/gen-sw.mjs, không sửa tay.
 const VERSION = '${version}';

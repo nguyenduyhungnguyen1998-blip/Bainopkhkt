@@ -9,7 +9,8 @@ export type Route =
   | { name: 'map' }
   | { name: 'destination'; siteId: string; spotId?: string; query: URLSearchParams }
   | { name: 'passport' }
-  | { name: 'quiz' }
+  | { name: 'quiz'; at?: string }
+  | { name: 'admin' }
   | { name: 'settings' }
   | { name: 'notfound'; path: string };
 
@@ -28,7 +29,9 @@ export function parseHash(hash: string): Route {
     case 'passport':
       return { name: 'passport' };
     case 'quiz':
-      return { name: 'quiz' };
+      return { name: 'quiz', at: query.get('at') ?? undefined };
+    case 'admin':
+      return { name: 'admin' };
     case 'settings':
       return { name: 'settings' };
     default:
@@ -57,6 +60,10 @@ export const routeHref = {
   map: '#/map',
   passport: '#/passport',
   quiz: '#/quiz',
+  /** Mở thẳng quiz của một điểm — dùng cho CTA "thử tài tại đây" cuối nội dung. */
+  quizAt: (siteId: string, spotId: string) => `#/quiz?at=${siteId}/${spotId}`,
+  /** Bảng điều khiển demo – chỉ gõ URL, không nằm trong dock. */
+  admin: '#/admin',
   settings: '#/settings',
   destination: (siteId: string, spotId?: string) => `#/d/${siteId}${spotId ? `/${spotId}` : ''}`,
 };

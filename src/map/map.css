@@ -30,8 +30,8 @@
 .vmap__coast-glow {
   fill: none;
   stroke: var(--color-accent-secondary);
-  stroke-opacity: 0.22;
-  stroke-width: 7;
+  stroke-opacity: 0.14;
+  stroke-width: 4;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
@@ -75,10 +75,10 @@
   pointer-events: none;
 }
 .vmap__journey--all {
-  stroke: var(--color-text-faint);
-  stroke-opacity: 0.55;
+  /* tuyến hành trình: vàng mờ liền mạch (đứt nét xám trông như biên giới hành chính) */
+  stroke: var(--color-accent-secondary);
+  stroke-opacity: 0.3;
   stroke-width: 2;
-  stroke-dasharray: 2 8;
 }
 .vmap__journey--done {
   stroke: var(--color-accent-tertiary);
@@ -104,7 +104,7 @@
   outline: none;
   transition: opacity var(--dur-base) var(--ease-out);
 }
-.vnode:focus-visible .vnode__body {
+.vnode [role='button']:focus-visible .vnode__body {
   stroke: var(--color-text);
   stroke-width: 3;
 }
@@ -137,7 +137,7 @@
   fill: var(--color-text);
   paint-order: stroke;
   stroke: var(--color-bg);
-  stroke-width: 4px;
+  stroke-width: 2.5px;
   stroke-linejoin: round;
   pointer-events: none;
 }
@@ -149,6 +149,9 @@
 }
 .vnode--locked .vnode__glyph {
   stroke: var(--color-locked);
+}
+.vnode--next .vnode__glyph {
+  stroke: var(--color-on-secondary);
 }
 .vnode--locked .vnode__label {
   fill: var(--color-text-muted);
@@ -191,13 +194,21 @@
   fill: var(--color-accent-tertiary);
   stroke: var(--color-bg);
 }
-.vnode--active .vnode__num,
+.vnode--active .vnode__glyph,
 .vnode--done .vnode__glyph {
-  fill: var(--color-on-tertiary);
   stroke: var(--color-on-tertiary);
 }
-.vnode--active .vnode__num {
-  stroke: none;
+.vnode__donebadge circle {
+  fill: var(--color-surface-solid);
+  stroke: var(--color-bg);
+  stroke-width: 1.6;
+}
+.vnode__donebadge path {
+  fill: none;
+  stroke: var(--color-accent-tertiary);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .vnode__progress {
   fill: none;
@@ -304,6 +315,25 @@
   stroke: var(--color-bg);
   stroke-width: 1.5;
 }
+/* Ranh giới các lớp sân + giếng (mặt bằng schematic) */
+.smap__band {
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1.5;
+  stroke-dasharray: 6 8;
+  vector-effect: non-scaling-stroke;
+}
+.smap__well {
+  fill: var(--color-sea);
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.smap__well-in {
+  fill: none;
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .vnode__pulse,
@@ -315,5 +345,25 @@
   }
   .vnode__ripple {
     animation-duration: 0.01ms;
+  }
+}
+
+/* Sơ đồ khu "rơi" vào sau khi camera lao sâu – cảm giác không gian liên tục. */
+.smap {
+  animation: smap-in 340ms var(--ease-out) both;
+}
+@keyframes smap-in {
+  from {
+    opacity: 0.25;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smap {
+    animation: none;
   }
 }

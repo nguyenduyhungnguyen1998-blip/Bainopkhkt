@@ -94,7 +94,8 @@
   margin: 0 var(--space-3);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  /* không border cứng: biển hòa vào nền + bóng trong rất nhẹ tạo chiều sâu */
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.08);
   background: var(--color-sea);
 }
 .mscreen__legend {
@@ -155,7 +156,7 @@
   display: flex;
   flex-direction: column;
   transform: translate(-50%, 105%);
-  transition: transform var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out);
+  transition: transform var(--dur-sheet) var(--ease-out), height var(--dur-sheet) var(--ease-out);
   z-index: 40;
   padding: 0 var(--space-4) calc(100px + env(safe-area-inset-bottom));
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -236,9 +237,9 @@
 
 /* Hint chip onboarding + toast XP + nút nổi trên bản đồ */
 .mhint {
-  position: fixed;
+  position: absolute; /* neo trong khung bản đồ, trên cùng – không đè legend/sheet */
   left: 50%;
-  bottom: calc(104px + env(safe-area-inset-bottom));
+  top: 10px;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
@@ -253,6 +254,98 @@
   font-weight: 600;
   z-index: 35;
   animation: mhint-in var(--dur-slow) var(--ease-out);
+}
+/* Tìm kiếm địa danh: sheet nổi trên bản đồ */
+.mscreen__searchbtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.msearch {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  width: min(400px, calc(100% - 20px));
+  max-height: 70%;
+  display: flex;
+  flex-direction: column;
+  z-index: 45;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  animation: mhint-in var(--dur-base) var(--ease-out);
+}
+.msearch__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.msearch__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-base);
+  outline: none;
+}
+.msearch__list {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.msearch__item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 14px;
+  min-height: 44px;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.msearch__item:first-child {
+  border-top: 0;
+}
+.msearch__item:hover,
+.msearch__item:focus-visible {
+  background: var(--color-bg);
+}
+.msearch__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.msearch__sub {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.msearch__empty {
+  padding: 18px 14px;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.mhint__skip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-accent-secondary);
+  background: transparent;
+  color: var(--color-accent-secondary-text);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
 }
 .mhint__x {
   display: inline-flex;
@@ -367,10 +460,13 @@
   margin: 0;
   font-size: var(--text-sm);
 }
+/* Peek mode: clamp 2 dòng (không cắt giữa từ); kéo sheet lên full sẽ thấy trọn đoạn. */
 .msheet__summary--clip {
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 .msheet__summary {
   margin: var(--space-3) 0;
@@ -385,4 +481,72 @@
 }
 .msheet__actions .mdv-btn {
   flex: 1 1 auto;
+}
+.msheet__scanhint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.msheet__scanhint svg {
+  color: var(--color-accent-secondary-text);
+  flex: none;
+}
+
+/* Tablet + desktop-lite cho màn bản đồ — PHẢI ở file này (load sau base.css),
+   nếu để ở base.css thì rule .mscreen{max-width:640px} bên trên thắng cascade. */
+@media (min-width: 600px) {
+  .mscreen {
+    max-width: 780px;
+  }
+}
+
+@media (min-width: 960px) {
+  .mscreen {
+    max-width: 1100px;
+  }
+  .mscreen__map {
+    margin-left: var(--space-5, var(--space-4));
+    margin-right: var(--space-5, var(--space-4));
+  }
+}
+
+/* Ô nhập mã dự phòng (mã in trên tem QR = chữ ký) — đường cứu khi camera không quét được. */
+.msearch__manual {
+  padding: 10px 14px 14px;
+  border-top: 1px solid var(--color-border);
+}
+.msearch__mlabel {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+.msearch__mrow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.msearch__code {
+  font-family: ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  padding: 8px 12px;
+}
+.msearch__cerr {
+  display: block;
+  margin-top: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+}
+
+/* Dòng "Kế tiếp: <điểm>" dưới tên khu ở sơ đồ nội khu */
+.mscreen__level-next {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent);
 }

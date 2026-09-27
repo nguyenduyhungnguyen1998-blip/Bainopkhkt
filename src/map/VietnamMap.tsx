@@ -18,6 +18,7 @@ import type { Region, Site } from '../data/types';
 import type { NodeStatus, UnlockResult } from '../lib/progress';
 import { inspector, useInspector } from '../debug/inspector';
 import { t, type Lang } from '../lib/i18n';
+import { iconPath } from '../components/Icon';
 import './map.css';
 
 export type MapFocus = 'all' | Region | 'journey';
@@ -44,6 +45,11 @@ interface Props {
   homeSignal: number;
   /** {d, n}: đổi n để zoom quanh tâm khung nhìn (nút +/-, tiện cho người không pinch được). */
   zoomSignal?: { d: number; n: number };
+  /** {x,y,k,n}: đổi n để camera "lao" vào điểm theo đường log-k (fly-to Earth). */
+  flyRequest?: { x: number; y: number; k: number; n: number };
+  onFlyDone?(): void;
+  /** Transform khởi tạo khác mặc định – dùng để khôi phục trạng thái khi quay lại. */
+  initialTransform?: Transform;
   onSelect(id: string | null): void;
   onTransform?(t: Transform): void;
   onOnboardDone?(): void;
@@ -102,6 +108,9 @@ export function VietnamMap({
   onboard,
   homeSignal,
   zoomSignal,
+  flyRequest,
+  onFlyDone,
+  initialTransform,
   onSelect,
   onTransform,
   onOnboardDone,
@@ -124,7 +133,7 @@ export function VietnamMap({
     viewH: MAP_HEIGHT,
     minK: 0.9,
     maxK: 6,
-    initial: ALL_TRANSFORM,
+    initial: initialTransform ?? ALL_TRANSFORM,
     onChange: (t) => {
       inspector.setTransform(t);
       onTransform?.(t);
@@ -137,7 +146,8 @@ export function VietnamMap({
       const svg = svgRef.current!;
       const r = svg.getBoundingClientRect();
       const s = Math.min(r.width / MAP_WIDTH, r.height / MAP_HEIGHT);
-      const hit = HIT_R / s / getTransform().k; // 22px màn hình -> đơn vị bản đồ
+      const k = getTransform().k;
+      const hit = HIT_R / s / k; // 22px màn hình -> đơn vị bản đồ
       let best: MapNode | null = null;
       let bestD = Infinity;
       for (const n of nodesRef.current) {
@@ -145,6 +155,19 @@ export function VietnamMap({
         if (d < hit && d < bestD) {
           best = n;
           bestD = d;
+          continue;
+        }
+        // Nhãn tên địa danh cũng là vùng chạm: text nằm trong nhóm counter-scale 1/k
+        // nên offset/rộng tính theo đơn vị bản đồ = px/k. Font 15px ~ 7.5px/ký tự.
+        const labelW = (7.5 * t(n.site.name, lang).length + 10) / k;
+        const lx0 = n.labelSide === 'right' ? n.x + (NODE_R + 4) / k : n.x - (NODE_R + 4) / k - labelW;
+        const inLabel = mx >= lx0 && mx <= lx0 + labelW && Math.abs(my - n.y) < 11 / k;
+        if (inLabel) {
+          const dl = Math.hypot(n.x - mx, n.y - my);
+          if (dl < bestD) {
+            best = n;
+            bestD = dl;
+          }
         }
       }
       onSelect(best ? best.site.entityId : null);
@@ -175,9 +198,13 @@ export function VietnamMap({
       setOnboardPhase('zoom');
       land();
     };
-    return () => draw.cancel();
+    // Khi 'onboard' tắt giữa chừng (nút Bỏ qua): huỷ vẽ + xoá hiệu ứng đường.
+    return () => {
+      draw.cancel();
+      setOnboardPhase('done');
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onboard]);
 
   // Chuỗi ăn mừng: sóng lan tại node vừa mở + đoạn đường mới vẽ dần + rung nhẹ.
   const doneCountRef = useRef(0);
@@ -227,7 +254,8 @@ export function VietnamMap({
   useEffect(() => {
     if (firstRun.current) {
       firstRun.current = false;
-      if (focus === 'all') return;
+      // Restore map (initialTransform): trạng thái đã đúng vị trí, không animate lại lần đầu.
+      if (focus === 'all' || initialTransform) return;
     }
     if (focus === 'all') {
       animateTo(ALL_TRANSFORM);
@@ -262,6 +290,16 @@ export function VietnamMap({
     animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 600);
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fly-to: camera "lao" vào điểm theo đường log-k rồi báo xong (mở sơ đồ/điều hướng).
+  // Seed undefined: remount sau sơ đồ khu mang flyRequest mới đặt cùng batch – phải chạy,
+  // nếu gieo bằng flyRequest hiện tại effect sẽ nuốt mất lượt bay đầu tiên.
+  const lastFly = useRef<typeof flyRequest>(undefined);
+  useEffect(() => {
+    if (!flyRequest || flyRequest === lastFly.current) return;
+    lastFly.current = flyRequest;
+    void animateTo(focusPoint(flyRequest.x, flyRequest.y, flyRequest.k), 640, true).then(() => onFlyDone?.());
+  }, [flyRequest, animateTo, onFlyDone]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const archi = ARCHIPELAGOS.map((a) => ({ ...a, p: project(a.lon, a.lat) }));
 
   // Lưới kinh/vĩ độ cho D9 Map Inspector (bước 1°).
@@ -295,6 +333,11 @@ export function VietnamMap({
         <pattern id="vmap-land-tex" width="14" height="14" patternUnits="userSpaceOnUse">
           <circle cx="7" cy="7" r="0.8" fill="currentColor" fill-opacity="0.12" />
         </pattern>
+        {/* Vignette: láng giềng/nội dung tan vào biển ở rìa khung (không còn cạnh thẳng cắt) */}
+        <radialGradient id="vmap-vignette" cx="50%" cy="50%" r="72%">
+          <stop offset="56%" stop-color="var(--color-sea)" stop-opacity="0" />
+          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="0.8" />
+        </radialGradient>
       </defs>
 
       <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-sea)" />
@@ -412,11 +455,10 @@ export function VietnamMap({
         })}
 
         {/* Node */}
-        {nodes.map((n, i) => (
+        {nodes.map((n) => (
           <MapNodeView
             key={n.site.entityId}
             node={n}
-            index={i + 1}
             lang={lang}
             dimmed={dim !== null && n.site.region !== dim}
             selected={selectedId === n.site.entityId}
@@ -424,20 +466,20 @@ export function VietnamMap({
           />
         ))}
       </g>
+      {/* Lớp tan vào biển ở mép khung nhìn – đặt NGOÀI transform để bám mép màn */}
+      <rect class="vmap__vignette" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-vignette)" pointer-events="none" />
     </svg>
   );
 }
 
 function MapNodeView({
   node,
-  index,
   lang,
   selected,
   dimmed,
   onSelect,
 }: {
   node: MapNode;
-  index: number;
   lang: Lang;
   selected: boolean;
   dimmed: boolean;
@@ -450,43 +492,46 @@ function MapNodeView({
     <g
       class={`vnode vnode--${status} ${selected ? 'vnode--selected' : ''} ${dimmed ? 'vnode--dim' : ''}`}
       style={{ transform: `translate(${x}px, ${y}px) scale(calc(1 / var(--k, 1)))` }}
-      role="button"
-      tabIndex={0}
-      aria-label={`${t(site.name, lang)} – ${status}`}
-      aria-pressed={selected}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect(site.entityId);
-        }
-      }}
     >
-      {/* vùng chạm 44px (ẩn) */}
-      <circle class="vnode__hit" r={HIT_R} />
-      {status === 'next' && <circle class="vnode__pulse" r={NODE_R + 4} />}
-      {status === 'next' && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
-      {selected && <circle class="vnode__ring" r={NODE_R + 7} />}
-      {status === 'active' && (
-        <circle
-          class="vnode__progress"
-          r={NODE_R + 5}
-          stroke-dasharray={`${C * progress} ${C}`}
-          transform="rotate(-90)"
-        />
-      )}
-      <circle class="vnode__body" r={NODE_R} />
-      {status === 'done' ? (
-        <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
-      ) : status === 'locked' ? (
-        <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
-      ) : (
-        <text class="vnode__num" text-anchor="middle" dominant-baseline="central">
-          {index}
+      <g
+        role="button"
+        tabindex={0}
+        focusable="true"
+        aria-label={`${t(site.name, lang)} – ${status}`}
+        aria-pressed={selected}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onSelect(site.entityId);
+          }
+        }}
+      >
+        {/* vùng chạm 44px (ẩn) */}
+        <circle class="vnode__hit" r={HIT_R} />
+        {status === 'next' && <circle class="vnode__pulse" r={NODE_R + 4} />}
+        {status === 'next' && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
+        {selected && <circle class="vnode__ring" r={NODE_R + 7} />}
+        {status === 'active' && (
+          <circle
+            class="vnode__progress"
+            r={NODE_R + 5}
+            stroke-dasharray={`${C * progress} ${C}`}
+            transform="rotate(-90)"
+          />
+        )}
+        <circle class="vnode__body" r={NODE_R} />
+        {/* Icon nhận diện của từng khu (stele/thuyền/vương miện/tháp/cờ) – nét chính của node. */}
+        <path class="vnode__glyph" d={iconPath(site.gamificationConfig.badge.icon)} transform="translate(-9.4 -9.4) scale(0.78)" />
+        {status === 'done' && (
+          <g class="vnode__donebadge" transform="translate(11 10.5)">
+            <circle r="6.4" />
+            <path d="M-2.9 .4l2 2 3.6-3.8" />
+          </g>
+        )}
+        <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
+          {t(site.name, lang)}
         </text>
-      )}
-      <text class="vnode__label" x={labelX} text-anchor={labelSide === 'right' ? 'start' : 'end'} dominant-baseline="central">
-        {t(site.name, lang)}
-      </text>
+      </g>
     </g>
   );
 }

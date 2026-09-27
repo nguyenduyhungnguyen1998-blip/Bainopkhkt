@@ -21,12 +21,25 @@ const PATHS: Record<string, string> = {
   book: 'M12 5c-1.5-1.2-3.5-1.8-6-1.8S3 4 3 4v14s1.5-.5 3-.5 4.5.6 6 1.8c1.5-1.2 3.5-1.8 6-1.8s3 .5 3 .5V4s-1.5-.3-3-.3-4.5.6-6 1.3Zm0 0v14.3',
   locate: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-13.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9ZM12 1v3m0 16v3M1 12h3m16 0h3',
   zoomIn: 'M11 5v12M5 11h12M21 21l-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z',
+  search: 'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm9.3 17.3-4.6-4.6',
   zoomOut: 'M5 11h12M21 21l-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z',
   layers: 'm12 3 9 5-9 5-9-5 9-5Zm-9 9.5 9 5 9-5',
   pause: 'M8 5v14M16 5v14',
   warn: 'M12 3 2.5 20h19L12 3Zm0 7v4m0 3v.01',
   leaf: 'M5 19c0-9 5-13 14-14-1 9-5 14-14 14Zm0 0c3-5 6-8 9-9',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-14v6l4 2',
+  share: 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13',
+  /* Icon nhận diện từng khu di sản (dùng trên node bản đồ + huy hiệu). */
+  scroll: 'M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 4h4m-4 4h4m-4 4h6', // Văn Miếu – bia tiến sĩ
+  wave: 'M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 4v7m0-7c2.4 0 4.3 1.9 4.8 4.4H12m0-4.4C9.6 4 7.7 5.9 7.2 8.4H12', // Hạ Long – thuyền trên sóng
+  crown: 'M4 17h16M5 16l-1.6-8 4.6 4L12 5l4 7 4.6-4L19 16H5Z', // Huế – vương miện
+  tower: 'M12 3c-2 2-3 3.6-3 6h6c0-2.4-1-4-3-6Zm-4 9h8l-1.2 9H9.2L8 12Zm2.2 5h3.6', // Mỹ Sơn – tháp Chăm
 };
+
+/** Tra path theo tên (rơi về spark) – dùng cho SVG vẽ tay như node bản đồ. */
+export function iconPath(name: string): string {
+  return PATHS[name] ?? PATHS.spark;
+}
 
 export function Icon({ name, size = 24, class: cls }: { name: string; size?: number; class?: string }) {
   return (

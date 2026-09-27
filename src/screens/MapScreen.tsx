@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { VietnamMap, buildNodes, type MapFocus, type MapNode } from '../map/VietnamMap';
+import { VietnamMap, buildNodes, HOME_ZOOM, type MapFocus, type MapNode } from '../map/VietnamMap';
+import { project } from '../map/projection';
 import { SiteLevelMap } from '../map/SiteLevelMap';
 import { MAP_WIDTH, MAP_HEIGHT } from '../map/vietnam-geometry';
 import type { Transform } from '../map/geometry-utils';
@@ -52,6 +53,9 @@ export function MapScreen() {
   });
   const [homeSignal, setHomeSignal] = useState(0);
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
+  const [userLoc, setUserLoc] = useState<{ x: number; y: number } | null>(null);
+  const [locMsg, setLocMsg] = useState<string | null>(null);
+  const [locBusy, setLocBusy] = useState(false);
   const [searchOn, setSearchOn] = useState(false);
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +65,45 @@ export function MapScreen() {
   useEffect(() => {
     if (searchOn) searchInputRef.current?.focus();
   }, [searchOn]);
+
+  // Thông báo vị trí tự tắt sau 3s.
+  useEffect(() => {
+    if (!locMsg) return;
+    const id = setTimeout(() => setLocMsg(null), 3000);
+    return () => clearTimeout(id);
+  }, [locMsg]);
+
+  // LBS-lite: chấm "Bạn đang ở đây" + bay về vị trí khách. GPS không bắt buộc cho QR flow.
+  const locate = () => {
+    if (!('geolocation' in navigator)) {
+      setLocMsg(t(UI.locDenied, lang));
+      return;
+    }
+    setLocBusy(true);
+    setLocMsg(t(UI.locating, lang));
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocBusy(false);
+        const [x, y] = project(pos.coords.longitude, pos.coords.latitude);
+        const inBox = x >= 0 && x <= MAP_WIDTH && y >= 0 && y <= MAP_HEIGHT;
+        if (!inBox) setLocMsg(t(UI.locOutside, lang));
+        else setLocMsg(null);
+        // Vẫn hiện chấm kể cả ngoài khung (du khách nước ngoài/đang bay)
+        setUserLoc({ x: Math.max(0, Math.min(MAP_WIDTH, x)), y: Math.max(0, Math.min(MAP_HEIGHT, y)) });
+        setFlyReq({
+          x: Math.max(0, Math.min(MAP_WIDTH, x)),
+          y: Math.max(0, Math.min(MAP_HEIGHT, y)),
+          k: HOME_ZOOM,
+          n: Date.now(),
+        });
+      },
+      () => {
+        setLocBusy(false);
+        setLocMsg(t(UI.locDenied, lang));
+      },
+      { timeout: 8000, maximumAge: 60000 }
+    );
+  };
 
   // Đường cứu demo: mã 16-ký-tự in trên tem QR (= chữ ký). Chấp nhận cả link QR
   // dán nguyên (tách s= ra luôn). Thử verify với mọi điểm — khớp thì mở điểm qua
@@ -373,6 +416,7 @@ export function MapScreen() {
             homeSignal={homeSignal}
             zoomSignal={zoomSignal}
             flyRequest={flyReq}
+            userLoc={userLoc}
             onFlyDone={() => {
               divingNav.current = false;
               flyDone.current();
@@ -399,6 +443,10 @@ export function MapScreen() {
             <button class="mscreen__zoombtn" onClick={() => setZoomSignal({ d: 1 / 1.5, n: Date.now() })} aria-label={t(UI.zoomOut, lang)}>
               <Icon name="zoomOut" size={18} />
             </button>
+            <button class="mscreen__zoombtn" onClick={locate} disabled={locBusy} aria-label={t(UI.locateMe, lang)} aria-busy={locBusy}>
+              <Icon name="locate" size={18} />
+            </button>
+            {locMsg && <div class="mscreen__locmsg" role="status">{locMsg}</div>}
           </div>
         )}
         {levelSite && (

@@ -118,6 +118,14 @@
               "body": {
                 "vi": "Văn Miếu được vua Lý Thánh Tông khởi dựng mùa thu năm 1070 để thờ Khổng Tử cùng các bậc Tiên Hiền, Tiên Nho. Con trưởng ông – Lý Nhân Tông, từng là Thái tử Càn Đức, học trò đầu tiên tại Văn Miếu – mở khoa thi Nho học đầu tiên năm 1075 rồi lập Quốc Tử Giám năm 1076: trường đại học đầu tiên của Việt Nam, mở đầu gần một thiên niên kỷ khoa cử.",
                 "en": "Van Mieu was founded in autumn 1070 by King Ly Thanh Tong to honour Confucius and the Confucian sages. His eldest son Ly Nhan Tong – once Crown Prince Can Duc, the temple's first student – opened the first Confucian examination in 1075 and founded the Imperial Academy in 1076: Vietnam's first university, opening nearly a millennium of examinations."
+              },
+              "video": {
+                "src": "media/nguon-goc-lich-su.mp4",
+                "poster": "/media/nguon-goc-poster.jpg",
+                "title": {
+                  "vi": "Thuyết minh: Nguồn gốc & lịch sử Văn Miếu – Quốc Tử Giám",
+                  "en": "Narrated tour: origins & history of Van Mieu – Quoc Tu Giam"
+                }
               }
             },
             {
@@ -129,6 +137,14 @@
               "body": {
                 "vi": "Quần thể rộng 54.331 m² quay mặt hướng Nam, gồm Hồ Văn, Vườn Giám và Nội tự. Từ khu Tiền Án – bốn trụ gạch lớn, hai trụ ngoài đắp bốn chim phượng xoè cánh, cùng hai bia Hạ mã – qua cổng Văn Miếu là khu Nhập Đạo nhiều cây xanh, hai bên có hồ nước. Con đường lát gạch đỏ dẫn đến cổng Đại Trung theo lối kiến trúc Hậu Lê: gỗ ba gian, mái ngói mũi hài, nóc đắp hai con cá chép chầu vào bình móc, nền lát gạch đá Bát Tràng với ba bậc lên xuống tôn nghiêm. Cổng chính Văn Miếu Môn gồm ba lối đi hai tầng – lối giữa xưa chỉ dành cho vua – hai bên là đôi rồng đá thời Lê.",
                 "en": "The 54,331 m² complex faces south and comprises Hồ Văn lake, Giám garden and the walled inner quarters. The Tiền Án forecourt opens with four great brick pillars – the outer pair crowned by four spreading phoenixes – and two dismount steles. Beyond the Văn Miếu gate lies the leafy Nhập Đạo quarter flanked by ponds. A red-tiled path leads to the Đại Trung gate in Later Lê style: three timber bays, a 'mũi hài' tiled roof, twin carps bowing to the ridge, Bát Tràng tile flooring and three ceremonial steps. The main portico itself has three passages on two levels – the central one once reserved for the king – flanked by a pair of Lê-dynasty stone dragons."
+              },
+              "video": {
+                "src": "media/kien-truc-van-mieu.mp4",
+                "poster": "/media/kien-truc-poster.jpg",
+                "title": {
+                  "vi": "Thuyết minh: Kiến trúc Văn Miếu – Quốc Tử Giám",
+                  "en": "Narrated tour: the architecture of Van Mieu – Quoc Tu Giam"
+                }
               }
             },
             {
@@ -154,26 +170,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "src": "media/nguon-goc-lich-su.mp4",
-          "poster": "/media/nguon-goc-poster.jpg",
-          "title": {
-            "vi": "Thuyết minh: Nguồn gốc & lịch sử Văn Miếu – Quốc Tử Giám",
-            "en": "Narrated video: Origin & history of the Temple of Literature"
-          }
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "title": {
-            "vi": "Thuyết minh: Kiến trúc Văn Miếu – Quốc Tử Giám",
-            "en": "Narrated tour: the architecture of Van Mieu – Quoc Tu Giam"
-          },
-          "src": "media/kien-truc-van-mieu.mp4",
-          "poster": "/media/kien-truc-poster.jpg"
         },
         {
           "type": "fact",

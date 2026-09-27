@@ -31,5 +31,7 @@ registerSw();
 }
 // IndexedDB là nguồn chuẩn (P3): hydrate xong mới render để mọi màn đọc tiến độ đồng bộ.
 void initProgress().finally(() => {
-  render(<App />, document.getElementById('app')!);
+  const el = document.getElementById('app')!;
+  el.innerHTML = ''; // dọn splash boot
+  render(<App />, el);
 });

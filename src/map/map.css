@@ -367,3 +367,42 @@
     animation: none;
   }
 }
+
+/* Chấm vị trí khách (GPS) – xanh dương để tách khỏi huy hiệu vàng của điểm di sản. */
+.vmap__uloc {
+  pointer-events: none;
+}
+.vmap__uloc-halo {
+  fill: #3b82f6;
+  fill-opacity: 0.22;
+}
+.vmap__uloc-dot {
+  fill: #3b82f6;
+  stroke: #fff;
+  stroke-width: 2;
+}
+.vmap__uloc-pulse {
+  fill: none;
+  stroke: #3b82f6;
+  stroke-width: 2;
+  transform-origin: 0 0;
+  animation: vnode-pulse 2.2s var(--ease-out) infinite;
+}
+.vmap__uloc-pulse--2 {
+  animation-delay: 1.1s;
+}
+.vmap__uloc-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  fill: #3b82f6;
+  paint-order: stroke;
+  stroke: var(--color-bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vmap__uloc-pulse {
+    animation: none;
+    opacity: 0;
+  }
+}

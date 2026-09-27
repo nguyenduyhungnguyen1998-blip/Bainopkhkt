@@ -17,7 +17,7 @@ import { SITES } from '../data/content';
 import type { Region, Site } from '../data/types';
 import type { NodeStatus, UnlockResult } from '../lib/progress';
 import { inspector, useInspector } from '../debug/inspector';
-import { t, type Lang } from '../lib/i18n';
+import { t, UI, type Lang } from '../lib/i18n';
 import { iconPath } from '../components/Icon';
 import './map.css';
 
@@ -50,6 +50,8 @@ interface Props {
   onFlyDone?(): void;
   /** Transform khởi tạo khác mặc định – dùng để khôi phục trạng thái khi quay lại. */
   initialTransform?: Transform;
+  /** Vị trí GPS của khách (tọa độ bản đồ) – hiện chấm "Bạn đang ở đây". */
+  userLoc?: { x: number; y: number } | null;
   onSelect(id: string | null): void;
   onTransform?(t: Transform): void;
   onOnboardDone?(): void;
@@ -111,6 +113,7 @@ export function VietnamMap({
   flyRequest,
   onFlyDone,
   initialTransform,
+  userLoc,
   onSelect,
   onTransform,
   onOnboardDone,
@@ -453,6 +456,19 @@ export function VietnamMap({
             </g>
           );
         })}
+
+        {/* Vị trí khách (GPS) */}
+        {userLoc && (
+          <g class="vmap__uloc" style={{ transform: `translate(${userLoc.x}px, ${userLoc.y}px) scale(calc(1 / var(--k, 1)))` }}>
+            <circle class="vmap__uloc-pulse" r={14} />
+            <circle class="vmap__uloc-pulse vmap__uloc-pulse--2" r={14} />
+            <circle class="vmap__uloc-halo" r={11} />
+            <circle class="vmap__uloc-dot" r={6.5} />
+            <text class="vmap__uloc-label" y={-18} text-anchor="middle">
+              {t(UI.youAreHere, lang)}
+            </text>
+          </g>
+        )}
 
         {/* Node */}
         {nodes.map((n) => (

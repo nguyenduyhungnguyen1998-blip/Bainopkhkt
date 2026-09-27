@@ -187,4 +187,9 @@ export const UI = {
   quizPraiseGood: { vi: 'Khá lắm, sĩ tử!', en: 'Well done, scholar!' },
   quizPraiseLow: { vi: 'Cố lên – sĩ tử rèn thêm nhé!', en: 'Keep practicing, scholar!' },
   quizLockedHint: { vi: 'Chơi trước được – điểm chưa mở', en: 'Preview – spot not unlocked' },
+  locateMe: { vi: 'Vị trí của tôi', en: 'My location' },
+  locating: { vi: 'Đang định vị…', en: 'Locating…' },
+  locDenied: { vi: 'Không lấy được vị trí – hãy bật GPS', en: 'Location unavailable – enable GPS' },
+  locOutside: { vi: 'Bạn đang ngoài vùng bản đồ di sản', en: 'You are outside the heritage map area' },
+  youAreHere: { vi: 'Bạn đang ở đây', en: 'You are here' },
 } satisfies Record<string, Localized>;

@@ -123,11 +123,16 @@ a.dest__crumb--link:active {
   aspect-ratio: 16 / 9;
   position: relative;
 }
-.dcard--video iframe {
+.dcard--video iframe,
+.dcard--video video {
   width: 100%;
   height: 100%;
   border: 0;
   display: block;
+}
+.dcard--video video {
+  object-fit: contain;
+  background: #000;
 }
 .dcard__video-ph {
   position: absolute;

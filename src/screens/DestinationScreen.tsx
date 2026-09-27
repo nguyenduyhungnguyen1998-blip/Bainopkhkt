@@ -440,9 +440,22 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
       </p>
     );
   }
+  // src local (media/*.mp4 trong public/) → phát trực tiếp; https:// → embed iframe.
+  const local = !card.src.startsWith('http');
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
-      <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+      {local ? (
+        <video
+          src={asset(card.src)}
+          poster={card.poster ? asset(card.poster) : undefined}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={t(card.title, lang)}
+        />
+      ) : (
+        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+      )}
     </div>
   );
 }

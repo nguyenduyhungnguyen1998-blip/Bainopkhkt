@@ -127,8 +127,8 @@
                 "en": "Architecture"
               },
               "body": {
-                "vi": "Cổng chính gồm ba lối đi, hai tầng, lối giữa xưa chỉ dành cho vua. Hai bên có đôi rồng đá mang phong cách thời Lê.",
-                "en": "The main gate has three passages on two levels; the central one was reserved for the king. A pair of Le-dynasty stone dragons flank the steps."
+                "vi": "Quần thể rộng 54.331 m² quay mặt hướng Nam, gồm Hồ Văn, Vườn Giám và Nội tự. Từ khu Tiền Án – bốn trụ gạch lớn, hai trụ ngoài đắp bốn chim phượng xoè cánh, cùng hai bia Hạ mã – qua cổng Văn Miếu là khu Nhập Đạo nhiều cây xanh, hai bên có hồ nước. Con đường lát gạch đỏ dẫn đến cổng Đại Trung theo lối kiến trúc Hậu Lê: gỗ ba gian, mái ngói mũi hài, nóc đắp hai con cá chép chầu vào bình móc, nền lát gạch đá Bát Tràng với ba bậc lên xuống tôn nghiêm. Cổng chính Văn Miếu Môn gồm ba lối đi hai tầng – lối giữa xưa chỉ dành cho vua – hai bên là đôi rồng đá thời Lê.",
+                "en": "The 54,331 m² complex faces south and comprises Hồ Văn lake, Giám garden and the walled inner quarters. The Tiền Án forecourt opens with four great brick pillars – the outer pair crowned by four spreading phoenixes – and two dismount steles. Beyond the Văn Miếu gate lies the leafy Nhập Đạo quarter flanked by ponds. A red-tiled path leads to the Đại Trung gate in Later Lê style: three timber bays, a 'mũi hài' tiled roof, twin carps bowing to the ridge, Bát Tràng tile flooring and three ceremonial steps. The main portico itself has three passages on two levels – the central one once reserved for the king – flanked by a pair of Lê-dynasty stone dragons."
               }
             },
             {
@@ -140,6 +140,17 @@
               "body": {
                 "vi": "Bước qua cổng là bước vào không gian tôn vinh việc học – tinh thần hiếu học là cốt lõi văn hóa Việt. Đến Văn Miếu là hành trình trở về cội nguồn đạo học: cúi đầu trước tri thức, biết ơn bậc tiền nhân mở cõi văn minh.",
                 "en": "Passing through the gate means entering a space devoted to learning – the heart of Vietnamese culture. To visit Van Mieu is to return to the roots of learning: bowing before knowledge and honouring the forebears who opened the realm of civilisation."
+              }
+            },
+            {
+              "id": "khong-gian",
+              "title": {
+                "vi": "Không gian",
+                "en": "Grounds"
+              },
+              "body": {
+                "vi": "Phía trước Văn Miếu là Hồ Văn rộng hơn 12.000 m²; giữa hồ nổi lên gò Kim Châu – xưa là nơi nho sĩ kinh thành bình thơ đàm đạo, nay có tòa Phương Đình hai tầng tám mái được phục dựng năm 2022 cùng cầu đá và những cây si cổ thụ. Hồ Văn được trả lại cho di tích năm 1940 – sự kiện ghi trên bia 'Hoàn Văn hồ bi'. Phía Tây, Vườn Giám được trùng tu 1996–2004 với Nhà Bát Giác mặt bằng bát giác, mái ngói nhiều lớp góc đao cong, hòa mình giữa cây xanh và mặt nước – vừa là điểm dừng chân vừa là nơi tổ chức hoạt động văn hóa, giáo dục. Ngày nay Hồ Văn còn là nơi diễn ra Hội chữ Xuân, hội sách, rối nước và các trò chơi dân gian.",
+                "en": "In front of the temple lies Hồ Văn lake, over 12,000 m²; on its Kim Châu islet – where capital scholars once composed poetry – stands the Phương Đình pavilion with two tiers and eight roofs, restored in 2022 amid stone bridges and ancient banyans. The lake was returned to the monument in 1940, an event recorded on the 'Hoàn Văn hồ bi' stele. To the west, Giám garden (restored 1996–2004) holds the octagonal pavilion with layered curved roofs amid greenery and water – both a resting place and a venue for cultural activities. Today the lake still hosts spring calligraphy fairs, book festivals, water puppetry and folk games."
               }
             }
           ]
@@ -155,12 +166,22 @@
           }
         },
         {
+          "type": "video",
+          "size": "md",
+          "title": {
+            "vi": "Thuyết minh: Kiến trúc Văn Miếu – Quốc Tử Giám",
+            "en": "Narrated tour: the architecture of Van Mieu – Quoc Tu Giam"
+          },
+          "src": "media/kien-truc-van-mieu.mp4",
+          "poster": "/media/kien-truc-poster.jpg"
+        },
+        {
           "type": "fact",
           "size": "sm",
           "icon": "spark",
           "text": {
-            "vi": "Khu di tích rộng hơn 54.000 m², chia thành 5 lớp sân nối tiếp nhau.",
-            "en": "The complex spans over 54,000 m², arranged in five successive courtyards."
+            "vi": "Khu di tích rộng 54.331 m², gồm Hồ Văn, Vườn Giám và Nội tự với các khu kiến trúc nối tiếp nhau.",
+            "en": "The complex spans 54,331 m²: Hồ Văn lake, Giám garden and the successive inner quarters."
           }
         }
       ],
@@ -169,6 +190,10 @@
           "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám (giới thiệu di tích)",
           "url": "https://vanmieu.gov.vn",
           "reviewed": false
+        },
+        {
+          "title": "Tài liệu kiến trúc Văn Miếu – Quốc Tử Giám (bản chính thức, đội ngũ biên soạn)",
+          "reviewed": true
         }
       ],
       "quiz": [
@@ -384,8 +409,8 @@
                 "en": "Architecture"
               },
               "body": {
-                "vi": "Gác hai tầng, tầng dưới là bốn trụ gạch vuông, tầng trên bằng gỗ sơn đỏ với bốn cửa sổ tròn tỏa tia như mặt trời – tượng trưng cho ánh sáng của tri thức lan ra bốn phương.",
-                "en": "A two-storey pavilion: four square brick pillars below, a red-lacquered wooden storey above with four round radiating windows – knowledge shining in all directions."
+                "vi": "Qua cổng Đại Trung là khu Thành Đạt với ba lối vào: lối chính dẫn tới Khuê Văn Các, hai lối bên đến cổng Bí Văn và Súc Văn – mang ý nghĩa vẻ đẹp của văn chương. Gác được dựng năm 1805 dưới Tổng trấn Bắc Thành Nguyễn Văn Thành, kiến trúc cân đối thanh thoát: đế vuông bốn trụ gạch, tầng trên bằng gỗ sơn đỏ với bốn cửa sổ tròn tỏa tia, mái hai tầng lợp ngói ống – giản dị mà tao nhã.",
+                "en": "Beyond the Đại Trung gate lies the Thành Đạt quarter with three entrances: the central path leads to Khuê Văn Các while the side paths reach the Bí Văn and Súc Văn gates – emblems of literary beauty. The pavilion was built in 1805 under Nguyễn Văn Thành, Governor of Bắc Thành: a square base of four brick pillars, a red-lacquered timber upper storey with four round radiating windows, and a two-tier tube-tile roof – simple yet elegant, balanced and graceful."
               }
             },
             {
@@ -639,8 +664,8 @@
                 "en": "Art"
               },
               "body": {
-                "vi": "Mỗi bia đặt trên lưng một con rùa đá – biểu tượng của sự trường tồn. Hoa văn trán bia thay đổi theo từng thời kỳ, là tư liệu quý về điêu khắc Việt qua ba thế kỷ.",
-                "en": "Each stele rests on a stone tortoise, a symbol of longevity. Their carved motifs change over time, documenting three centuries of Vietnamese sculpture."
+                "vi": "Mỗi bia đặt trên lưng một con rùa đá – biểu tượng của sự trường tồn. Hoa văn trán bia thay đổi theo từng thời kỳ, là tư liệu quý về điêu khắc Việt qua ba thế kỷ. Giữa khu vườn là Thiên Quang Tỉnh – giếng cổ hình vuông 30×30 m, mặt nước quanh năm xanh trong phẳng lặng; tám dãy nhà che bia được xây năm 1994, kiến trúc hài hòa cùng cảnh quan cổ kính của khu di tích.",
+                "en": "Each stele rests on a stone tortoise, a symbol of longevity. Their carved motifs change over time, documenting three centuries of Vietnamese sculpture. At the centre of the courtyard is the Thiên Quang Tỉnh – a square 30×30 m ancient well whose water stays clear and still year-round; eight roofed halls sheltering the steles were built in 1994 in harmony with the historic landscape."
               }
             },
             {
@@ -886,8 +911,8 @@
                 "en": "Architecture"
               },
               "body": {
-                "vi": "Điện gồm chín gian, mái ngói mũi hài, hệ cột gỗ lim sơn son thếp vàng theo lối kiến trúc thời Hậu Lê.",
-                "en": "A nine-bay hall with a tiled roof and red-lacquered, gilded ironwood columns in the Later Le style."
+                "vi": "Trung tâm khu thờ tự là sân Đại Bái, hai bên là các dãy nhà chạy song song. Phía trước là Bái Đường chín gian – nơi từng diễn ra nghi lễ tế Khổng Tử – với hệ cột gỗ lim, mái ngói mũi hài và họa tiết truyền thống. Phía sau, một tiểu đình nối với Điện Đại Thành chín gian: cột sơn son thếp vàng, mái ngói mũi hài, trên nóc là đôi rồng chầu nhật nguyệt. Trong điện thờ Khổng Tử – tượng chính giữa hướng về phương Nam – cùng Tứ Phối và Thập Triết.",
+                "en": "The worship quarter centres on the Đại Bái courtyard, flanked by parallel rows of buildings. In front stands the nine-bay Bái Đường – where ceremonies honouring Confucius were held – with ironwood columns and a 'mũi hài' tiled roof. A small pavilion links it to the nine-bay Điện Đại Thành: gilded lacquered columns, mũi hài tiles, and twin dragons bowing to the sun and moon on the roof. Inside are worshipped Confucius – the central statue facing south – together with the Four Paragons and Ten Philosophers."
               }
             },
             {
@@ -1157,8 +1182,8 @@
                 "en": "Architecture"
               },
               "body": {
-                "vi": "Nhà hai tầng theo lối kiến trúc truyền thống; tầng trên thờ ba vị vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.",
-                "en": "A two-storey traditional building; the upper floor honours three kings who founded and developed the academy: Ly Thanh Tong, Ly Nhan Tong and Le Thanh Tong."
+                "vi": "Nhà Thái Học được xây năm 2000 trên nền Quốc Tử Giám xưa, mang dáng dấp kiến trúc truyền thống gồm Tiền Đường, Hậu Đường, Tả vu, Hữu vu cùng nhà Chuông và nhà Trống. Tiền Đường là không gian diễn ra các hoạt động văn hóa, khoa học và nghệ thuật; Hậu Đường hai tầng – tầng dưới giới thiệu lịch sử Văn Miếu – Quốc Tử Giám và tôn vinh thầy Chu Văn An, tầng trên thờ ba vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.",
+                "en": "The Thái Học house was built in 2000 on the foundations of the old Imperial Academy, in traditional style with Tiền Đường and Hậu Đường halls, left and right wings, plus a bell house and drum house. Tiền Đường hosts cultural, scientific and artistic events; the two-storey Hậu Đường presents the site's history and honours teacher Chu Văn An below, while the upper floor worships the three kings who founded the school: Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông."
               }
             },
             {

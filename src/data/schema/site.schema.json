@@ -197,7 +197,17 @@
                 "properties": {
                   "id": { "$ref": "#/definitions/slug" },
                   "title": { "$ref": "#/definitions/localized" },
-                  "body": { "$ref": "#/definitions/localized" }
+                  "body": { "$ref": "#/definitions/localized" },
+                  "video": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["src"],
+                    "properties": {
+                      "src": { "type": "string", "format": "uri-reference" },
+                      "poster": { "$ref": "#/definitions/assetPath" },
+                      "title": { "$ref": "#/definitions/localized" }
+                    }
+                  }
                 }
               }
             }

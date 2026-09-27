@@ -66,14 +66,42 @@
           "ambient": "garden",
           "script": {
             "vi": [
-              "Chào mừng bạn đến Văn Miếu Quốc Tử Giám.",
-              "Cổng tam quan trước mặt bạn được dựng lại từ thời Lê, với ba lối đi mà lối giữa xưa chỉ dành cho nhà vua.",
-              "Hãy đi qua lối bên và bắt đầu hành trình của một sĩ tử."
+              "Nhắc đến Văn Miếu – Quốc Tử Giám, ta thường nhớ những mái ngói rêu phong và hàng bia Tiến sĩ nghìn năm tuổi.",
+              "Nhưng linh hồn thực sự của nơi này không nằm ở gạch đá, mà ở những con người được tôn vinh.",
+              "Mỗi nhân vật được phụng thờ là một mắt xích lịch sử: từ nền tảng tư tưởng, trường đại học đầu tiên, khí tiết người thầy, đến truyền thống trọng dụng nhân tài của dân tộc.",
+              "Bước vào Điện Đại Thành – nơi trang nghiêm nhất của Văn Miếu – ta diện kiến Đức Khổng Tử cùng Tứ Phối.",
+              "Tứ Phối gồm Nhan Hồi và Tăng Sâm – học trò của Khổng Tử; Khổng Cấp (Tử Tư) – cháu nội Khổng Tử, học trò của Tăng Sâm; và Mạnh Kha (Mạnh Tử) – học trò của Tử Tư.",
+              "Chữ Nhân, chữ Lễ cùng đạo tu thân tích đức của Nho gia được cha ông tôn phụng tại Thăng Long như nền tảng tri thức để rèn nhân tài và quản lý đất nước.",
+              "Để dòng tư tưởng ấy có thiết chế chính thức tại Đại Việt, mùa thu năm 1070 vua Lý Thánh Tông khởi dựng Văn Miếu tại kinh đô Thăng Long.",
+              "Dấu mốc ấy đặt nền móng cho nền giáo dục quy củ, và là lời tuyên ngôn văn hiến khẳng định nền độc lập tự chủ vững bền của dân tộc.",
+              "Con trưởng ông – Lý Nhân Tông (1066–1128) – từng là Thái tử Càn Đức, học trò đầu tiên học tại Văn Miếu.",
+              "Sau khi lên ngôi, ông mở khoa thi Nho học đầu tiên năm 1075 và lập Quốc Tử Giám năm 1076 – trường đại học đầu tiên của Việt Nam, mở đầu gần một thiên niên kỷ khoa cử vẻ vang.",
+              "Nền giáo dục chỉ thực sự có hồn khi có những người thầy mẫu mực: thời Trần, thầy Chu Văn An (1292–1370) được mời giữ chức Tư nghiệp Quốc Tử Giám.",
+              "Ông dạy dỗ thái tử, rèn bao thế hệ sĩ tử thành tài, và lưu danh thiên cổ bởi khí tiết thanh cao với 'Thất trảm sớ' đòi chém bảy gian thần; dâng sớ không thành, ông thẳng thắn từ quan về núi ở ẩn.",
+              "Tượng thờ ông tại khu Thái Học là sự tri ân vĩnh cửu dành cho chuẩn mực đạo đức và nhân cách của người thầy Việt Nam.",
+              "Đỉnh cao nền giáo dục quân chủ đến dưới triều Lê Thánh Tông: mở rộng quy mô trường lớp, tổ chức 12 khoa thi lớn và tu sửa Văn Miếu năm 1483.",
+              "Năm 1484, ngài khởi dựng bia Tiến sĩ; 82 tấm bia còn lại đến nay là lời nhắc muôn đời: 'Hiền tài là nguyên khí quốc gia, nguyên khí thịnh thì thế nước mạnh'.",
+              "Đến Văn Miếu là hành trình trở về cội nguồn của đạo học: cúi đầu trước tri thức của nhân loại, biết ơn những bậc tiền nhân mở cõi văn minh, khắc ghi công những người thầy tận tụy.",
+              "Tinh thần ấy chính là ngọn lửa sáng mãi, soi đường cho đạo học Việt Nam vững bước cùng thời đại."
             ],
             "en": [
-              "Welcome to the Temple of Literature.",
-              "The triple gate before you dates from the Le dynasty; its central passage was once reserved for the king.",
-              "Take a side passage and begin your journey as a scholar."
+              "Mention the Temple of Literature – Imperial Academy and we think of moss-covered roofs and thousand-year-old doctoral stelae.",
+              "But the soul of this place lies not in brick and stone, but in the people honoured here.",
+              "Each enshrined figure is a link in history: from the foundation of thought, the first university, the teacher's integrity, to the nation's tradition of valuing talent.",
+              "Entering the Hall of Great Success – the temple's most solemn space – we meet Confucius together with the Four Correlates.",
+              "The Four Correlates are Yan Hui and Zeng Shen, disciples of Confucius; Kong Ji (Zi Si), Confucius' grandson and Zeng Shen's student; and Meng Ke (Mencius), Zi Si's student.",
+              "The ideals of Benevolence and Ritual, and the Confucian path of self-cultivation, were honoured at Thang Long as the foundation of learning for training talent and governing the land.",
+              "To give that current of thought an official institution in Dai Viet, in autumn 1070 King Ly Thanh Tong founded the Temple of Literature in the capital Thang Long.",
+              "That milestone laid the groundwork for formal education – a declaration of learning affirming the nation's firm independence and self-determination.",
+              "His eldest son Ly Nhan Tong (1066–1128), once Crown Prince Can Duc, was the first student at Van Mieu.",
+              "After ascending the throne, he opened the first Confucian examination in 1075 and founded the Imperial Academy in 1076 – Vietnam's first university, opening nearly a millennium of glorious examinations.",
+              "Education only truly has a soul with exemplary teachers: under the Tran dynasty, Chu Van An (1292–1370) was invited to serve as Rector of the Imperial Academy.",
+              "He tutored the crown prince, trained generations of scholars, and is remembered for his noble integrity in the 'Memorial of the Seven Executions' demanding seven corrupt mandarins be beheaded; when the petition failed, he frankly resigned and withdrew to the mountains.",
+              "His worshipped statue in the Thai Hoc area is an eternal tribute to the moral standard and character of the Vietnamese teacher.",
+              "Royal education reached its peak under Le Thanh Tong: expanding the academy, holding twelve great examinations, and restoring Van Mieu in 1483.",
+              "In 1484 he founded the doctoral stelae; the 82 stones remaining today remind all generations: 'Talented scholars are the nation's vital energy; when that energy thrives, the nation is strong.'",
+              "To visit Van Mieu is to return to the roots of learning: bowing before humanity's knowledge, honouring the forebears who opened the realm of civilisation, and remembering devoted teachers.",
+              "That spirit is the eternal torch lighting the way for Vietnamese learning to stride firmly with the times."
             ]
           }
         },
@@ -88,8 +116,8 @@
                 "en": "History"
               },
               "body": {
-                "vi": "Văn Miếu được xây dựng năm 1070 dưới triều vua Lý Thánh Tông để thờ Khổng Tử và các bậc hiền triết. Năm 1076, vua Lý Nhân Tông lập Quốc Tử Giám bên cạnh – trường học dành cho hoàng tử và con em quý tộc, sau mở rộng cho người tài trong cả nước.",
-                "en": "The Temple of Literature was founded in 1070 under King Ly Thanh Tong to honour Confucius. In 1076 King Ly Nhan Tong established the Imperial Academy beside it, first for princes and later for gifted students nationwide."
+                "vi": "Văn Miếu được vua Lý Thánh Tông khởi dựng mùa thu năm 1070 để thờ Khổng Tử cùng các bậc Tiên Hiền, Tiên Nho. Con trưởng ông – Lý Nhân Tông, từng là Thái tử Càn Đức, học trò đầu tiên tại Văn Miếu – mở khoa thi Nho học đầu tiên năm 1075 rồi lập Quốc Tử Giám năm 1076: trường đại học đầu tiên của Việt Nam, mở đầu gần một thiên niên kỷ khoa cử.",
+                "en": "Van Mieu was founded in autumn 1070 by King Ly Thanh Tong to honour Confucius and the Confucian sages. His eldest son Ly Nhan Tong – once Crown Prince Can Duc, the temple's first student – opened the first Confucian examination in 1075 and founded the Imperial Academy in 1076: Vietnam's first university, opening nearly a millennium of examinations."
               }
             },
             {
@@ -110,8 +138,8 @@
                 "en": "Meaning"
               },
               "body": {
-                "vi": "Bước qua cổng là bước vào không gian tôn vinh việc học – tinh thần hiếu học được xem là cốt lõi của văn hóa Việt.",
-                "en": "Passing through the gate means entering a space devoted to learning – a value at the heart of Vietnamese culture."
+                "vi": "Bước qua cổng là bước vào không gian tôn vinh việc học – tinh thần hiếu học là cốt lõi văn hóa Việt. Đến Văn Miếu là hành trình trở về cội nguồn đạo học: cúi đầu trước tri thức, biết ơn bậc tiền nhân mở cõi văn minh.",
+                "en": "Passing through the gate means entering a space devoted to learning – the heart of Vietnamese culture. To visit Van Mieu is to return to the roots of learning: bowing before knowledge and honouring the forebears who opened the realm of civilisation."
               }
             }
           ]
@@ -119,9 +147,11 @@
         {
           "type": "video",
           "size": "md",
+          "src": "media/nguon-goc-lich-su.mp4",
+          "poster": "/media/nguon-goc-poster.jpg",
           "title": {
-            "vi": "Clip thuyết minh Văn Miếu Môn",
-            "en": "Narrated clip: Great Portico"
+            "vi": "Thuyết minh: Nguồn gốc & lịch sử Văn Miếu – Quốc Tử Giám",
+            "en": "Narrated video: Origin & history of the Temple of Literature"
           }
         },
         {
@@ -1149,8 +1179,8 @@
                 "en": "Who is honoured"
               },
               "body": {
-                "vi": "Tầng trên thờ ba vua có công lập trường. Lý Thánh Tông (trị vì 1054–1072) đặt quốc hiệu Đại Việt và mùa thu năm 1070 cho dựng Văn Miếu, thờ Khổng Tử cùng các bậc hiền Nho – sự kiện được Ngô Sĩ Liên chép trong Đại Việt sử ký toàn thư. Con trưởng của ông, Lý Nhân Tông (1072–1128), là học trò đầu tiên của Văn Miếu; năm 1075 mở khoa thi đầu tiên trong lịch sử khoa cử nước ta, năm 1076 lập Quốc Tử Giám. Lê Thánh Tông (1460–1497) mở 12 khoa thi chọn 502 tiến sĩ; năm 1483 tu sửa Văn Miếu, 1484 cho dựng những bia tiến sĩ đầu tiên để biểu dương người hiền tài. Tầng dưới thờ Chu Văn An (1292–1370) – từng làm Tư nghiệp Quốc Tử Giám, thầy của hai vua Trần, người dâng 'Thất trảm sớ' xin chém bảy gian thần; năm 2019 UNESCO tôn vinh ông là nhà giáo dục tiêu biểu của Việt Nam. Tượng thờ bằng đồng do nghệ nhân làng Ngũ Xã đúc năm 2003; riêng tượng Chu Văn An nặng khoảng 3 tấn.",
-                "en": "The upper floor honours the academy's three founding kings. Ly Thanh Tong (r. 1054–1072) gave the nation the name Dai Viet and built Van Mieu in autumn 1070, enshrining Confucius and the Confucian sages – an event recorded by Ngo Si Lien in Dai Viet su ky toan thu. His eldest son Ly Nhan Tong (r. 1072–1128) was Van Mieu's first student; in 1075 he held Vietnam's first imperial examination and in 1076 founded Quoc Tu Giam. Le Thanh Tong (r. 1460–1497) held 12 examinations selecting 502 doctoral laureates; he restored Van Mieu in 1483 and in 1484 erected the first doctors' stelae to honour the talented. The ground floor honours Chu Van An (1292–1370) – once Director of Quoc Tu Giam and tutor to two Tran kings, who submitted the 'Seven Executions' petition demanding the removal of seven corrupt courtiers; UNESCO honoured him in 2019 as a model educator of Vietnam. The bronze statues were cast by artisans of Ngu Xa village in 2003; Chu Van An's alone weighs about 3 tonnes."
+                "vi": "Tầng trên thờ ba vua có công lập trường. Lý Thánh Tông (trị vì 1054–1072) đặt quốc hiệu Đại Việt và mùa thu năm 1070 cho dựng Văn Miếu, thờ Khổng Tử cùng các bậc hiền Nho – sự kiện được Ngô Sĩ Liên chép trong Đại Việt sử ký toàn thư. Con trưởng của ông, Lý Nhân Tông (1066–1128), từng là Thái tử Càn Đức – học trò đầu tiên của Văn Miếu; năm 1075 mở khoa thi đầu tiên trong lịch sử khoa cử nước ta, năm 1076 lập Quốc Tử Giám. Lê Thánh Tông (1460–1497) mở 12 khoa thi chọn 502 tiến sĩ; năm 1483 tu sửa và mở rộng Quốc Tử Giám, 1484 cho dựng những bia tiến sĩ đầu tiên để biểu dương người hiền tài – 'Hiền tài là nguyên khí quốc gia, nguyên khí thịnh thì thế nước mạnh'. Tầng dưới thờ Chu Văn An (1292–1370) – từng làm Tư nghiệp Quốc Tử Giám, thầy của hai vua Trần, người dâng 'Thất trảm sớ' xin chém bảy gian thần; dâng sớ không thành, ông thẳng thắn từ quan về núi ở ẩn – chuẩn mực khí tiết người thầy Việt Nam. Năm 2019 UNESCO tôn vinh ông là nhà giáo dục tiêu biểu của Việt Nam. Tượng thờ bằng đồng do nghệ nhân làng Ngũ Xã đúc năm 2003; riêng tượng Chu Văn An nặng khoảng 3 tấn.",
+                "en": "The upper floor honours the academy's three founding kings. Ly Thanh Tong (r. 1054–1072) gave the nation the name Dai Viet and built Van Mieu in autumn 1070, enshrining Confucius and the Confucian sages – an event recorded by Ngo Si Lien in Dai Viet su ky toan thu. His eldest son Ly Nhan Tong (1066–1128), once Crown Prince Can Duc, was Van Mieu's first student; in 1075 he held Vietnam's first imperial examination and in 1076 founded Quoc Tu Giam. Le Thanh Tong (r. 1460–1497) held 12 examinations selecting 502 doctoral laureates; he restored and expanded the academy in 1483 and in 1484 erected the first doctors' stelae to honour the talented – 'Talented scholars are the nation's vital energy; when that energy thrives, the nation is strong.' The ground floor honours Chu Van An (1292–1370) – once Director of Quoc Tu Giam and tutor to two Tran kings, who submitted the 'Seven Executions' petition demanding the removal of seven corrupt courtiers; when it failed he frankly resigned and withdrew to the mountains – the moral standard of the Vietnamese teacher. UNESCO honoured him in 2019 as a model educator of Vietnam. The bronze statues were cast by artisans of Ngu Xa village in 2003; Chu Van An's alone weighs about 3 tonnes."
               }
             }
           ]

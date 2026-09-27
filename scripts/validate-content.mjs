@@ -21,6 +21,7 @@ const pub = join(root, 'public');
 const schema = JSON.parse(readFileSync(join(root, 'src/data/schema/site.schema.json'), 'utf8'));
 
 const IMG_MAX_KB = 300;
+const VIDEO_MAX_MB = 50;
 
 const ajv = new Ajv({ allErrors: true, strict: true });
 addFormats(ajv);
@@ -71,6 +72,7 @@ for (const f of files) {
   if (site.region !== expected) warn(f, `region="${site.region}" nhưng vĩ độ ${lat} gợi ý "${expected}" – kiểm tra lại`);
 
   const assets = new Set([site.heroImage]);
+  const videos = new Set();
   const spotIds = new Set();
 
   for (const spot of site.spots) {
@@ -89,7 +91,12 @@ for (const f of files) {
         if (card.poster) assets.add(card.poster);
         if (card.src) {
           hasVideoSrc = true;
-          if (!card.src.startsWith('https://')) err(tag, `video.src phải là https: ${card.src}`);
+          if (card.src.startsWith('https://')) {
+            // embed ngoài (YouTube/Vimeo)
+          } else {
+            // video local trong public/ (vd media/clip.mp4) — kiểm tồn tại + dung lượng
+            videos.add(card.src);
+          }
         }
       }
       if (card.type === 'audio') {
@@ -123,6 +130,15 @@ for (const f of files) {
     }
     const kb = statSync(abs).size / 1024;
     if (kb > IMG_MAX_KB) err(f, `${a} nặng ${kb.toFixed(0)} KB > ${IMG_MAX_KB} KB (nén lại)`);
+  }
+  for (const v of videos) {
+    const abs = join(pub, v);
+    if (!existsSync(abs)) {
+      err(f, `thiếu tệp video ${v}`);
+      continue;
+    }
+    const mb = statSync(abs).size / (1024 * 1024);
+    if (mb > VIDEO_MAX_MB) err(f, `${v} nặng ${mb.toFixed(0)} MB > ${VIDEO_MAX_MB} MB (nén lại)`);
   }
 }
 

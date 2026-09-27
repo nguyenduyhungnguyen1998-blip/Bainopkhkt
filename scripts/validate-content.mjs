@@ -106,6 +106,14 @@ for (const f of files) {
       if (card.type === 'aspects') {
         const ids = card.aspects.map((a) => a.id);
         if (new Set(ids).size !== ids.length) err(tag, 'aspects.id trùng');
+        for (const a of card.aspects) {
+          // video gắn riêng vào một tab aspect — cũng kiểm tồn tại/dung lượng
+          if (a.video) {
+            hasVideoSrc = true;
+            if (a.video.poster) assets.add(a.video.poster);
+            if (!a.video.src.startsWith('https://')) videos.add(a.video.src);
+          }
+        }
       }
     }
     if (!hasHero) err(tag, 'thiếu card hero (mọi điểm phải có ảnh mở đầu)');

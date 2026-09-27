@@ -618,3 +618,20 @@ a.dest__crumb--link:active {
   font-size: 0.8rem;
   color: var(--color-muted);
 }
+
+/* Video gắn trong tab aspect – chỉ hiện khi tab đang chọn. */
+.dcard__avideo {
+  margin-top: 10px;
+}
+.dcard__avideo video,
+.dcard__avideo iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-md, 12px);
+  display: block;
+  background: #000;
+}
+.dcard__avideo video {
+  object-fit: contain;
+}

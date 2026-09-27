@@ -573,6 +573,7 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial]);
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
+  const online = useOnline();
   const idx = card.aspects.indexOf(cur);
   const startX = useRef<number | null>(null);
   // Vuốt ngang trên thân thẻ đổi tab (P2: "tab vuốt ngang")
@@ -599,6 +600,22 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
       <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
         {t(cur.body, lang)}
       </p>
+      {cur.video && online && (
+        <div class="dcard__avideo">
+          {cur.video.src.startsWith('http') ? (
+            <iframe src={cur.video.src} title={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+          ) : (
+            <video
+              src={asset(cur.video.src)}
+              poster={cur.video.poster ? asset(cur.video.poster) : undefined}
+              controls
+              playsInline
+              preload="metadata"
+              aria-label={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)}
+            />
+          )}
+        </div>
+      )}
       <div class="dcard__dots" aria-hidden="true">
         {card.aspects.map((a) => (
           <i key={a.id} class={a.id === cur.id ? 'on' : ''} />

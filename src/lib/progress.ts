@@ -132,6 +132,47 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   return result;
 }
 
+/** Công cụ demo (#/admin): cộng XP trực tiếp để dựng kịch bản trình diễn. */
+export function grantXp(amount: number): void {
+  if (!Number.isFinite(amount) || amount === 0) return;
+  commit({ ...state, xp: Math.max(0, state.xp + amount) });
+}
+
+/**
+ * Công cụ demo (#/admin): gỡ dấu một điểm để diễn lại check-in.
+ * Hoàn lại XP của điểm — nếu không, mở lại sẽ cộng XP lần nữa và XP bị thổi phồng
+ * (huy hiệu khu + điểm quiz giữ nguyên).
+ */
+export function relockSpot(siteId: string, spotId: string): void {
+  const key = `${siteId}/${spotId}`;
+  if (!(key in state.unlocked)) return;
+  const spot = SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId);
+  const unlocked = { ...state.unlocked };
+  delete unlocked[key];
+  commit({ ...state, unlocked, xp: Math.max(0, state.xp - (spot?.xp ?? 0)) });
+}
+
+/** Công cụ demo: gỡ dấu mọi điểm + hoàn XP của các điểm đó (huy hiệu/quiz giữ nguyên). */
+export function relockAll(): void {
+  let refund = 0;
+  for (const key of Object.keys(state.unlocked)) {
+    const [siteId, spotId] = key.split('/');
+    refund += SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId)?.xp ?? 0;
+  }
+  commit({ ...state, unlocked: {}, xp: Math.max(0, state.xp - refund) });
+}
+
+/** Công cụ demo: xóa mọi điểm quiz (giữ dấu + XP) — để giám khảo chơi lại và thấy XP thưởng thật. */
+export function clearQuizResults(): void {
+  commit({ ...state, quizDone: {} });
+}
+
+/** Công cụ demo: tước huy hiệu khu + hoàn XP thưởng hoàn thành — diễn lại khoảnh khắc nhận huy hiệu. */
+export function revokeBadge(badgeId: string, refundXp = 0): void {
+  if (!state.badges.includes(badgeId)) return;
+  commit({ ...state, badges: state.badges.filter((b) => b !== badgeId), xp: Math.max(0, state.xp - refundXp) });
+}
+
 export const QUIZ_XP_PER_CORRECT = 5;
 
 /**
@@ -152,6 +193,15 @@ export function quizBest(siteId: string, spotId: string): number | undefined {
 }
 
 export function resetProgress() {
+  // Reset hành trình -> cho phép finale 9/9 và finale cấp khu xuất hiện lại ở hành trình mới.
+  try {
+    localStorage.removeItem('mdv.finale.v1');
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith('mdv.sitefin.')) localStorage.removeItem(k);
+    }
+  } catch {
+    /* bộ nhớ riêng tư */
+  }
   commit({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] });
 }
 
@@ -199,6 +249,34 @@ export function importPassportJson(json: string): boolean {
   } catch {
     return false;
   }
+}
+
+/** Đọc file sao lưu mà không ghi đè – trả tóm tắt để hiện bản xem trước trước khi xác nhận. */
+export function previewPassportJson(json: string): { progress: Progress; spots: number; xp: number; exportedAt: string | null } | null {
+  try {
+    const raw = JSON.parse(json) as { kind?: string; progress?: unknown; exportedAt?: string };
+    if (raw?.kind !== 'passport') return null;
+    const p = migrate(raw.progress);
+    if (!p) return null;
+    return { progress: p, spots: Object.keys(p.unlocked).length, xp: p.xp, exportedAt: raw.exportedAt ?? null };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Áp bản sao đã xem trước: 'replace' ghi đè toàn bộ;
+ * 'merge' hợp nhất điểm đã mở + lấy điểm quiz cao hơn + XP lấy mức lớn hơn + hợp nhất huy hiệu.
+ */
+export function applyPassportImport(p: Progress, mode: 'merge' | 'replace'): void {
+  if (mode === 'replace') {
+    commit(p);
+    return;
+  }
+  const unlocked = { ...p.unlocked, ...state.unlocked };
+  const quizDone: Record<string, number> = { ...p.quizDone };
+  for (const [k, v] of Object.entries(state.quizDone)) quizDone[k] = Math.max(v, quizDone[k] ?? 0);
+  commit({ ...p, unlocked, quizDone, badges: Array.from(new Set([...state.badges, ...p.badges])), xp: Math.max(p.xp, state.xp) });
 }
 
 export interface Achievement {

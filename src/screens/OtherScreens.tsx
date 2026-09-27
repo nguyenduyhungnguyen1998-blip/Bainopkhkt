@@ -1,13 +1,16 @@
 /** Hộ chiếu, Thử tài, Cài đặt – P3: quiz engine + xuất/nhập hộ chiếu. */
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, importPassportJson } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
+import type { Progress } from '../lib/progress';
+import { asset } from '../lib/asset';
 import './passport.css';
 import { useTheme } from '../lib/theme';
 import { Icon } from '../components/Icon';
 import { routeHref } from '../lib/router';
+import { enableDemoDock } from '../components/DemoDock';
 
 export function PassportScreen() {
   const [lang] = useLang();
@@ -64,7 +67,7 @@ export function PassportScreen() {
         </a>
       )}
 
-      <PassportTools lang={lang} />
+      <ShareJourney lang={lang} done={doneSpots} total={totalSpots} xp={p.xp} />
 
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
@@ -85,12 +88,20 @@ export function PassportScreen() {
           const done = n === s.spots.length;
           return (
             <a key={s.entityId} class="mdv-card" href={routeHref.destination(s.entityId)} style="display:flex;gap:12px;align-items:center;color:inherit">
-              <img src={s.heroImage} alt="" width="56" height="56" style="border-radius:12px;object-fit:cover" />
+              <img src={asset(s.heroImage)} alt="" width="56" height="56" style="border-radius:12px;object-fit:cover" />
               <div style="flex:1;min-width:0">
                 <b>{t(s.name, lang)}</b>
                 <div class="mdv-muted" style="font-size:var(--text-sm)">
                   {n}/{s.spots.length} {t(UI.spots, lang)}
                 </div>
+                {/* Hàng dấu từng điểm – kỷ niệm nhìn được thay vì chỉ con số */}
+                <span class="pstamp" aria-hidden="true">
+                  {s.spots.map((sp, i) => (
+                    <i key={sp.spotId} class={`pstamp__dot ${isSpotUnlocked(s.entityId, sp.spotId) ? 'pstamp__dot--on' : ''}`}>
+                      {i + 1}
+                    </i>
+                  ))}
+                </span>
               </div>
               {done ? (
                 <span class="mdv-badge mdv-badge--unlocked">
@@ -109,10 +120,47 @@ export function PassportScreen() {
   );
 }
 
-/** Xuất/nhập hộ chiếu JSON (P3): lưu tiến độ ra file và khôi phục trên máy khác. */
-function PassportTools({ lang }: { lang: Lang }) {
+/** Chia sẻ hành trình: Web Share API nếu có, không thì chép nội dung vào clipboard. */
+function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; total: number; xp: number }) {
+  const [copied, setCopied] = useState(false);
+  const text =
+    lang === 'vi'
+      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Mở Dấu Việt`
+      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in Mo Dau Viet`;
+  const share = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: 'Mở Dấu Việt', text });
+        return;
+      }
+    } catch {
+      /* user hủy share sheet hoặc API lỗi -> fallback copy */
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2200);
+    } catch {
+      /* clipboard bị chặn */
+    }
+  };
+  return (
+    <button class="mdv-btn mdv-btn--ghost ppass__share" onClick={() => void share()}>
+      <Icon name="share" size={18} /> {copied ? t(UI.shareCopied, lang) : t(UI.sharePassport, lang)}
+    </button>
+  );
+}
+
+/** Sao lưu & chuyển thiết bị (Cài đặt): xuất JSON có thông báo; nhập có xem trước + chọn gộp/thay thế. */
+function BackupCard({ lang }: { lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [preview, setPreview] = useState<{ progress: Progress; spots: number; xp: number; exportedAt: string | null } | null>(null);
+
+  const flash = (m: string) => {
+    setMsg(m);
+    window.setTimeout(() => setMsg(null), 2600);
+  };
 
   const doExport = () => {
     const blob = new Blob([exportPassportJson()], { type: 'application/json' });
@@ -121,34 +169,73 @@ function PassportTools({ lang }: { lang: Lang }) {
     a.download = `ho-chieu-mo-dau-viet-${Date.now()}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
+    flash(t(UI.backupExported, lang));
   };
 
-  const doImport = async (f: File | undefined) => {
+  const doPick = async (f: File | undefined) => {
     if (!f) return;
-    const ok = importPassportJson(await f.text());
-    setMsg(t(ok ? UI.importOk : UI.importBad, lang));
     if (fileRef.current) fileRef.current.value = '';
-    window.setTimeout(() => setMsg(null), 2600);
+    const pv = previewPassportJson(await f.text());
+    if (!pv) {
+      flash(t(UI.importBad, lang));
+      return;
+    }
+    setPreview(pv);
+  };
+
+  const apply = (mode: 'merge' | 'replace') => {
+    if (preview) applyPassportImport(preview.progress, mode);
+    setPreview(null);
+    flash(t(UI.importOk, lang));
   };
 
   return (
-    <section class="mdv-card ppass__tools">
-      <button class="mdv-btn mdv-btn--ghost" onClick={doExport}>
-        {t(UI.exportPassport, lang)}
-      </button>
-      <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
-        {t(UI.importPassport, lang)}
-      </button>
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={(e) => void doImport((e.target as HTMLInputElement).files?.[0])} />
+    <section class="mdv-card">
+      <h2 style="font-size:var(--text-md);margin:0 0 4px">{t(UI.backupTitle, lang)}</h2>
+      <p class="mdv-muted" style="margin:0 0 10px;font-size:var(--text-sm)">{t(UI.backupDesc, lang)}</p>
+      {preview ? (
+        <div class="backup__preview">
+          <p class="backup__pvtitle">{t(UI.backupPreviewTitle, lang)}</p>
+          <p class="backup__pvmeta">
+            {preview.spots}/9 {t(UI.spots, lang)} · {preview.xp} XP
+            {preview.exportedAt ? ` · ${new Date(preview.exportedAt).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}` : ''}
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="mdv-btn mdv-btn--primary" onClick={() => apply('merge')}>
+              {t(UI.backupMerge, lang)}
+            </button>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => apply('replace')}>
+              {t(UI.backupReplace, lang)}
+            </button>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => setPreview(null)}>
+              {t(UI.cancel, lang)}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--ghost" onClick={doExport}>
+            {t(UI.exportPassport, lang)}
+          </button>
+          <button class="mdv-btn mdv-btn--ghost" onClick={() => fileRef.current?.click()}>
+            {t(UI.importPassport, lang)}
+          </button>
+        </div>
+      )}
+      <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doPick((e.target as HTMLInputElement).files?.[0])} />
       {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
     </section>
   );
 }
 
-export function QuizScreen() {
+export function QuizScreen({ at }: { at?: string }) {
   const [lang] = useLang();
   useProgress();
-  const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(null);
+  const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(() => {
+    // Deep link #/quiz?at=<site>/<spot> từ CTA "thử tài tại đây" — validate trước khi mở.
+    const [siteId, spotId] = at?.split('/') ?? [];
+    return siteId && spotId && getSpot(siteId, spotId)?.spot.quiz?.length ? { siteId, spotId } : null;
+  });
   const spotsWithQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz && sp.quiz.length > 0).map((sp) => ({ site: s, spot: sp })));
 
   if (active) {
@@ -178,10 +265,16 @@ export function QuizScreen() {
               </div>
               {withQuiz.map((sp) => {
                 const best = quizBest(s.entityId, sp.spotId);
+                const locked = !isSpotUnlocked(s.entityId, sp.spotId);
                 return (
                   <button key={sp.spotId} class="quiz__row" onClick={() => setActive({ siteId: s.entityId, spotId: sp.spotId })}>
                     <Icon name="quiz" size={18} />
                     <span class="quiz__name">{t(sp.name, lang)}</span>
+                    {locked && (
+                      <span class="quiz__lock" title={t(UI.quizLockedHint, lang)}>
+                        <Icon name="lock" size={11} /> {t(UI.locked, lang)}
+                      </span>
+                    )}
                     <small class="mdv-muted">
                       {sp.quiz!.length} {lang === 'vi' ? 'câu' : 'qs'}
                       {best !== undefined && ` · ${t(UI.bestScore, lang)} ${best}/${sp.quiz!.length}`}
@@ -202,6 +295,13 @@ export function QuizScreen() {
 /** Chơi quiz một điểm: chọn đáp án -> hiện đúng/sai -> câu tiếp -> kết quả + XP (phần vượt best). */
 function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: Lang; onExit: () => void }) {
   const quiz = spot.quiz!;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onExit();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onExit]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [correct, setCorrect] = useState(0);
@@ -215,9 +315,11 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
     if (i === quiz[idx].answer) setCorrect((c) => c + 1);
     if (navigator.vibrate) navigator.vibrate(i === quiz[idx].answer ? 20 : [60, 40, 60]);
   };
+  const locked = !isSpotUnlocked(site.entityId, spot.spotId);
   const nextQ = () => {
     if (idx + 1 >= quiz.length) {
-      const g = recordQuizResult(site.entityId, spot.spotId, correct, quiz.length);
+      // Điểm chưa check-in: chơi thử được (hội đồng xem trước) nhưng không ghi XP.
+      const g = locked ? 0 : recordQuizResult(site.entityId, spot.spotId, correct, quiz.length);
       setGained(g);
       setDone(true);
     } else {
@@ -227,10 +329,13 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   };
 
   if (done) {
-    // Gợi ý điểm có quiz kế tiếp chưa làm – tránh màn kết quả thành ngõ cụt.
-    const nextQuiz = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ site: s, spot: sp }))).find(
-      ({ site: s, spot: sp }) => quizBest(s.entityId, sp.spotId) === undefined
-    );
+    // Gợi ý điểm có quiz kế tiếp chưa làm — ưu tiên cùng khu (đang đứng trong khu),
+    // loại chính điểm vừa chơi (chơi thử không ghi best nên sẽ bị gợi lại nếu không lọc).
+    const quizSpots = (s: (typeof SITES)[number]) =>
+      s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ site: s, spot: sp }));
+    const isUnplayed = ({ site: s, spot: sp }: { site: Site; spot: Spot }) =>
+      !(s.entityId === site.entityId && sp.spotId === spot.spotId) && quizBest(s.entityId, sp.spotId) === undefined;
+    const nextQuiz = quizSpots(site).find(isUnplayed) ?? SITES.flatMap(quizSpots).find(isUnplayed);
     return (
       <main class="mdv-screen">
         <div class="mdv-card quiz__result">
@@ -239,8 +344,13 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
           <div class="quiz__score">
             {correct}/{quiz.length} <small>{t(UI.quizCorrect, lang)}</small>
           </div>
+          <p class="quiz__praise">
+            {t(correct === quiz.length ? UI.quizPraisePerfect : correct / quiz.length >= 0.6 ? UI.quizPraiseGood : UI.quizPraiseLow, lang)}
+          </p>
           {gained !== null && gained > 0 ? (
             <p class="quiz__xp">+{gained} XP</p>
+          ) : locked ? (
+            <p class="mdv-muted">{t(UI.quizTrial, lang)}</p>
           ) : (
             <p class="mdv-muted">{best !== undefined && `${t(UI.bestScore, lang)}: ${best}/${quiz.length}`}</p>
           )}
@@ -276,7 +386,19 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
           </h1>
         </div>
       </header>
+      {/* Báo chơi thử NGAY câu đầu — không để khách bỏ công xong mới biết không có XP. */}
+      {locked && <p class="quiz__trialnote">{t(UI.quizTrial, lang)}</p>}
       <div class="mdv-card">
+        <div
+          class="quiz__prog"
+          role="progressbar"
+          aria-label={t(UI.quizProgress, lang)}
+          aria-valuemin={0}
+          aria-valuemax={quiz.length}
+          aria-valuenow={idx + (picked !== null ? 1 : 0)}
+        >
+          <span style={{ width: `${((idx + (picked !== null ? 1 : 0)) / quiz.length) * 100}%` }} />
+        </div>
         <p class="quiz__q">{t(q.q, lang)}</p>
         <div class="quiz__opts">
           {q.options.map((o, i) => {
@@ -291,9 +413,14 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
         {picked !== null && (
           <div class={`quiz__mark ${picked === q.answer ? 'ok' : 'bad'}`}>{t(picked === q.answer ? UI.correctMark : UI.wrongMark, lang)}</div>
         )}
+        {picked !== null && q.explain && (
+          <p class="quiz__explain">
+            <b>{t(UI.quizExplain, lang)}</b> {t(q.explain, lang)}
+          </p>
+        )}
         {picked !== null && (
           <button class="mdv-btn mdv-btn--primary" style="width:100%;margin-top:12px" onClick={nextQ}>
-            {t(UI.quizNext, lang)}
+            {t(idx + 1 >= quiz.length ? UI.quizResult : UI.quizNext, lang)}
           </button>
         )}
       </div>
@@ -335,6 +462,7 @@ export function SettingsScreen() {
             </button>
           </div>
         </section>
+        <BackupCard lang={lang} />
         <section class="mdv-card">
           <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dữ liệu' : 'Data'}</h2>
           <button
@@ -346,10 +474,142 @@ export function SettingsScreen() {
             {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
           </button>
         </section>
+        <section class="mdv-card">
+          <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dành cho trình diễn' : 'For demo'}</h2>
+          <a class="mdv-btn mdv-btn--ghost" href={routeHref.admin}>
+            <Icon name="spark" size={16} /> {lang === 'vi' ? 'Bảng điều khiển demo' : 'Demo control panel'}
+          </a>
+        </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
           Mở Dấu Việt v{__APP_VERSION__} · {lang === 'vi' ? 'Thêm ?debug=1 vào địa chỉ để mở Debug HUD' : 'Append ?debug=1 to open the Debug HUD'}
         </p>
       </div>
+    </main>
+  );
+}
+
+/**
+ * Bảng điều khiển demo (#/admin) – dựng kịch bản trình diễn mà không cần quét QR thật:
+ * mở/khóa từng điểm, mở cả khu, đặt điểm quiz, cộng XP, reset cờ finale.
+ * Mở khóa đi qua unlockSpot thật nên confetti + finale cấp khu tự chạy -> demo được cả màn ăn mừng.
+ */
+export function AdminScreen() {
+  const p = useProgress();
+  const [, forceTick] = useState(0); // re-render sau thao tác cục bộ (finale flags)
+  // Mở trang admin = có ý định demo -> bật luôn nút điều khiển nổi (DemoDock).
+  useEffect(() => enableDemoDock(), []);
+  const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
+  const doneSpots = Object.keys(p.unlocked).length;
+
+  const unlockSite = (site: Site) => site.spots.forEach((sp) => unlockSpot(site.entityId, sp.spotId));
+  const unlockAll = () => SITES.forEach(unlockSite);
+  const clearFinaleFlags = () => {
+    try {
+      localStorage.removeItem('mdv.finale.v1');
+      for (const k of Object.keys(localStorage)) {
+        if (k.startsWith('mdv.sitefin.')) localStorage.removeItem(k);
+      }
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    forceTick((n) => n + 1);
+  };
+
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">Demo admin</span>
+          <h1>Bảng điều khiển trình diễn</h1>
+        </div>
+      </header>
+      <p class="mdv-muted">
+        Dựng kịch bản cho giám khảo: mở khóa từng điểm/khu, đặt điểm thử tài, cộng XP. Mọi thao tác đi qua hệ
+        tiến độ thật — confetti và finale cấp khu tự hiện. Trang này không nằm trong điều hướng; mở qua{' '}
+        <code>#/admin</code>. Đang có {doneSpots}/{totalSpots} điểm · {p.xp} XP.
+      </p>
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">Mở khóa nhanh</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--primary" onClick={unlockAll}>
+            <Icon name="check" size={16} /> Mở hết {totalSpots} điểm
+          </button>
+          {SITES.map((s) => (
+            <button key={s.entityId} class="mdv-chip" onClick={() => unlockSite(s)}>
+              Mở hết {t(s.name)} ({siteUnlockedCount(s, p)}/{s.spots.length})
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {SITES.map((s) => (
+        <section key={s.entityId} class="mdv-card">
+          <h2 style="font-size:var(--text-md);margin:0 0 10px">
+            {t(s.name)} <span class="mdv-muted" style="font-weight:400">({siteUnlockedCount(s, p)}/{s.spots.length})</span>
+          </h2>
+          <div class="adm__rows">
+            {s.spots.map((sp) => {
+              const on = isSpotUnlocked(s.entityId, sp.spotId);
+              const best = quizBest(s.entityId, sp.spotId);
+              return (
+                <div key={sp.spotId} class="adm__row">
+                  <span class={`adm__name ${on ? 'adm__name--on' : ''}`}>{t(sp.name)}</span>
+                  <button class="mdv-chip" aria-pressed={on} onClick={() => (on ? relockSpot(s.entityId, sp.spotId) : unlockSpot(s.entityId, sp.spotId))}>
+                    {on ? 'Đã nhận dấu — gỡ lại' : `Mở (+${sp.xp} XP)`}
+                  </button>
+                  {sp.quiz?.length ? (
+                    <button
+                      class="mdv-chip"
+                      aria-pressed={best === sp.quiz.length}
+                      onClick={() => recordQuizResult(s.entityId, sp.spotId, sp.quiz!.length, sp.quiz!.length)}
+                    >
+                      Quiz {best ?? '–'}/{sp.quiz.length} → đặt đủ
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">XP &amp; cờ ăn mừng</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          {[30, 100, 500].map((x) => (
+            <button key={x} class="mdv-chip" onClick={() => grantXp(x)}>
+              +{x} XP
+            </button>
+          ))}
+          <button class="mdv-chip" onClick={clearFinaleFlags}>
+            Cho xem lại finale (reset cờ)
+          </button>
+        </div>
+      </section>
+
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">Tiện ích</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="mdv-btn mdv-btn--primary" onClick={() => enableDemoDock()}>
+            <Icon name="spark" size={16} /> Hiện nút điều khiển nổi (góc phải màn)
+          </button>
+          <a class="mdv-chip" href="qr-sheet.html" target="_blank" rel="noreferrer">
+            Trang in tem QR
+          </a>
+          <a class="mdv-chip" href={routeHref.map}>
+            Về bản đồ
+          </a>
+          <button
+            class="mdv-btn mdv-btn--ghost"
+            onClick={() => {
+              if (confirm('Xóa toàn bộ tiến độ hành trình?')) resetProgress();
+            }}
+          >
+            Reset hành trình
+          </button>
+        </div>
+      </section>
     </main>
   );
 }

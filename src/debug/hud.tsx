@@ -255,7 +255,8 @@ function JourneyPanel() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const simulate = async (tamper = false) => {
-    let sig = await signSpot(site, spot);
+    const spotObj = siteObj.spots.find((sp) => sp.spotId === spot);
+    let sig = await signSpot(site, spot, spotObj?.qrId);
     if (tamper) sig = 'f'.repeat(16);
     navigate(`d/${site}/${spot}?s=${sig}`);
   };

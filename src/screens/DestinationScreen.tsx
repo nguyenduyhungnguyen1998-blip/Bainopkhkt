@@ -7,6 +7,7 @@ import { getSpot, getSite } from '../data/content';
 import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
+import { asset } from '../lib/asset';
 import { isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
@@ -32,6 +33,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
     );
   }
   const { site, spot } = found;
+  const mode = getExploreMode();
   const idx = site.spots.indexOf(spot);
   const prev = site.spots[idx - 1];
   const next = site.spots[idx + 1];
@@ -57,7 +59,10 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         </span>
       </header>
 
-      {sig && <ScanConfirm site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
+      {/* key spot+sig: remount mỗi QR mới — nếu không, reward/state của điểm trước
+          sống sót khi đổi điểm cùng khu (component cha key theo siteId) và che nút xác nhận mới. */}
+      {sig && <ScanConfirm key={`${spot.spotId}:${sig}`} site={site} spot={spot} sig={sig} unlocked={unlocked} lang={lang} />}
+      {/* Không có sig -> vào bằng điều hướng thường: không hiện panel chọn mục (chỉ áp dụng cho QR/link direct). */}
 
       {/* Dải điểm QR trong khu – điều hướng nhanh giữa các điểm */}
       <nav class="dest__spots" aria-label="Các điểm trong khu">
@@ -75,11 +80,53 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         ))}
       </nav>
 
+      {/* Một câu mời quan sát – khiến khách nhìn lại vật thật trước khi đọc lịch sử */}
+      {spot.hook && (
+        <p class="dest__hook">
+          <Icon name="spark" size={15} aria-hidden="true" />
+          {t(spot.hook, lang)}
+        </p>
+      )}
+
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} />
+          <CardView key={i} card={card} lang={lang} mode={mode} initialAspect={query?.get('a')} />
         ))}
       </div>
+
+      {/* Thông tin tham quan thực tế (địa chỉ/giờ/vé) – trả lời nhanh câu hỏi của khách */}
+      {site.visit && (site.visit.address || site.visit.hours || site.visit.tickets) && (
+        <section class="dvisit" aria-label={t(UI.visitInfo, lang)}>
+          <h2 class="dvisit__h">{t(UI.visitInfo, lang)}</h2>
+          {site.visit.address && (
+            <div class="dvisit__row"><Icon name="locate" size={16} /><span>{t(site.visit.address, lang)}</span></div>
+          )}
+          {site.visit.hours && (
+            <div class="dvisit__row"><Icon name="clock" size={16} /><span>{t(site.visit.hours, lang)}</span></div>
+          )}
+          {site.visit.tickets && (
+            <div class="dvisit__row"><Icon name="qr" size={16} /><span>{t(site.visit.tickets, lang)}</span></div>
+          )}
+        </section>
+      )}
+
+      {/* Chuỗi hành động cuối nội dung: thử tài đúng điểm → xem dấu → tiếp trong khu (nav dưới) */}
+      <footer class="dchain">
+        {spot.quiz?.length ? (
+          <a class="mdv-btn mdv-btn--primary dchain__quiz" href={routeHref.quizAt(site.entityId, spot.spotId)}>
+            <Icon name="quiz" size={18} /> {t(UI.quizAtSpot, lang)} · {spot.quiz.length} {lang === 'vi' ? 'câu' : 'qs'}
+          </a>
+        ) : null}
+        {unlocked ? (
+          <a class="dchain__pass" href={routeHref.passport}>
+            <Icon name="passport" size={15} /> {t(UI.viewStamp, lang)}
+          </a>
+        ) : (
+          <span class="dchain__hint">
+            <Icon name="qr" size={14} /> {t(UI.stampHint, lang)} (+{spot.xp} XP)
+          </span>
+        )}
+      </footer>
 
       <div class="dest__nav">
         {prev ? (
@@ -107,10 +154,20 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   const [reward, setReward] = useState<number | null>(null);
   const [badgeName, setBadgeName] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [, setLang] = useLang();
+  // Khách quét QR lần đầu chưa từng chọn ngôn ngữ -> hỏi 1 lần, nhớ luôn (mdv.lang).
+  // Tránh rơi thẳng vào nội dung tiếng Việt/audio mặc định cho du khách nước ngoài.
+  const [needLang, setNeedLang] = useState(() => {
+    try {
+      return !localStorage.getItem('mdv.lang');
+    } catch {
+      return false;
+    }
+  });
 
   useEffect(() => {
     let live = true;
-    void verifySignature(site.entityId, spot.spotId, sig).then((ok) => {
+    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then((ok) => {
       if (live) setState(ok ? 'ok' : 'bad');
     });
     return () => {
@@ -118,7 +175,43 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     };
   }, [site.entityId, spot.spotId, sig]);
 
-  if (dismissed || state === 'checking') return null;
+  if (needLang) {
+    const pick = (l: Lang) => {
+      setLang(l);
+      setNeedLang(false);
+    };
+    return (
+      <div class="dscan" role="dialog" aria-label={t(UI.chooseLang, lang)}>
+        <span class="dscan__txt">{t(UI.chooseLang, lang)}</span>
+        <button class="mdv-chip" onClick={() => pick('vi')}>Tiếng Việt</button>
+        <button class="mdv-chip" onClick={() => pick('en')}>English</button>
+      </div>
+    );
+  }
+
+  if (state === 'checking') return null;
+  // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
+  // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
+  if (dismissed) {
+    if (unlocked) return null;
+    return (
+      <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
+        <Icon name="check" size={18} />
+        <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
+        <button
+          class="mdv-btn mdv-btn--primary dscan__cta"
+          onClick={() => {
+            const r = unlockSpot(site.entityId, spot.spotId);
+            setReward(r.gainedXp);
+            setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+            if (navigator.vibrate) navigator.vibrate(30);
+          }}
+        >
+          {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
+        </button>
+      </div>
+    );
+  }
 
   if (state === 'bad') {
     return (
@@ -132,7 +225,7 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             // Bỏ chữ ký xấu khỏi URL để reload không hồi sinh cảnh báo.
             navigate(`d/${site.entityId}/${spot.spotId}`, true);
           }}
-          aria-label="close"
+          aria-label={t(UI.dismiss, lang)}
         >
           ✕
         </button>
@@ -151,30 +244,70 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (unlocked) {
-    return (
-      <div class="dscan dscan--done" role="status">
-        <Icon name="check" size={18} />
-        <span>{t(UI.unlockedDone, lang)}</span>
-      </div>
-    );
-  }
+  // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
+  const doUnlock = () => {
+    if (unlocked) return;
+    const r = unlockSpot(site.entityId, spot.spotId);
+    setReward(r.gainedXp);
+    setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+    if (navigator.vibrate) navigator.vibrate(30);
+  };
+  const goAspect = (aspectId: string) => {
+    doUnlock();
+    // replace: back không quay lại panel chọn — khách đã vào điểm.
+    navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
+  };
 
+  // Mọi khía cạnh của điểm (một điểm có thể nhiều thẻ aspects) — data-driven,
+  // di tích nào nhiều tính chất tự liệt kê hết, không hard-code.
+  const aspects = spot.layoutSchema
+    .filter((c): c is AspectsCard => c.type === 'aspects')
+    .flatMap((c) => c.aspects)
+    .filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
+
+  // Modal chặn đầu sau khi quét QR: nền mờ phủ toàn màn, chỉ panel nổi bật;
+  // khách buộc tương tác trước khi vào nội dung. ✕ = bỏ qua (về trang điểm).
   return (
-    <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
-      <Icon name="check" size={18} />
-      <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
-      <button
-        class="mdv-btn mdv-btn--primary dscan__cta"
-        onClick={() => {
-          const r = unlockSpot(site.entityId, spot.spotId);
-          setReward(r.gainedXp);
-          setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
-          if (navigator.vibrate) navigator.vibrate(30);
-        }}
-      >
-        {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
-      </button>
+    <div class="dpick" role="presentation">
+      <div class="dpick__backdrop" onClick={() => setDismissed(true)} aria-hidden="true" />
+      <div class="dpick__panel" role="dialog" aria-modal="true" aria-label={t(UI.scanValid, lang)}>
+        <button class="dscan__x dpick__x" onClick={() => setDismissed(true)} aria-label={t(UI.dismiss, lang)}>
+          ✕
+        </button>
+        <div class="dscan__langs">
+          <span class="dscan__langlbl">{t(UI.chooseLangShort, lang)}</span>
+          <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
+            Tiếng Việt
+          </button>
+          <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+            English
+          </button>
+        </div>
+        <header class="dscan__head">
+          <span class="mdv-eyebrow">{t(site.name, lang)}</span>
+          <b class="dscan__spot">{t(spot.name, lang)}</b>
+          {site.visit?.address && (
+            <span class="dscan__addr">
+              <Icon name="locate" size={13} /> {t(site.visit.address, lang)}
+            </span>
+          )}
+        </header>
+        {aspects.length > 0 && (
+          <>
+            <p class="dscan__ask">{t(UI.exploreWhat, lang)}</p>
+            <div class="dscan__aspects">
+              {aspects.map((a) => (
+                <button key={a.id} class="dscan__aspect" onClick={() => goAspect(a.id)}>
+                  {t(a.title, lang)}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={() => { doUnlock(); setDismissed(true); navigate(`d/${site.entityId}/${spot.spotId}`, true); }}>
+          {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
+        </button>
+      </div>
     </div>
   );
 }
@@ -214,7 +347,7 @@ function SiteIntro({ site }: { site: Site }) {
         </a>
       </header>
       <figure class="dintro__hero">
-        <img src={site.heroImage} alt={t(site.name, lang)} />
+        <img src={asset(site.heroImage)} alt={t(site.name, lang)} />
       </figure>
       <div class="dintro__body">
         <span class="mdv-eyebrow">{t(site.province, lang)}</span>
@@ -232,7 +365,7 @@ function SiteIntro({ site }: { site: Site }) {
         </div>
 
         <h2 class="dintro__h">{t(UI.exploreMode, lang)}</h2>
-        <div class="dintro__modes" role="radiogroup">
+        <div class="dintro__modes" role="radiogroup" aria-label={t(UI.exploreMode, lang)}>
           <button
             class={`dintro__mode ${mode === 'audio' ? 'dintro__mode--on' : ''}`}
             role="radio"
@@ -263,21 +396,23 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang }: { card: Card; lang: Lang }) {
+function CardView({ card, lang, mode, initialAspect }: { card: Card; lang: Lang; mode: ExploreMode; initialAspect?: string | null }) {
   switch (card.type) {
     case 'hero':
       return (
         <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={card.image} alt={t(card.caption, lang)} />
+          <img src={asset(card.image)} alt={t(card.caption, lang)} />
           {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
         </figure>
       );
     case 'aspects':
-      return <AspectsCardView card={card} lang={lang} />;
+      return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
-      return <VideoCardView card={card} lang={lang} />;
+      // "Văn bản + Hình ảnh": không render thẻ video – lựa chọn hình thức phải thật.
+      return mode === 'text' ? null : <VideoCardView card={card} lang={lang} />;
     case 'audio':
-      return <AudioCardView card={card} lang={lang} />;
+      // "Văn bản + Hình ảnh": audio biến thành bản đọc thuần chữ, không nút TTS/ambient.
+      return mode === 'text' ? <AudioTextView card={card} lang={lang} /> : <AudioCardView card={card} lang={lang} />;
     case 'fact':
       return (
         <div class={`dcard dcard--fact dcard--${card.size}`}>
@@ -288,33 +423,52 @@ function CardView({ card, lang }: { card: Card; lang: Lang }) {
     case 'image':
       return (
         <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={card.image} alt={t(card.caption, lang)} loading="lazy" />
+          <img src={asset(card.image)} alt={t(card.caption, lang)} loading="lazy" />
           {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
         </figure>
       );
   }
 }
 
-/** Thẻ video: embed khi có link; poster + gợi ý khi chưa. Offline → báo rõ video cần mạng, gợi nghe audio. */
+/** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
 function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   const online = useOnline();
+  if (!card.src || !online) {
+    return (
+      <p class="dcard__vsoon">
+        <Icon name="play" size={14} /> {card.src ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}
+      </p>
+    );
+  }
+  // src local (media/*.mp4 trong public/) → phát trực tiếp; https:// → embed iframe.
+  const local = !card.src.startsWith('http');
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
-      {card.src && online ? (
-        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+      {local ? (
+        <video
+          src={asset(card.src)}
+          poster={card.poster ? asset(card.poster) : undefined}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={t(card.title, lang)}
+        />
       ) : (
-        <div
-          class={`dcard__video-ph${online ? '' : ' dcard__video-ph--off'}`}
-          style={card.poster ? { backgroundImage: `url(${card.poster})` } : undefined}
-        >
-          <span class="dcard__play">
-            <Icon name="play" size={28} />
-          </span>
-          <b>{t(card.title, lang)}</b>
-          <small>{online ? t(UI.videoSoon, lang) : t(UI.videoOffline, lang)}</small>
-          <small class="dcard__videotip">{t(UI.listeningTip, lang)}</small>
-        </div>
+        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
+    </div>
+  );
+}
+
+/** Bản đọc thuần chữ của thẻ audio – dùng trong chế độ "Văn bản + Hình ảnh". */
+function AudioTextView({ card, lang }: { card: AudioCard; lang: Lang }) {
+  return (
+    <div class={`dcard dcard--audio dcard--${card.size}`}>
+      <ol class="dcard__script dcard__script--show">
+        {card.script[lang].map((s, i) => (
+          <li key={i}>{s}</li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -331,9 +485,11 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   useEffect(
     () => () => {
       playerRef.current?.stop();
-      // Không tắt ambient khi rời thẻ – người nghe có thể muốn giữ nền; HUD/D4 tắt được.
+      // Rời điểm là tắt cả âm nền – không để tiếng chạy lửng lơ không nút tắt ở màn khác.
+      if (ambientOn) stopAmbient();
     },
-    []
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ambientOn]
   );
 
   const toggle = () => {
@@ -379,7 +535,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
             setRate(r);
             playerRef.current?.setRate(r);
           }}
-          aria-label="speed"
+          aria-label={`${t(UI.playbackSpeed, lang)}: ${rate.toFixed(1)}×`}
         >
           {rate.toFixed(1)}×
         </button>
@@ -389,7 +545,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
           </button>
         )}
       </div>
-      <div class="dcard__progbar" role="progressbar" aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
+      <div class="dcard__progbar" role="progressbar" aria-label={t(UI.audioProgress, lang)} aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
         <span style={{ width: `${prog}%` }} />
       </div>
       {(status === 'failed' || !speechSupported()) && <p class="dcard__notice">{t(UI.listenFallback, lang)}</p>}
@@ -406,8 +562,16 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
 
 const SWIPE_PX = 40;
 
-function AspectsCardView({ card, lang }: { card: AspectsCard; lang: Lang }) {
-  const [active, setActive] = useState(card.aspects[0].id);
+function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lang; initial?: string | null }) {
+  // Tab mở đầu theo lựa chọn từ panel quét QR (?a=<aspectId>); fallback tab đầu.
+  // Phải sync theo param — navigate ?a= đổi query không remount component,
+  // useState khởi tạo chỉ chạy lần đầu nên tab sẽ kẹt ở mục đầu tiên.
+  const valid = (v?: string | null) => (v && card.aspects.some((a) => a.id === v) ? v : card.aspects[0].id);
+  const [active, setActive] = useState(() => valid(initial));
+  useEffect(() => {
+    setActive(valid(initial));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
   const idx = card.aspects.indexOf(cur);
   const startX = useRef<number | null>(null);
@@ -425,9 +589,9 @@ function AspectsCardView({ card, lang }: { card: AspectsCard; lang: Lang }) {
   };
   return (
     <div class={`dcard dcard--aspects dcard--${card.size}`}>
-      <div class="dcard__tabs" role="tablist">
+      <div class="dcard__tabs" role="group" aria-label={t(UI.aspects, lang)}>
         {card.aspects.map((a) => (
-          <button key={a.id} role="tab" class="mdv-chip" aria-pressed={a.id === cur.id} aria-selected={a.id === cur.id} onClick={() => setActive(a.id)}>
+          <button key={a.id} class="mdv-chip" aria-pressed={a.id === cur.id} onClick={() => setActive(a.id)}>
             {t(a.title, lang)}
           </button>
         ))}

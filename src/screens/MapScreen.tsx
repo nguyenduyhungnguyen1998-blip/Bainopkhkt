@@ -8,6 +8,9 @@ import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProg
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
+import { asset } from '../lib/asset';
+import { verifySignature } from '../lib/qr';
+import { isDebug } from '../lib/debug';
 import './map-screen.css';
 
 const FILTERS: { id: MapFocus; label: keyof typeof UI }[] = [
@@ -24,12 +27,15 @@ const SHEET_PEEK = 0.4; // 40% chiều cao màn hình
 const SHEET_FULL = 0.9; // 90% khi kéo lên
 const SITE_ZOOM_K = 4.6; // zoom sâu hơn mức này vào khu nhiều điểm -> mở sơ đồ cấp 2
 
+// Trạng thái bản đồ giữa các lần điều hướng: quay từ trang di tích về đúng zoom/vùng/lựa chọn cũ.
+let mapMem: { t: Transform | null; focus: MapFocus; site: string | null; sel: string | null } | null = null;
+
 export function MapScreen() {
   const [lang] = useLang();
   const progress = useProgress();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [focus, setFocus] = useState<MapFocus>('all');
-  const [siteLevel, setSiteLevel] = useState<string | null>(null); // entityId của khu đang xem sơ đồ
+  const [selectedId, setSelectedId] = useState<string | null>(mapMem?.sel ?? null);
+  const [focus, setFocus] = useState<MapFocus>(mapMem?.focus ?? 'all');
+  const [siteLevel, setSiteLevel] = useState<string | null>(mapMem?.site ?? null); // entityId của khu đang xem sơ đồ
   const [hintOn, setHintOn] = useState(() => {
     try {
       return !localStorage.getItem(HINT_KEY);
@@ -46,10 +52,80 @@ export function MapScreen() {
   });
   const [homeSignal, setHomeSignal] = useState(0);
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
+  const [searchOn, setSearchOn] = useState(false);
+  const [query, setQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [codeIn, setCodeIn] = useState('');
+  const [codeErr, setCodeErr] = useState(false);
+
+  useEffect(() => {
+    if (searchOn) searchInputRef.current?.focus();
+  }, [searchOn]);
+
+  // Đường cứu demo: mã 16-ký-tự in trên tem QR (= chữ ký). Chấp nhận cả link QR
+  // dán nguyên (tách s= ra luôn). Thử verify với mọi điểm — khớp thì mở điểm qua
+  // cổng check-in thật (offline vẫn chạy vì cùng secret HMAC).
+  const useCode = async () => {
+    const c = codeIn.trim().toLowerCase();
+    if (!c) return;
+    const link =
+      c.match(/[?&]d=([\w-]+)\/([\w-]+)[^\s]*?s=([0-9a-f]{16})/) ??
+      c.match(/d\/([\w-]+)\/([\w-]+)\?[^\s]*?s=([0-9a-f]{16})/);
+    if (link) {
+      setSearchOn(false);
+      navigate(`d/${link[1]}/${link[2]}?s=${link[3]}`);
+      return;
+    }
+    // Link tem compact ?q=<nn>.<sig>: vòng verify phía dưới tự tìm đúng điểm.
+    const sig = c.match(/[?&]q=\d+\.([0-9a-f]{16})/)?.[1] ?? c.match(/[0-9a-f]{16}/)?.[0] ?? c;
+    for (const s of SITES)
+      for (const sp of s.spots)
+        if (await verifySignature(s.entityId, sp.spotId, sig, sp.qrId)) {
+          setSearchOn(false);
+          navigate(`d/${s.entityId}/${sp.spotId}?s=${sig}`);
+          return;
+        }
+    setCodeErr(true);
+  };
+  // Tìm kiếm địa danh/tỉnh: khách thường biết tên và muốn đi thẳng – bản đồ không phải đường duy nhất.
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out: { siteId: string; spotId?: string; label: string; sub: string }[] = [];
+    for (const s of SITES) {
+      const siteKey = `${t(s.name, 'vi')} ${t(s.name, 'en')} ${t(s.province, 'vi')} ${t(s.province, 'en')}`.toLowerCase();
+      if (!q || siteKey.includes(q))
+        out.push({ siteId: s.entityId, label: t(s.name, lang), sub: t(s.province, lang) });
+      for (const sp of s.spots) {
+        const spotKey = `${t(sp.name, 'vi')} ${t(sp.name, 'en')}`.toLowerCase();
+        if (q && spotKey.includes(q))
+          out.push({ siteId: s.entityId, spotId: sp.spotId, label: t(sp.name, lang), sub: t(s.name, lang) });
+      }
+    }
+    return out.slice(0, 12);
+  }, [query, lang]);
   const [nextOffscreen, setNextOffscreen] = useState(false);
   const [toast, setToast] = useState<{ xp: number; seq: number } | null>(null);
   const [expanded, setExpanded] = useState(false);
+  const [flyReq, setFlyReq] = useState<{ x: number; y: number; k: number; n: number } | undefined>();
+  const [mountT, setMountT] = useState<Transform | undefined>(mapMem?.t ?? undefined); // transform khi VietnamMap remount sau sơ đồ khu
+  const deepExit = useRef(false); // vừa thoát sơ đồ khu: chặn auto-mở lại tới khi k tụt hẳn
   const toastTimer = useRef(0);
+  const tRef = useRef<Transform | null>(mapMem?.t ?? null); // transform mới nhất để lưu trạng thái
+  const keepMem = useRef(false); // khi dive-then-navigate: mem đã chốt trước lúc bay, unmount không ghi đè
+  const divingNav = useRef(false); // đang fly-to để điều hướng -> chặn auto-mở sơ đồ khi k>4.6
+  const flyDone = useRef<() => void>(() => {});
+
+  // Lưu trạng thái bản đồ khi rời màn hình (điều hướng sang di tích/quiz/...).
+  useEffect(
+    () => () => {
+      if (keepMem.current) {
+        keepMem.current = false;
+        return;
+      }
+      mapMem = { t: tRef.current, focus, site: siteLevel, sel: selectedId };
+    },
+    [focus, siteLevel, selectedId]
+  );
 
   const statuses = useMemo(() => computeStatuses(progress), [progress]);
   const progressBySite = useMemo(
@@ -66,16 +142,19 @@ export function MapScreen() {
   const unlockedSpots = Object.keys(progress.unlocked).length;
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
 
+  const [obSkip, setObSkip] = useState(false); // bỏ qua onboarding camera
   const markSeen = () => {
     try {
       localStorage.setItem(SEEN_KEY, '1');
     } catch {
       /* bộ nhớ riêng tư */
     }
+    setObSkip(true); // tour đã xong → giấu nút Bỏ qua
   };
   // Hint "Chạm điểm sáng" chỉ tắt khi user thật sự tương tác (tap node / bấm ✕) – không chết khi camera hạ cánh.
   const dismissHint = () => {
     setHintOn(false);
+    setObSkip(true); // đóng hint = bỏ qua luôn phần hướng dẫn camera
     markSeen();
     try {
       localStorage.setItem(HINT_KEY, '1');
@@ -97,11 +176,59 @@ export function MapScreen() {
     return () => window.removeEventListener('mdv:unlock', onUnlock);
   }, []);
 
+  // Esc đóng sheet / thoát sơ đồ khu – thói quen của người dùng bàn phím.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (selectedId) {
+        setExpanded(false);
+        setSelectedId(null);
+      } else {
+        exitSiteLevel();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedId, siteLevel]);
+
+  // Sheet mở: đưa focus vào sheet, giữ Tab trong sheet, đóng thì trả focus về nút trước đó.
+  useEffect(() => {
+    const sheet = sheetRef.current;
+    if (!selected || !sheet) return;
+    const prev = document.activeElement as HTMLElement | null;
+    const focusables = () =>
+      Array.from(sheet.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')).filter(
+        (el) => !el.hasAttribute('aria-hidden')
+      );
+    focusables()[0]?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const els = focusables();
+      if (!els.length) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    };
+    sheet.addEventListener('keydown', onKey);
+    return () => {
+      sheet.removeEventListener('keydown', onKey);
+      if (prev && document.contains(prev)) prev.focus();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
   // Phát hiện node "kế tiếp" ra khỏi khung nhìn -> hiện nút Về hành trình;
   // zoom rất sâu vào khu có nhiều điểm -> mở sơ đồ cấp 2.
   const offscreenRef = useRef(false);
   const onMapTransform = (t: Transform) => {
-    if (siteLevel) return;
+    tRef.current = t;
+    if (siteLevel || divingNav.current) return;
     const next: MapNode | undefined =
       nodesRef.current.find((n) => n.status === 'next') ?? nodesRef.current.find((n) => n.status === 'active');
     let off = false;
@@ -114,7 +241,9 @@ export function MapScreen() {
       offscreenRef.current = off;
       setNextOffscreen(off);
     }
+    if (deepExit.current && t.k <= SITE_ZOOM_K) deepExit.current = false; // đã tụt khỏi ngưỡng -> cho auto-mở lại
     if (t.k > SITE_ZOOM_K) {
+      if (deepExit.current) return;
       const cx = (MAP_WIDTH / 2 - t.tx) / t.k;
       const cy = (MAP_HEIGHT / 2 - t.ty) / t.k;
       let best: MapNode | null = null;
@@ -131,6 +260,22 @@ export function MapScreen() {
         setSiteLevel(best.site.entityId);
       }
     }
+  };
+
+  // Thoát sơ đồ khu: kéo camera ngược ra mức vùng tại đúng khu vừa xem (không đổi màn đột ngột,
+  // và tránh vòng lặp remount ở zoom sâu -> auto-mở lại sơ đồ).
+  const exitSiteLevel = () => {
+    if (!siteLevel) return;
+    deepExit.current = true;
+    // An toàn: nếu user chen ngón tay hủy lượt bay giữa chừng (k vẫn >4.6),
+    // latch tự nhả sau 900ms để cơ chế zoom-sâu auto-mở sơ đồ hoạt động lại.
+    window.setTimeout(() => {
+      deepExit.current = false;
+    }, 900);
+    const n = nodesRef.current.find((nd) => nd.site.entityId === siteLevel);
+    setSiteLevel(null);
+    setMountT(tRef.current ?? undefined); // VietnamMap remount đúng độ sâu cũ, rồi zoom-out
+    if (n) setFlyReq({ x: n.x, y: n.y, k: 2.4, n: Date.now() });
   };
 
   // Demo: mô phỏng quét QR tại điểm đầu tiên chưa mở của khu đang chọn (P3 thay bằng camera + xác thực).
@@ -172,7 +317,7 @@ export function MapScreen() {
   };
 
   return (
-    <div class="mscreen">
+    <main class="mscreen">
       <header class="mscreen__top">
         <div class="mscreen__title">
           <span class="mdv-eyebrow">Mở Dấu Việt</span>
@@ -185,23 +330,29 @@ export function MapScreen() {
         </div>
       </header>
 
-      <div class="mscreen__filters" role="tablist" aria-label={lang === 'vi' ? 'Lọc vùng' : 'Filter region'}>
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            class="mdv-chip"
-            role="tab"
-            aria-pressed={focus === f.id}
-            aria-selected={focus === f.id}
-            onClick={() => {
-              setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
-              setSiteLevel(null);
-              setFocus(f.id);
-            }}
-          >
-            {t(UI[f.label], lang)}
-          </button>
-        ))}
+      <div class="mscreen__filters" role="group" aria-label={t(UI.regionFilter, lang)}>
+        {/* Ở sơ đồ nội khu: ẩn lọc vùng – hai quy mô (quốc gia / nội khu) không trộn nhau */}
+        {!levelSite &&
+          FILTERS.map((f) => (
+            <button
+              key={f.id}
+              class="mdv-chip"
+              aria-pressed={focus === f.id}
+              onClick={() => {
+                setSelectedId(null); // đóng sheet để không che vùng vừa bay tới
+                deepExit.current = true;
+                setMountT(undefined); // remount cảnh toàn quốc rồi focus-anim bay tới vùng
+                setFlyReq(undefined); // flyReq cũ không được tái chạy trên remount
+                setSiteLevel(null);
+                setFocus(f.id);
+              }}
+            >
+              {t(UI[f.label], lang)}
+            </button>
+          ))}
+        <button class="mdv-chip mscreen__searchbtn" onClick={() => setSearchOn(true)} aria-label={t(UI.search, lang)}>
+          <Icon name="search" size={16} /> {t(UI.search, lang)}
+        </button>
       </div>
 
       <div class="mscreen__map">
@@ -218,9 +369,15 @@ export function MapScreen() {
             selectedId={selectedId}
             focus={focus}
             lang={lang}
-            onboard={cinema}
+            onboard={cinema && !obSkip}
             homeSignal={homeSignal}
             zoomSignal={zoomSignal}
+            flyRequest={flyReq}
+            onFlyDone={() => {
+              divingNav.current = false;
+              flyDone.current();
+            }}
+            initialTransform={mountT}
             onSelect={(id) => { setSelectedId(id); if (hintOn) dismissHint(); }}
             onTransform={onMapTransform}
             onOnboardDone={markSeen}
@@ -232,10 +389,10 @@ export function MapScreen() {
           <span class="lg lg--locked" /> {t(UI.locked, lang)}
         </div>
         <div class="mscreen__counter">
-          {unlockedSpots}/{totalSpots} {t(UI.spots, lang)}
+          {levelSite ? `${siteUnlockedCount(levelSite)}/${levelSite.spots.length}` : `${unlockedSpots}/${totalSpots}`} {t(UI.spots, lang)}
         </div>
         {!levelSite && (
-          <div class="mscreen__zoomctl" role="group" aria-label="zoom">
+          <div class="mscreen__zoomctl" role="group" aria-label={t(UI.zoomControls, lang)}>
             <button class="mscreen__zoombtn" onClick={() => setZoomSignal({ d: 1.5, n: Date.now() })} aria-label={t(UI.zoomIn, lang)}>
               <Icon name="zoomIn" size={18} />
             </button>
@@ -245,11 +402,89 @@ export function MapScreen() {
           </div>
         )}
         {levelSite && (
-          <button class="mscreen__chipbtn mscreen__chipbtn--exit" onClick={() => setSiteLevel(null)}>
+          <button class="mscreen__chipbtn mscreen__chipbtn--exit" onClick={exitSiteLevel}>
             <Icon name="map" size={16} /> {t(UI.countryMap, lang)}
           </button>
         )}
-        {levelSite && <div class="mscreen__level-title">{t(levelSite.name, lang)}</div>}
+        {levelSite && (
+          <div class="mscreen__level-title">
+            {t(levelSite.name, lang)}
+            {(() => {
+              // "Kế tiếp" trong ngữ cảnh nội khu: điểm chưa ghé đầu tiên của khu này,
+              // không nhầm với điểm kế tiếp quốc gia trên bản đồ toàn cảnh.
+              const nxt = levelSite.spots.find((sp) => !isSpotUnlocked(levelSite.entityId, sp.spotId));
+              return nxt ? (
+                <span class="mscreen__level-next">
+                  {t(UI.nextInSite, lang)}: {t(nxt.name, lang)}
+                </span>
+              ) : null;
+            })()}
+          </div>
+        )}
+        {searchOn && (
+          <div class="msearch" role="dialog" aria-label={t(UI.search, lang)} onKeyDown={(e) => { if (e.key === 'Escape') setSearchOn(false); }}>
+            <div class="msearch__bar">
+              <Icon name="search" size={18} />
+              <input
+                ref={searchInputRef}
+                class="msearch__input"
+                value={query}
+                placeholder={t(UI.searchPlaceholder, lang)}
+                onInput={(e) => setQuery(e.currentTarget.value)}
+              />
+              <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={() => setSearchOn(false)}>
+                <Icon name="close" size={16} />
+              </button>
+            </div>
+            <div class="msearch__list">
+              {results.length === 0 && <div class="msearch__empty">{t(UI.noResults, lang)}</div>}
+              {results.map((r) => (
+                <a
+                  key={r.siteId + '/' + (r.spotId ?? '')}
+                  class="msearch__item"
+                  href={routeHref.destination(r.siteId, r.spotId)}
+                  onClick={() => setSearchOn(false)}
+                >
+                  <span class="msearch__name">{r.label}</span>
+                  <span class="msearch__sub">{r.sub}</span>
+                </a>
+              ))}
+            </div>
+            <div class="msearch__manual">
+              <label class="msearch__mlabel" htmlFor="mcode">{t(UI.manualCode, lang)}</label>
+              <div class="msearch__mrow">
+                <input
+                  id="mcode"
+                  class="msearch__input msearch__code"
+                  value={codeIn}
+                  placeholder="c9f200…"
+                  inputMode="text"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellcheck={false}
+                  onInput={(e) => { setCodeIn(e.currentTarget.value); setCodeErr(false); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') void useCode(); }}
+                />
+                <button class="mdv-chip" onClick={() => void useCode()}>{t(UI.manualCodeUse, lang)}</button>
+              </div>
+              {codeErr && <span class="msearch__cerr">{t(UI.codeInvalid, lang)}</span>}
+            </div>
+          </div>
+        )}
+        {hintOn && (
+          <div class="mhint" role="status">
+            <Icon name="compass" size={18} />
+            <span>{t(UI.hintTap, lang)}</span>
+            {cinema && !obSkip && (
+              <button class="mhint__skip" onClick={dismissHint}>
+                {t(UI.skipOnboard, lang)}
+              </button>
+            )}
+            <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
+              <Icon name="close" size={16} />
+            </button>
+          </div>
+        )}
         {!levelSite && nextOffscreen && (
           <button
             class="mscreen__chipbtn mscreen__chipbtn--home"
@@ -264,15 +499,7 @@ export function MapScreen() {
         )}
       </div>
 
-      {hintOn && (
-        <div class="mhint" role="status">
-          <Icon name="compass" size={18} />
-          <span>{t(UI.hintTap, lang)}</span>
-          <button class="mhint__x" aria-label={t(UI.back, lang)} onClick={dismissHint}>
-            <Icon name="close" size={16} />
-          </button>
-        </div>
-      )}
+
 
       {toast && (
         <div class="mtoast" key={toast.seq} role="status">
@@ -303,7 +530,7 @@ export function MapScreen() {
               <Icon name="close" size={20} />
             </button>
             <div class="msheet__head">
-              <img class="msheet__img" src={selected.heroImage} alt="" loading="lazy" />
+              <img class="msheet__img" src={asset(selected.heroImage)} alt="" loading="lazy" />
               <div>
                 <span class={`mdv-badge mdv-badge--${selectedStatus === 'locked' ? 'locked' : selectedStatus === 'next' ? 'next' : 'unlocked'}`}>
                   {selectedStatus === 'locked'
@@ -317,7 +544,7 @@ export function MapScreen() {
               </div>
             </div>
             <div class="msheet__body">
-              <p class="msheet__summary msheet__summary--clip">{t(selected.summary, lang)}</p>
+              <p class={`msheet__summary${expanded ? '' : ' msheet__summary--clip'}`}>{t(selected.summary, lang)}</p>
               {expanded &&
                 selected.spots.map((sp, i) => {
                   const ok = isSpotUnlocked(selected.entityId, sp.spotId);
@@ -333,23 +560,54 @@ export function MapScreen() {
                 })}
             </div>
             <div class="msheet__actions">
-              <a class="mdv-btn mdv-btn--primary" href={routeHref.destination(selected.entityId)}>
+              <button
+                class="mdv-btn mdv-btn--primary"
+                onClick={() => {
+                  // Fly-to: chốt trạng thái pre-dive rồi camera lao vào node trước khi mở trang di tích.
+                  const n = nodes.find((nd) => nd.site.entityId === selected.entityId);
+                  if (!n) return navigate(`d/${selected.entityId}`);
+                  mapMem = { t: tRef.current, focus, site: siteLevel, sel: selectedId };
+                  keepMem.current = true;
+                  divingNav.current = true;
+                  flyDone.current = () => navigate(`d/${selected.entityId}`);
+                  setFlyReq({ x: n.x, y: n.y, k: 5.1, n: Date.now() });
+                  try {
+                    navigator.vibrate?.(10);
+                  } catch {
+                    /* bỏ qua */
+                  }
+                }}
+              >
                 <Icon name="compass" size={20} /> {t(UI.explore, lang)}
-              </a>
+              </button>
               {selected.spots.length > 1 && (
-                <button class="mdv-btn mdv-btn--ghost" onClick={() => { setSelectedId(null); setSiteLevel(selected.entityId); }}>
+                <button
+                  class="mdv-btn mdv-btn--ghost"
+                  onClick={() => {
+                    // Camera lao sâu vào khu; khi k vượt SITE_ZOOM_K cơ chế zoom sẽ tự mở sơ đồ.
+                    const n = nodes.find((nd) => nd.site.entityId === selected.entityId);
+                    setSelectedId(null);
+                    if (n) setFlyReq({ x: n.x, y: n.y, k: SITE_ZOOM_K + 0.6, n: Date.now() });
+                    else setSiteLevel(selected.entityId);
+                  }}
+                >
                   <Icon name="layers" size={20} /> {t(UI.siteMap, lang)}
                 </button>
               )}
-              {selectedStatus !== 'done' && (
+              {isDebug() && selectedStatus !== 'done' && (
                 <button class="mdv-btn mdv-btn--ghost" onClick={simulateScan} title={t(UI.scanToUnlock, lang)}>
                   <Icon name="qr" size={20} /> {t(UI.simulateScan, lang)}
                 </button>
               )}
             </div>
+            {selectedStatus === 'locked' && (
+              <p class="msheet__scanhint">
+                <Icon name="qr" size={14} /> {t(UI.scanToUnlock, lang)}
+              </p>
+            )}
           </>
         )}
       </section>
-    </div>
+    </main>
   );
 }

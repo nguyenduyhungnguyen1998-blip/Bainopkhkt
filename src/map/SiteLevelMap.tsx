@@ -26,20 +26,53 @@ interface SpotNode {
   labelSide: 'left' | 'right';
 }
 
-/** Bố trí điểm dọc trục dưới->trên, lệch trái/phải so le (mặt bằng kiểu dãy sân). */
+/**
+ * Sơ đồ nội khu dữ liệu hoá (C1 + P2): vị trí node + trang trí lấy từ
+ * `site.siteMap` trong JSON — thêm khu mới chỉ cần data, không sửa component.
+ * Nếu không có siteMap, các điểm bố dọc trục giữa mặc định.
+ */
+
+/** Trang trí riêng của khu (giếng, tường phụ, …) – rect, neo theo khung/node. */
+function siteDecors(site: Site, nodes: SpotNode[]) {
+  const decor = site.siteMap?.decor;
+  if (!decor || !decor.length) return null;
+  const nodeBySpot = new Map(nodes.map((n) => [n.spotId, n]));
+  return (
+    <g aria-hidden="true">
+      {decor.map((d, i) => {
+        const cx = d.cx === 'center' ? W / 2 : d.cx;
+        const cy = typeof d.cy === 'number' ? d.cy : (nodeBySpot.get(d.cy)?.y ?? 0);
+        return (
+          <rect
+            key={i}
+            class={d.cls}
+            x={cx - d.w / 2}
+            y={cy - d.h / 2}
+            width={d.w}
+            height={d.h}
+            rx={d.rx}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** Bố trí điểm dọc trục dưới->trên (mặt bằng kiểu các lớp sân nối nhau). */
 export function layoutSpots(site: Site, p: Progress): SpotNode[] {
   const n = site.spots.length;
   const firstLocked = site.spots.findIndex((s) => !(`${site.entityId}/${s.spotId}` in p.unlocked));
+  const custom = site.siteMap?.nodes;
   return site.spots.map((s, i) => {
+    const c = custom?.[s.spotId];
     const ratio = n === 1 ? 0.5 : i / (n - 1); // 0 -> 1 dọc hành trình
-    const swing = n === 1 ? 0 : Math.sin(ratio * Math.PI) * 110 * (i % 2 === 0 ? 1 : -1);
     return {
       spotId: s.spotId,
-      x: W / 2 + swing,
-      y: H - 90 - ratio * (H - 190),
+      x: c ? c.x : W / 2,
+      y: c ? c.y : H - 90 - ratio * (H - 190),
       unlocked: `${site.entityId}/${s.spotId}` in p.unlocked,
       next: firstLocked === -1 ? false : i === firstLocked,
-      labelSide: swing > 0 ? 'left' : 'right',
+      labelSide: c?.labelSide ?? (i % 2 === 0 ? 'right' : 'left'),
     };
   });
 }
@@ -66,7 +99,8 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
       const svg = svgRef.current!;
       const r = svg.getBoundingClientRect();
       const s = Math.min(r.width / W, r.height / H);
-      const hit = HIT_R / s / getTransform().k;
+      const k = getTransform().k;
+      const hit = HIT_R / s / k;
       let best: SpotNode | null = null;
       let bestD = Infinity;
       for (const nd of nodesRef.current) {
@@ -74,6 +108,17 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
         if (d < hit && d < bestD) {
           best = nd;
           bestD = d;
+          continue;
+        }
+        // Nhãn tên điểm cũng bấm được (cùng cơ chế counter-scale như bản đồ quốc gia).
+        const spot = site.spots.find((sp) => sp.spotId === nd.spotId);
+        const labelW = (7.5 * (spot ? t(spot.name, lang).length : 12) + 10) / k;
+        const lx0 = nd.labelSide === 'right' ? nd.x + (NODE_R + 4) / k : nd.x - (NODE_R + 4) / k - labelW;
+        if (mx >= lx0 && mx <= lx0 + labelW && Math.abs(my - nd.y) < 11 / k) {
+          if (d < bestD) {
+            best = nd;
+            bestD = d;
+          }
         }
       }
       if (best) onOpenSpot(best.spotId);
@@ -102,6 +147,12 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
         <g class="smap__gate" transform={`translate(${W / 2} ${H - 52})`}>
           <rect x={-34} y={-12} width={68} height={24} rx={6} />
         </g>
+        {/* Ranh giới các lớp sân: vạch ngang giữa hai điểm liên tiếp */}
+        {nodes.slice(1).map((nd, i) => {
+          const y = (nodes[i].y + nd.y) / 2;
+          return <line key={i} class="smap__band" x1={118} x2={W - 118} y1={y} y2={y} />;
+        })}
+        {siteDecors(site, nodes)}
         {/* Trục hành trình trong khu */}
         <path class="vmap__journey vmap__journey--all" d={path} />
         {donePath && <path class="vmap__journey vmap__journey--done" d={donePath} />}
@@ -112,37 +163,42 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
               key={nd.spotId}
               class={`vnode ${nd.unlocked ? 'vnode--done' : nd.next ? 'vnode--next' : 'vnode--locked'}`}
               style={{ transform: `translate(${nd.x}px, ${nd.y}px) scale(calc(1 / var(--k, 1)))` }}
-              role="button"
-              tabIndex={0}
-              aria-label={t(spot.name, lang)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onOpenSpot(nd.spotId);
-                }
-              }}
             >
-              <circle class="vnode__hit" r={HIT_R} />
-              {nd.next && <circle class="vnode__pulse" r={NODE_R + 4} />}
-              {nd.next && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
-              <circle class="vnode__body" r={NODE_R} />
-              {nd.unlocked ? (
-                <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
-              ) : nd.next ? (
-                <text class="vnode__num" text-anchor="middle" dominant-baseline="central">
+              <g
+                role="button"
+                tabindex={0}
+                focusable="true"
+                aria-label={t(spot.name, lang)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    onOpenSpot(nd.spotId);
+                  }
+                }}
+              >
+                <circle class="vnode__hit" r={HIT_R} />
+                {nd.next && <circle class="vnode__pulse" r={NODE_R + 4} />}
+                {nd.next && <circle class="vnode__pulse vnode__pulse--2" r={NODE_R + 4} />}
+                <circle class="vnode__body" r={NODE_R} />
+                {nd.unlocked ? (
+                  <path class="vnode__glyph" d="M-5 0l3.5 3.5L6-4" />
+                ) : nd.next ? null : (
+                  <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
+                )}
+                <text
+                  class="vnode__label"
+                  x={nd.labelSide === 'right' ? NODE_R + 12 : -(NODE_R + 12)}
+                  text-anchor={nd.labelSide === 'right' ? 'start' : 'end'}
+                  dominant-baseline="central"
+                >
+                  {t(spot.name, lang)}
+                </text>
+              </g>
+              {nd.next && !nd.unlocked && (
+                <text class="vnode__num" text-anchor="middle" dominant-baseline="central" aria-hidden="true" pointer-events="none">
                   {i + 1}
                 </text>
-              ) : (
-                <path class="vnode__glyph" d="M-3.5 -1v-2a3.5 3.5 0 0 1 7 0v2M-5 -1h10v6h-10z" />
               )}
-              <text
-                class="vnode__label"
-                x={nd.labelSide === 'right' ? NODE_R + 12 : -(NODE_R + 12)}
-                text-anchor={nd.labelSide === 'right' ? 'start' : 'end'}
-                dominant-baseline="central"
-              >
-                {t(spot.name, lang)}
-              </text>
             </g>
           );
         })}

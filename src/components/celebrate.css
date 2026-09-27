@@ -1,0 +1,131 @@
+/* Confetti thuần CSS + banner huy hiệu + modal finale */
+.celebrate {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 80;
+  overflow: hidden;
+}
+.celebrate i {
+  position: absolute;
+  top: -16px;
+  opacity: 0.95;
+  animation-name: celebrate-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+@keyframes celebrate-fall {
+  to {
+    transform: translateY(112vh) rotate(var(--rot, 540deg));
+    opacity: 0.6;
+  }
+}
+
+/* Banner huy hiệu trượt xuống giữa đỉnh – nổi hơn toast XP thường */
+.mbadge {
+  position: fixed;
+  left: 50%;
+  top: calc(var(--space-4) + env(safe-area-inset-top) + 46px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-tertiary);
+  color: var(--color-on-tertiary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  z-index: 81;
+  box-shadow: var(--shadow-card);
+  animation: mtoast-in var(--dur-base) var(--ease-out);
+  white-space: nowrap;
+}
+.mbadge svg {
+  color: var(--color-on-tertiary);
+}
+
+/* Modal finale 9/9 */
+.finale {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--color-bg) 72%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: finale-fade var(--dur-base) ease-out;
+}
+@keyframes finale-fade {
+  from {
+    opacity: 0;
+  }
+}
+.finale__card {
+  width: min(400px, 100%);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-solid);
+  border: 1px solid color-mix(in srgb, var(--color-accent-secondary) 55%, var(--color-border));
+  box-shadow: var(--shadow-card), 0 0 60px color-mix(in srgb, var(--color-accent-secondary) 25%, transparent);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: center;
+  outline: none;
+  animation: finale-pop 480ms var(--ease-spring, cubic-bezier(0.34, 1.4, 0.64, 1));
+}
+@keyframes finale-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(14px);
+  }
+}
+.finale__icon {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-accent-secondary) 18%, var(--color-surface));
+  color: var(--color-accent-secondary-text);
+}
+.finale__card h2 {
+  font-size: var(--text-2xl);
+}
+.finale__stats {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: var(--text-md);
+}
+.finale__stats b {
+  font-size: var(--text-xl);
+  color: var(--color-accent-secondary-text);
+}
+.finale__stats span {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.finale__stats i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-text-faint);
+  align-self: center;
+  margin: 0 4px;
+}
+.finale__cta {
+  width: 100%;
+  min-height: 52px;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebrate {
+    display: none;
+  }
+}

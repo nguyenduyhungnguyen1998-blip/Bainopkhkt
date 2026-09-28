@@ -147,8 +147,11 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
         <g class="smap__gate" transform={`translate(${W / 2} ${H - 52})`}>
           <rect x={-34} y={-12} width={68} height={24} rx={6} />
         </g>
-        {/* Ranh giới các lớp sân: vạch ngang giữa hai điểm liên tiếp */}
+        {/* Ranh giới các lớp sân: vạch ngang giữa hai điểm liên tiếp trên trục —
+            điểm lệch trục (offAxis, vd vườn bên hông) không sinh vạch ngang. */}
         {nodes.slice(1).map((nd, i) => {
+          const cm = site.siteMap?.nodes;
+          if (cm?.[nd.spotId]?.offAxis || cm?.[nodes[i].spotId]?.offAxis) return null;
           const y = (nodes[i].y + nd.y) / 2;
           return <line key={i} class="smap__band" x1={118} x2={W - 118} y1={y} y2={y} />;
         })}

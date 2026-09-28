@@ -91,7 +91,8 @@
             "properties": {
               "x": { "type": "number" },
               "y": { "type": "number" },
-              "labelSide": { "enum": ["left", "right"] }
+              "labelSide": { "enum": ["left", "right"] },
+              "offAxis": { "type": "boolean" }
             }
           }
         },

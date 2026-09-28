@@ -1378,6 +1378,256 @@
           }
         }
       ]
+    },
+    {
+      "spotId": "vuon-giam",
+      "qrId": "mdvq10",
+      "name": {
+        "vi": "Vườn Giám",
+        "en": "Academy Garden"
+      },
+      "hook": {
+        "vi": "Khoảng xanh phía Tây khu di tích – phần đất Hồ Văn được trả lại năm 1940, mang tên của trường đại học đầu tiên nước ta.",
+        "en": "The green quarter west of the complex – Literature Lake land returned in 1940, named after Vietnam's first university."
+      },
+      "coords": [105.8335, 21.0263],
+      "xp": 40,
+      "layoutSchema": [
+        {
+          "type": "hero",
+          "size": "lg",
+          "image": "/img/van-mieu/vuon-giam.svg",
+          "caption": {
+            "vi": "Vườn Giám – khoảng xanh phía Tây Văn Miếu – Quốc Tử Giám",
+            "en": "Academy Garden – the green quarter west of Van Mieu – Quoc Tu Giam"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Bạn đang đứng trong Vườn Giám, khoảng xanh phía Tây của khu di tích Văn Miếu – Quốc Tử Giám.",
+              "Phần đất này vốn thuộc Hồ Văn, được trả lại cho Văn Miếu vào năm 1940 và mang tên Vườn Giám theo Quốc Tử Giám khi ấy.",
+              "Từ năm 1996 đến 2004, khu vườn được trùng tu, cải tạo, khôi phục không gian xanh gắn với Hồ Văn.",
+              "Nổi bật trong vườn là Nhà Bát Giác – ngôi nhà mặt bằng bát giác, mái ngói nhiều lớp cong đao, điểm dừng chân cho các hoạt động văn hóa, giáo dục."
+            ],
+            "en": [
+              "You are standing in the Academy Garden, the green quarter on the west side of the Temple of Literature complex.",
+              "This land once belonged to the Literature Lake; it was returned to the complex in 1940 and named after the Quoc Tu Giam of that era.",
+              "From 1996 to 2004 the garden was restored, bringing back the green landscape linked with the lake.",
+              "Its landmark is the Octagonal Pavilion – a multi-tiered roofed structure with curved ridges, now a resting point for cultural and educational activities."
+            ]
+          }
+        },
+        {
+          "type": "aspects",
+          "size": "lg",
+          "aspects": [
+            {
+              "id": "lich-su",
+              "title": {
+                "vi": "Lịch sử",
+                "en": "History"
+              },
+              "body": {
+                "vi": "Phần đất còn lại của Hồ Văn được trả lại cho Văn Miếu vào năm 1940 và được gọi là Vườn Giám, theo tên Quốc Tử Giám khi ấy. Trải qua nhiều giai đoạn, khu vực này từng bị sử dụng sai mục đích và lấn chiếm, ảnh hưởng đến cảnh quan di tích. Từ năm 1996, Vườn Giám được triển khai trùng tu, cải tạo và hoàn thành vào năm 2004, từng bước khôi phục không gian xanh gắn với Hồ Văn và Văn Miếu – Quốc Tử Giám.",
+                "en": "The remaining land of the Literature Lake was returned to Van Mieu in 1940 and named the Academy Garden after the Quoc Tu Giam of that time. Over the years the area was misused and encroached upon, harming the site's landscape. Restoration began in 1996 and finished in 2004, gradually recovering the green space that links the lake and the Temple of Literature – Imperial Academy."
+              }
+            },
+            {
+              "id": "kien-truc",
+              "title": {
+                "vi": "Kiến trúc",
+                "en": "Architecture"
+              },
+              "body": {
+                "vi": "Nằm ở phía Tây Văn Miếu – Quốc Tử Giám, Nhà Bát Giác là công trình mang phong cách kiến trúc truyền thống, hài hòa với cây xanh và mặt nước. Công trình có mặt bằng hình bát giác, mái ngói nhiều lớp với những góc đao cong, kết hợp cùng hệ thống cột gỗ tạo nên vẻ thanh thoát, cổ kính.",
+                "en": "Set on the west side of the complex, the Octagonal Pavilion is a traditional design that blends with the greenery and water. It has an octagonal floor plan, a multi-layer tiled roof with curved ridge corners, and a timber column system that gives it a graceful, ancient feel."
+              }
+            },
+            {
+              "id": "y-nghia",
+              "title": {
+                "vi": "Ý nghĩa",
+                "en": "Meaning"
+              },
+              "body": {
+                "vi": "Không gian mở giúp Nhà Bát Giác hòa mình vào cảnh quan xung quanh, đồng thời trở thành điểm dừng chân và không gian tổ chức các hoạt động văn hóa, giáo dục trong khu di tích.",
+                "en": "The open space lets the pavilion blend into its surroundings while serving as a resting point and a venue for cultural and educational activities within the heritage site."
+              }
+            }
+          ]
+        },
+        {
+          "type": "fact",
+          "size": "sm",
+          "icon": "leaf",
+          "text": {
+            "vi": "Tên 'Vườn Giám' bắt nguồn từ Quốc Tử Giám – trường đại học đầu tiên của Việt Nam.",
+            "en": "The name 'Vuon Giam' comes from Quoc Tu Giam – Vietnam's first university."
+          }
+        }
+      ],
+      "sources": [
+        {
+          "title": "Trung tâm Hoạt động VHKH Văn Miếu – Quốc Tử Giám",
+          "url": "https://vanmieu.gov.vn",
+          "reviewed": false
+        },
+        {
+          "title": "Tài liệu kiến trúc Văn Miếu – Quốc Tử Giám (nguồn nội bộ KHKT)",
+          "reviewed": false
+        }
+      ],
+      "quiz": [
+        {
+          "q": {
+            "vi": "Vườn Giám được trả lại cho Văn Miếu vào năm nào?",
+            "en": "When was the Academy Garden returned to Van Mieu?"
+          },
+          "options": [
+            {
+              "vi": "1905",
+              "en": "1905"
+            },
+            {
+              "vi": "1940",
+              "en": "1940"
+            },
+            {
+              "vi": "1975",
+              "en": "1975"
+            },
+            {
+              "vi": "2004",
+              "en": "2004"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Năm 1940 phần đất còn lại của Hồ Văn được trả lại cho Văn Miếu và được gọi là Vườn Giám.",
+            "en": "In 1940 the remaining Literature Lake land was returned to Van Mieu and named the Academy Garden."
+          }
+        },
+        {
+          "q": {
+            "vi": "Vườn Giám hoàn thành trùng tu, cải tạo vào năm nào?",
+            "en": "When was the garden's restoration completed?"
+          },
+          "options": [
+            {
+              "vi": "1996",
+              "en": "1996"
+            },
+            {
+              "vi": "2000",
+              "en": "2000"
+            },
+            {
+              "vi": "2004",
+              "en": "2004"
+            },
+            {
+              "vi": "2012",
+              "en": "2012"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Từ năm 1996 Vườn Giám được triển khai trùng tu, cải tạo và hoàn thành vào năm 2004.",
+            "en": "Restoration started in 1996 and was completed in 2004."
+          }
+        },
+        {
+          "q": {
+            "vi": "Nhà Bát Giác trong Vườn Giám có mặt bằng hình gì?",
+            "en": "What shape is the Octagonal Pavilion's floor plan?"
+          },
+          "options": [
+            {
+              "vi": "Hình vuông",
+              "en": "Square"
+            },
+            {
+              "vi": "Hình tròn",
+              "en": "Circle"
+            },
+            {
+              "vi": "Hình bát giác",
+              "en": "Octagon"
+            },
+            {
+              "vi": "Hình lục giác",
+              "en": "Hexagon"
+            }
+          ],
+          "answer": 2,
+          "explain": {
+            "vi": "Nhà Bát Giác có mặt bằng hình bát giác, mái ngói nhiều lớp với những góc đao cong.",
+            "en": "The pavilion has an octagonal plan with a multi-layer tiled roof and curved ridge corners."
+          }
+        },
+        {
+          "q": {
+            "vi": "Tên 'Vườn Giám' bắt nguồn từ đâu?",
+            "en": "Where does the name 'Vuon Giam' come from?"
+          },
+          "options": [
+            {
+              "vi": "Quốc Tử Giám – trường đại học đầu tiên nước ta",
+              "en": "Quoc Tu Giam – Vietnam's first university"
+            },
+            {
+              "vi": "Tên một vị vua",
+              "en": "A king's name"
+            },
+            {
+              "vi": "Tên một cây cổ thụ",
+              "en": "An ancient tree"
+            },
+            {
+              "vi": "Tên dòng sông",
+              "en": "A river's name"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Khu vườn mang tên Vườn Giám theo tên Quốc Tử Giám khi ấy.",
+            "en": "The garden is named after the Quoc Tu Giam (Imperial Academy) of that era."
+          }
+        },
+        {
+          "q": {
+            "vi": "Nhà Bát Giác nằm ở phía nào của khu di tích?",
+            "en": "On which side of the complex is the Octagonal Pavilion?"
+          },
+          "options": [
+            {
+              "vi": "Phía Đông",
+              "en": "East"
+            },
+            {
+              "vi": "Phía Tây",
+              "en": "West"
+            },
+            {
+              "vi": "Phía Nam",
+              "en": "South"
+            },
+            {
+              "vi": "Phía Bắc",
+              "en": "North"
+            }
+          ],
+          "answer": 1,
+          "explain": {
+            "vi": "Nhà Bát Giác nằm ở phía Tây Văn Miếu – Quốc Tử Giám, hài hòa với cây xanh và mặt nước.",
+            "en": "The pavilion sits on the west side of Van Mieu – Quoc Tu Giam, amid greenery and water."
+          }
+        }
+      ]
     }
   ],
   "siteMap": {
@@ -1402,9 +1652,24 @@
       "nha-thai-hoc": {
         "x": 360,
         "y": 92
+      },
+      "vuon-giam": {
+        "x": 155,
+        "y": 430,
+        "labelSide": "right",
+        "offAxis": true
       }
     },
     "decor": [
+      {
+        "shape": "rect",
+        "cls": "smap__garden",
+        "cx": 155,
+        "cy": 430,
+        "w": 120,
+        "h": 170,
+        "rx": 18
+      },
       {
         "shape": "rect",
         "cls": "smap__well",

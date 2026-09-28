@@ -84,6 +84,8 @@ export interface SiteMapNode {
   x: number;
   y: number;
   labelSide?: 'left' | 'right';
+  /** Điểm nằm ngoài trục hành trình chính (vườn, góc phụ) — không vẽ vạch ranh giới sân trước nó. */
+  offAxis?: boolean;
 }
 
 /** Trang trí vẽ thêm trên sơ đồ cấp 2 (giếng, tường phụ, …), neo theo khu. */

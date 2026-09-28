@@ -8,7 +8,7 @@ import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../dat
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { asset } from '../lib/asset';
-import { isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
+import { getProgress, isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
@@ -33,7 +33,6 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
     );
   }
   const { site, spot } = found;
-  const mode = getExploreMode();
   const idx = site.spots.indexOf(spot);
   const prev = site.spots[idx - 1];
   const next = site.spots[idx + 1];
@@ -43,6 +42,16 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
   useEffect(() => {
     curRef.current?.scrollIntoView({ block: 'nearest', inline: 'center' });
   }, [spot.spotId]);
+  // Đến từ panel QR với ?a=<aspect>: đưa chính thẻ khía cạnh đó vào khung nhìn
+  // thay vì bắt khách tự cuộn tìm (P0: "bấm Kiến trúc mà không thấy Kiến trúc").
+  const wantAspect = query?.get('a');
+  useEffect(() => {
+    if (!wantAspect) return;
+    const id = setTimeout(() => {
+      document.querySelector('.dcard--aspects')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }, 90);
+    return () => clearTimeout(id);
+  }, [wantAspect, spot.spotId]);
 
   return (
     <main class="mdv-screen dest">
@@ -90,7 +99,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} mode={mode} initialAspect={query?.get('a')} />
+          <CardView key={i} card={card} lang={lang} initialAspect={query?.get('a')} />
         ))}
       </div>
 
@@ -153,6 +162,7 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   const [state, setState] = useState<SigState>('checking');
   const [reward, setReward] = useState<number | null>(null);
   const [badgeName, setBadgeName] = useState<string | null>(null);
+  const [totalXp, setTotalXp] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const [, setLang] = useLang();
   // Khách quét QR lần đầu chưa từng chọn ngôn ngữ -> hỏi 1 lần, nhớ luôn (mdv.lang).
@@ -174,6 +184,42 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
       live = false;
     };
   }, [site.entityId, spot.spotId, sig]);
+
+  // Esc đóng panel QR như nút ✕ (khách dùng bàn phím/máy chiếu).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDismissed(true);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Bỏ chữ ký khỏi URL mà giữ lựa chọn aspect ?a= – reload không hồi sinh panel/toast.
+  const dropSig = () => {
+    const a = new URLSearchParams(location.hash.split('?')[1] ?? '').get('a');
+    navigate(`d/${site.entityId}/${spot.spotId}${a ? `?a=${a}` : ''}`, true);
+  };
+
+  const doUnlock = () => {
+    if (unlocked) return;
+    const r = unlockSpot(site.entityId, spot.spotId);
+    setReward(r.gainedXp);
+    setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
+    setTotalXp(getProgress().xp);
+    if (navigator.vibrate) navigator.vibrate(30);
+  };
+
+  // Sau khi nhận dấu: toast nổi bật vài giây (tên điểm + XP + tổng + đường tới hộ chiếu),
+  // rồi tự thu gọn — khoảnh khắc thưởng không thể bị bỏ lỡ.
+  useEffect(() => {
+    if (reward === null) return;
+    const id = setTimeout(() => {
+      setDismissed(true);
+      dropSig();
+    }, 6000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reward]);
 
   if (needLang) {
     const pick = (l: Lang) => {
@@ -235,27 +281,39 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
 
   if (reward !== null) {
     return (
-      <div class="dscan dscan--done" role="status">
-        <Icon name="check" size={18} />
-        <span>
-          +{reward} XP{badgeName ? ` · ${badgeName}` : ''}
-        </span>
+      <div class="dtoast" role="status">
+        <Icon name="check" size={22} />
+        <div class="dtoast__txt">
+          <b>
+            {t(UI.gotStamp, lang)}: {t(spot.name, lang)}
+          </b>
+          <span>
+            +{reward} XP · {t(UI.totalXp, lang)} {totalXp} XP{badgeName ? ` · ${badgeName}` : ''}
+          </span>
+        </div>
+        <a class="dtoast__link" href={routeHref.passport}>
+          {t(UI.viewStamp, lang)}
+        </a>
+        <button
+          class="dscan__x"
+          onClick={() => {
+            setDismissed(true);
+            dropSig();
+          }}
+          aria-label={t(UI.dismiss, lang)}
+        >
+          ✕
+        </button>
       </div>
     );
   }
 
   // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
-  const doUnlock = () => {
-    if (unlocked) return;
-    const r = unlockSpot(site.entityId, spot.spotId);
-    setReward(r.gainedXp);
-    setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
-    if (navigator.vibrate) navigator.vibrate(30);
-  };
   const goAspect = (aspectId: string) => {
     doUnlock();
+    // Giữ `s` trong URL để toast nhận dấu hiện sau khi cuộn tới aspect đã chọn;
     // replace: back không quay lại panel chọn — khách đã vào điểm.
-    navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
+    navigate(`d/${site.entityId}/${spot.spotId}?s=${sig}&a=${encodeURIComponent(aspectId)}`, true);
   };
 
   // Mọi khía cạnh của điểm (một điểm có thể nhiều thẻ aspects) — data-driven,
@@ -304,7 +362,17 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             </div>
           </>
         )}
-        <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={() => { doUnlock(); setDismissed(true); navigate(`d/${site.entityId}/${spot.spotId}`, true); }}>
+        <button
+          class="mdv-btn mdv-btn--primary dscan__cta"
+          onClick={() => {
+            if (unlocked) {
+              setDismissed(true);
+              dropSig();
+            } else {
+              doUnlock();
+            }
+          }}
+        >
           {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
         </button>
       </div>
@@ -312,32 +380,13 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   );
 }
 
-type ExploreMode = 'audio' | 'text';
-const MODE_KEY = 'mdv.exploreMode';
-
-function getExploreMode(): ExploreMode {
-  try {
-    return localStorage.getItem(MODE_KEY) === 'text' ? 'text' : 'audio';
-  } catch {
-    return 'audio';
-  }
-}
-
 /**
  * Màn giới thiệu khu di sản sau khi quét QR (mockup dự tính):
- * hero 40%, chọn ngôn ngữ, chọn hình thức khám phá, CTA đỏ bắt đầu.
+ * hero 40%, chọn ngôn ngữ, CTA đỏ bắt đầu. (Một hình thức khám phá duy nhất:
+ * nút Nghe + bản đọc gập gọn nằm ngay trong trang điểm.)
  */
 function SiteIntro({ site }: { site: Site }) {
   const [lang, setLang] = useLang();
-  const [mode, setMode] = useState<ExploreMode>(getExploreMode);
-  const pick = (m: ExploreMode) => {
-    setMode(m);
-    try {
-      localStorage.setItem(MODE_KEY, m);
-    } catch {
-      /* bộ nhớ riêng tư */
-    }
-  };
   const first = site.spots[0];
   return (
     <main class="mdv-screen dest dintro">
@@ -364,30 +413,6 @@ function SiteIntro({ site }: { site: Site }) {
           </button>
         </div>
 
-        <h2 class="dintro__h">{t(UI.exploreMode, lang)}</h2>
-        <div class="dintro__modes" role="radiogroup" aria-label={t(UI.exploreMode, lang)}>
-          <button
-            class={`dintro__mode ${mode === 'audio' ? 'dintro__mode--on' : ''}`}
-            role="radio"
-            aria-checked={mode === 'audio'}
-            onClick={() => pick('audio')}
-          >
-            <Icon name="headphones" size={26} />
-            <b>{t(UI.modeAudio, lang)}</b>
-            <small>{t(UI.modeAudioDesc, lang)}</small>
-          </button>
-          <button
-            class={`dintro__mode ${mode === 'text' ? 'dintro__mode--on' : ''}`}
-            role="radio"
-            aria-checked={mode === 'text'}
-            onClick={() => pick('text')}
-          >
-            <Icon name="book" size={26} />
-            <b>{t(UI.modeText, lang)}</b>
-            <small>{t(UI.modeTextDesc, lang)}</small>
-          </button>
-        </div>
-
         <button class="mdv-btn mdv-btn--primary dintro__cta" onClick={() => first && navigate(`d/${site.entityId}/${first.spotId}`)}>
           {t(UI.startExploring, lang)}
         </button>
@@ -396,7 +421,7 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang, mode, initialAspect }: { card: Card; lang: Lang; mode: ExploreMode; initialAspect?: string | null }) {
+function CardView({ card, lang, initialAspect }: { card: Card; lang: Lang; initialAspect?: string | null }) {
   switch (card.type) {
     case 'hero':
       return (
@@ -408,11 +433,9 @@ function CardView({ card, lang, mode, initialAspect }: { card: Card; lang: Lang;
     case 'aspects':
       return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
-      // "Văn bản + Hình ảnh": không render thẻ video – lựa chọn hình thức phải thật.
-      return mode === 'text' ? null : <VideoCardView card={card} lang={lang} />;
+      return <VideoCardView card={card} lang={lang} />;
     case 'audio':
-      // "Văn bản + Hình ảnh": audio biến thành bản đọc thuần chữ, không nút TTS/ambient.
-      return mode === 'text' ? <AudioTextView card={card} lang={lang} /> : <AudioCardView card={card} lang={lang} />;
+      return <AudioCardView card={card} lang={lang} />;
     case 'fact':
       return (
         <div class={`dcard dcard--fact dcard--${card.size}`}>
@@ -433,10 +456,12 @@ function CardView({ card, lang, mode, initialAspect }: { card: Card; lang: Lang;
 /** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
 function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   const online = useOnline();
-  if (!card.src || !online) {
+  // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
+  if (!card.src) return null;
+  if (!online) {
     return (
       <p class="dcard__vsoon">
-        <Icon name="play" size={14} /> {card.src ? t(UI.videoOffline, lang) : t(UI.videoSoon, lang)}
+        <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
       </p>
     );
   }
@@ -460,18 +485,6 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   );
 }
 
-/** Bản đọc thuần chữ của thẻ audio – dùng trong chế độ "Văn bản + Hình ảnh". */
-function AudioTextView({ card, lang }: { card: AudioCard; lang: Lang }) {
-  return (
-    <div class={`dcard dcard--audio dcard--${card.size}`}>
-      <ol class="dcard__script dcard__script--show">
-        {card.script[lang].map((s, i) => (
-          <li key={i}>{s}</li>
-        ))}
-      </ol>
-    </div>
-  );
-}
 
 /** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */
 function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
@@ -549,13 +562,16 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
         <span style={{ width: `${prog}%` }} />
       </div>
       {(status === 'failed' || !speechSupported()) && <p class="dcard__notice">{t(UI.listenFallback, lang)}</p>}
-      <ol class="dcard__script" data-reading={status === 'playing' || status === 'paused'}>
-        {sentences.map((s, i) => (
-          <li key={i} class={i === sent ? 'is-saying' : ''}>
-            {s}
-          </li>
-        ))}
-      </ol>
+      <details class="dcard__scriptwrap" open={status === 'playing' || status === 'paused' || status === 'failed' || !speechSupported()}>
+        <summary>{t(UI.readScript, lang)}</summary>
+        <ol class="dcard__script" data-reading={status === 'playing' || status === 'paused'}>
+          {sentences.map((s, i) => (
+            <li key={i} class={i === sent ? 'is-saying' : ''}>
+              {s}
+            </li>
+          ))}
+        </ol>
+      </details>
     </div>
   );
 }

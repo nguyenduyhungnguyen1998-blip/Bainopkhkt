@@ -237,10 +237,95 @@ export function exportPassportJson(): string {
   );
 }
 
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/**
+ * Bản sao "thẻ hộ chiếu": file .html tự chứa — du khách mở lên thấy ngay hành trình của mình
+ * (đẹp, in/chia sẻ được), đồng thời nhúng JSON vào <script id="mdv-backup"> để app nhập lại được.
+ */
+export function exportPassportCardHtml(): string {
+  const exportedAt = new Date();
+  const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
+  const doneSpots = Object.keys(state.unlocked).length;
+  const pct = totalSpots ? Math.round((doneSpots / totalSpots) * 100) : 0;
+  const dateVi = exportedAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const siteRows = SITES.map((site) => {
+    const n = site.spots.filter((sp) => `${site.entityId}/${sp.spotId}` in state.unlocked).length;
+    const cls = n === site.spots.length ? 'done' : n > 0 ? 'mid' : 'none';
+    const segs = site.spots
+      .map((sp) => {
+        const on = `${site.entityId}/${sp.spotId}` in state.unlocked;
+        return `<span class="seg${on ? ' on' : ''}">${on ? '✓' : ''}<em>${escHtml(sp.name.vi)}</em></span>`;
+      })
+      .join('');
+    const badge = state.badges.includes(site.gamificationConfig.badge.id)
+      ? `<span class="badge">🏅 ${escHtml(site.gamificationConfig.badge.name.vi)}</span>`
+      : '';
+    return `<li class="site ${cls}">
+      <div class="site__head"><b>${escHtml(site.name.vi)}</b>${badge}<span class="cnt">${n}/${site.spots.length} điểm</span></div>
+      <div class="segs">${segs}</div>
+    </li>`;
+  }).join('');
+
+  const payload = exportPassportJson().replace(/</g, '\\u003c');
+  return `<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hộ chiếu Mở Dấu Việt</title><style>
+*{box-sizing:border-box;margin:0}body{font-family:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;background:#f4f1ea;color:#2a2019;padding:24px;display:flex;justify-content:center}
+.card{max-width:520px;width:100%;background:#fffdf8;border-radius:22px;padding:30px 26px;box-shadow:0 12px 40px rgb(60 40 10 / .14);border:1.5px solid #e5d9bf}
+.brand{text-align:center;letter-spacing:.24em;font-size:12px;font-weight:700;color:#b23a2e}
+h1{text-align:center;font-size:24px;margin:6px 0 2px;letter-spacing:.02em}
+.sub{text-align:center;font-size:12.5px;color:#8a7f6f;margin-bottom:20px}
+.stats{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#fdf6e3,#f8ecd2);border:1px solid #e8dcc0;border-radius:16px;padding:16px 18px;margin-bottom:18px}
+.ring{flex:none;width:84px;height:84px;border-radius:50%;background:conic-gradient(#c8941a ${pct}%,#e3d8c1 0);display:grid;place-items:center}
+.ring i{width:62px;height:62px;border-radius:50%;background:#fffdf8;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px}
+.stats .nums{flex:1}.stats .big{font-size:26px;font-weight:800}.stats .lbl{font-size:12px;color:#8a7f6f}
+.xp{float:right;text-align:right}.xp b{color:#b23a2e;font-size:22px}
+ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.site{border:1px solid #e9dfc9;border-radius:14px;padding:10px 12px;background:#fff}
+.site__head{display:flex;align-items:baseline;gap:8px;font-size:13.5px}.site__head b{flex:1}
+.cnt{font-size:12px;color:#8a7f6f;white-space:nowrap}
+.badge{font-size:11px;background:#fdf1d7;color:#8a6408;border-radius:8px;padding:2px 7px;white-space:nowrap}
+.segs{display:flex;gap:4px;margin-top:8px}
+.seg{flex:1;min-width:0;height:26px;border-radius:8px;background:#eee6d4;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;position:relative}
+.seg em{font-style:normal;font-size:8.5px;color:#8a7f6f;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+.site.mid .seg.on{background:#ffd56a}.site.done .seg.on{background:#7fd8b0}
+.seg.on em{color:#4a3c10}.site.done .seg.on em{color:#0c4a2e}
+.seg.on{font-weight:700;color:#4a3c10}.site.done .seg.on{color:#0c4a2e}
+.foot{margin-top:20px;font-size:11.5px;color:#8a7f6f;text-align:center;line-height:1.55}
+.foot b{color:#b23a2e}
+@media print{body{padding:0}.card{box-shadow:none}}
+</style></head><body><div class="card">
+<div class="brand">MỞ DẤU VIỆT</div>
+<h1>Hộ chiếu hành trình</h1>
+<p class="sub">Heritage Journey Passport — ${dateVi}</p>
+<div class="stats">
+  <div class="ring"><i>${pct}%</i></div>
+  <div class="nums"><div class="big">${doneSpots}/${totalSpots} điểm</div><div class="lbl">đã nhận dấu trên hành trình</div></div>
+  <div class="xp"><b>${state.xp}</b><div class="lbl">XP</div></div>
+</div>
+<ul>${siteRows}</ul>
+<p class="foot">Để chuyển tiến độ sang thiết bị khác: mở app <b>Mở Dấu Việt</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
+</div>
+<script type="application/json" id="mdv-backup">${payload}</script>
+</body></html>`;
+}
+
+/** Tách JSON bản sao: chấp nhận cả file .json thuần lẫn thẻ hộ chiếu .html (đọc khối nhúng). */
+export function extractBackupJson(text: string): string | null {
+  const t = text.trim();
+  if (t.startsWith('{')) return t;
+  const m = text.match(/<script[^>]*id=["']mdv-backup["'][^>]*>([\s\S]*?)<\/script>/);
+  return m ? m[1].trim() : null;
+}
+
 /** Nhập hộ chiếu: chỉ chấp nhận đúng kind + schemaVersion hỗ trợ. Trả false nếu file lạ. */
 export function importPassportJson(json: string): boolean {
   try {
-    const raw = JSON.parse(json) as { kind?: string; progress?: unknown };
+    const text = extractBackupJson(json);
+    if (!text) return false;
+    const raw = JSON.parse(text) as { kind?: string; progress?: unknown };
     if (raw?.kind !== 'passport') return false;
     const p = migrate(raw.progress);
     if (!p) return false;
@@ -254,7 +339,9 @@ export function importPassportJson(json: string): boolean {
 /** Đọc file sao lưu mà không ghi đè – trả tóm tắt để hiện bản xem trước trước khi xác nhận. */
 export function previewPassportJson(json: string): { progress: Progress; spots: number; xp: number; exportedAt: string | null } | null {
   try {
-    const raw = JSON.parse(json) as { kind?: string; progress?: unknown; exportedAt?: string };
+    const text = extractBackupJson(json);
+    if (!text) return null;
+    const raw = JSON.parse(text) as { kind?: string; progress?: unknown; exportedAt?: string };
     if (raw?.kind !== 'passport') return null;
     const p = migrate(raw.progress);
     if (!p) return null;

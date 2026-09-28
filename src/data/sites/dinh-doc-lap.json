@@ -16,7 +16,7 @@
     10.777
   ],
   "journeyOrder": 5,
-  "heroImage": "/img/dinh-doc-lap/hero.svg",
+  "heroImage": "/img/dinh-doc-lap/hero.webp",
   "tint": "#2c4a33",
   "summary": {
     "vi": "Chứng nhân của ngày 30/4/1975 – nơi kết thúc chiến tranh và thống nhất đất nước.",
@@ -50,7 +50,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/dinh-doc-lap/hero.svg"
+          "image": "/img/dinh-doc-lap/cong-chinh.webp"
         },
         {
           "type": "audio",

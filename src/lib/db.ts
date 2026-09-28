@@ -13,7 +13,7 @@ let dbPromise: Promise<IDBDatabase | null> | null = null;
 function openDb(): Promise<IDBDatabase | null> {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve) => {
-    if (!('indexedDB' in window)) return resolve(null);
+    if (typeof indexedDB === 'undefined') return resolve(null);
     let req: IDBOpenDBRequest;
     try {
       req = indexedDB.open(DB_NAME, DB_VERSION);

@@ -39,11 +39,22 @@ Chrome headful min width ~500px — for 390px mobile use CDP emulation:
 - lang change needs a REAL `Page.reload` (module-level cache) — hash navigation won't re-init; localStorage.setItem('mdv.lang','en') + reload.
 - Same for `mdv.theme` — the inline boot script in index.html only applies it at document load.
 - Settings theme chips are labelled `Nguyệt Quang (tối)` / `Thái Dương (sáng)` — don't grep for plain 'Sáng'/'Tối'.
-- SW sanity: don't trust `register()` resolving — check `getRegistration().active` after a real reload. A registration object with all-null workers = install failed. (On this branch install throws `Cache.addAll(): duplicate requests` because `/index.html` is both in PRECACHE and appended as OFFLINE_URL — offline is broken until gen-sw dedupes.)
-- SVG `tabIndex` on `<g>` renders camelCase attr → NOT keyboard-focusable: Tab order skips all `.vnode` nodes and `.focus()` no-ops. To verify keydown wiring, dispatch `new KeyboardEvent('keydown',{key:'Enter',bubbles:true})` on the `g[role=button]` instead.
+- SW sanity: don't trust `register()` resolving — check `getRegistration().active` after a real reload. A registration object with all-null workers = install failed. (A past bug where install threw `Cache.addAll(): duplicate requests` from `/index.html` being both in PRECACHE and OFFLINE_URL was fixed via a Set dedupe in gen-sw — verify `new Set(` in `dist/sw.js` before assuming offline works.)
+- SVG `<g>` nodes ARE keyboard-focusable in current builds (`tabindex="0"` lowercased attr): Tab order = filter chips → `.mscreen__searchbtn` → `.vnode g[role=button]` ×N → zoom ×3 → dock links ×4 → BODY. `.focus()` works; Enter/Space via real `Input.dispatchKeyEvent` or dispatched `KeyboardEvent` opens the sheet. If Tab skips expected items, check `document.activeElement` first — `.focus()` calls persist across evals and your sequence may start mid-order.
 - `?debug=1` needs query BEFORE hash: `?debug=1#/map`. Signed scan URLs: `#/d/<site>/<spot>?s=<sig>` — generate via `node scripts/sign-qr.mjs`.
 - This box has 0 TTS voices → utterances error instantly → cards/probe hit the fallback path; to verify real playback you'd need espeak voices.
-- Errorlog introspection: `await import('/src/debug/errorlog.ts').then(m=>m.getErrors())` in Runtime.evaluate (vite serves source modules).
+- Errorlog introspection: dev = `await import('/src/debug/errorlog.ts').then(m=>m.getErrors())` in Runtime.evaluate; production build has no `/src/` modules → read `localStorage.getItem('mdv.errors.v1')` (200-entry ring buffer, includes manual `logError` calls like `speechSynthesis: synthesis-failed`).
+
+## Production build (dist/) testing
+- Serve dist statically (`python3 -m http.server` at a dir containing the build) — `vite preview` serves `sw.js` with wrong MIME → SW fails falsely.
+- Progress lives in IndexedDB `mdv` (localStorage `mdv.progress.v1` is only a mirror). Reset = `localStorage.clear()` + `indexedDB.deleteDatabase('mdv')` + reload — localStorage.clear() alone leaves progress intact.
+- Signed QR scan URLs: `?q=NN.<sig>` (NN = spot num, sig = HMAC-SHA256("mdvqNN","mdv-qr-v1")[:16] — generate w/ `node scripts/sign-qr.mjs`); boot rewrites to `#/d/<site>/<spot>?s=<sig>`. Legacy `?d=site/spot&s=<sig>` converges to same path. Bad sig → `.dscan--bad` alert.
+- Navigating to `?q=` URLs: `Page.navigate` reply can be lost (in-page `location.replace` + SW reload storms). Fire nav, don't await reply, verify `location.hash` after ~4.5s silent settle before any `Runtime.evaluate` (eval during boot context-destroy hangs). Wrap evals in retry-on-timeout (3×, 1.2s backoff).
+- Top-level `const`/`let` in a Runtime.evaluate persist across evals in the same session → wrap eval bodies in `(()=>{...})()` to avoid "already been declared".
+- `.mscreen__searchbtn` can be clipped offscreen in the horizontal `.mscreen__filters` row → `scrollTo({left:300, behavior:'instant'})` on the row before `tap_sel`.
+- `Browser.setDownloadBehavior`: omit `browserContextId` (passing null errors); blob downloads land in `~/Downloads` regardless of `downloadPath` — check there.
+- DemoDock (`.demodock`) only mounts after `localStorage mdv.admin=1` (set by visiting `#/admin`) — then FAB floats over ALL screens; `removeItem` + `dispatchEvent(new Event('mdv:demo-dock'))` to unmount without reload. Never exposed via guest nav links.
+- Manual QR code: search modal has `.msearch__code` input — enter the 16-char sig, press "Nhận dấu" → routes to `#/d/…?s=<sig>` (already-unlocked spots show "Vào trang điểm" CTA).
 
 ## P4/P5-era gotchas
 - `mdv.hintDone` gate: onboarding hint chip (`.mhint`, NOT `.mscreen__hint`) persists until first node tap; reset = `localStorage.removeItem('mdv.seen')` + `localStorage.removeItem('mdv.hintDone')` + reload.

@@ -639,15 +639,17 @@ a.dest__crumb--link:active {
 /* Toast nhận dấu sau quét QR — khoảnh khắc thưởng rõ ràng, tự thu sau vài giây. */
 .dtoast {
   position: fixed;
-  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  /* Dưới dải offline (~26px) + banner cập nhật (28–72px) — khoảnh khắc thưởng không bị đè. */
+  top: calc(env(safe-area-inset-top, 0px) + 76px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 60;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  max-width: min(560px, calc(100vw - 24px));
-  padding: 12px 14px;
+  width: min(560px, calc(100vw - 24px));
+  padding: 12px 46px 12px 14px;
   border-radius: 16px;
   background: var(--card, #fff);
   color: var(--ink, #1c1a17);
@@ -663,6 +665,7 @@ a.dest__crumb--link:active {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1 1 auto;
 }
 .dtoast__txt b {
   font-size: var(--text-sm, 0.9rem);
@@ -673,7 +676,7 @@ a.dest__crumb--link:active {
   font-weight: 700;
 }
 .dtoast__link {
-  flex: none;
+  flex: 1 1 100%;
   font-size: var(--text-xs, 0.78rem);
   font-weight: 700;
   color: var(--accent, #8c1d18);
@@ -681,6 +684,12 @@ a.dest__crumb--link:active {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+}
+.dtoast .dscan__x {
+  position: absolute;
+  top: 4px;
+  right: 4px;
 }
 @keyframes dtoast-in {
   from {

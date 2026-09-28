@@ -474,15 +474,7 @@ export function SettingsScreen() {
             {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
           </button>
         </section>
-        <section class="mdv-card">
-          <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dành cho trình diễn' : 'For demo'}</h2>
-          <a class="mdv-btn mdv-btn--ghost" href={routeHref.admin}>
-            <Icon name="spark" size={16} /> {lang === 'vi' ? 'Bảng điều khiển demo' : 'Demo control panel'}
-          </a>
-        </section>
-        <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
-          Mở Dấu Việt v{__APP_VERSION__} · {lang === 'vi' ? 'Thêm ?debug=1 vào địa chỉ để mở Debug HUD' : 'Append ?debug=1 to open the Debug HUD'}
-        </p>
+        <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
       </div>
     </main>
   );

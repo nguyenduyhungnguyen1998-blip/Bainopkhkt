@@ -16,7 +16,7 @@
     21.0277
   ],
   "journeyOrder": 1,
-  "heroImage": "/img/van-mieu/hero.svg",
+  "heroImage": "/img/van-mieu/hero.webp",
   "tint": "#5a2320",
   "summary": {
     "vi": "Trường đại học đầu tiên của Việt Nam, nơi lưu giữ 82 bia Tiến sĩ – Di sản tư liệu thế giới.",
@@ -54,7 +54,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/van-mieu-mon.svg",
+          "image": "/img/van-mieu/van-mieu-mon.webp",
           "caption": {
             "vi": "Cổng tam quan hai tầng dẫn vào khu di tích",
             "en": "The two-storey triple gate at the entrance"
@@ -360,7 +360,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/khue-van-cac.svg",
+          "image": "/img/van-mieu/khue-van-cac.webp",
           "caption": {
             "vi": "Gác Khuê Văn – biểu tượng của Thủ đô Hà Nội",
             "en": "Khue Van Pavilion – the symbol of Hanoi"
@@ -615,7 +615,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/bia-tien-si.svg",
+          "image": "/img/van-mieu/bia-tien-si.webp",
           "caption": {
             "vi": "82 bia đá đặt trên lưng rùa quanh giếng Thiên Quang",
             "en": "82 stone steles on tortoise backs around the Well of Heavenly Clarity"
@@ -1396,7 +1396,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/vuon-giam.svg",
+          "image": "/img/van-mieu/vuon-giam.webp",
           "caption": {
             "vi": "Vườn Giám – khoảng xanh phía Tây Văn Miếu – Quốc Tử Giám",
             "en": "Academy Garden – the green quarter west of Van Mieu – Quoc Tu Giam"

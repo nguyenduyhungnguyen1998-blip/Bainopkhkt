@@ -16,7 +16,7 @@
     20.91
   ],
   "journeyOrder": 2,
-  "heroImage": "/img/ha-long/hero.svg",
+  "heroImage": "/img/ha-long/hero.webp",
   "tint": "#1d4f4a",
   "summary": {
     "vi": "Gần 2.000 đảo đá vôi giữa biển xanh – Di sản thiên nhiên thế giới được UNESCO công nhận năm 1994.",
@@ -50,7 +50,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/ha-long/hero.svg"
+          "image": "/img/ha-long/hang-sung-sot.webp"
         },
         {
           "type": "audio",

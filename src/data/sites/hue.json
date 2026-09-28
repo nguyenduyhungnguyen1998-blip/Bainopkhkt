@@ -16,7 +16,7 @@
     16.4698
   ],
   "journeyOrder": 3,
-  "heroImage": "/img/hue/hero.svg",
+  "heroImage": "/img/hue/hero.webp",
   "tint": "#3f2a56",
   "summary": {
     "vi": "Kinh đô của triều Nguyễn (1802–1945), Di sản văn hóa thế giới đầu tiên của Việt Nam.",
@@ -50,7 +50,7 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/hue/hero.svg"
+          "image": "/img/hue/ngo-mon.webp"
         },
         {
           "type": "audio",

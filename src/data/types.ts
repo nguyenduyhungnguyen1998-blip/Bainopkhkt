@@ -21,7 +21,7 @@ export interface HeroCard {
 export interface AspectsCard {
   type: 'aspects';
   size: CardSize;
-  aspects: { id: string; title: Localized; body: Localized }[];
+  aspects: { id: string; title: Localized; body: Localized; video?: { src: string; poster?: string; title?: Localized } }[];
 }
 
 export interface VideoCard {

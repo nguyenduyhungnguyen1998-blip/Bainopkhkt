@@ -14,6 +14,69 @@
     <meta name="apple-mobile-web-app-title" content="Mở Dấu Việt" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Mở Dấu Việt</title>
+    <style>
+      /* Splash boot: hiện ngay từ first paint, Preact render sẽ thay thế. */
+      #splash {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: #07111f;
+        color: #e8d9a0;
+        font-family: system-ui, -apple-system, sans-serif;
+        z-index: 99;
+      }
+      html[data-theme='light'] #splash {
+        background: #f4f1ea;
+        color: #5a2320;
+      }
+      #splash .brand {
+        text-align: center;
+        letter-spacing: 0.04em;
+      }
+      #splash .brand h1 {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0 0 6px;
+      }
+      #splash .brand p {
+        font-size: 13px;
+        opacity: 0.7;
+        margin: 0;
+      }
+      #splash .dot {
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        border: 3px solid currentColor;
+        position: relative;
+        animation: splash-pulse 1.6s ease-out infinite;
+      }
+      #splash .dot::after {
+        content: '';
+        position: absolute;
+        inset: 14px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      @keyframes splash-pulse {
+        0% {
+          transform: scale(0.92);
+          opacity: 0.9;
+        }
+        60%,
+        100% {
+          transform: scale(1.06);
+          opacity: 0.55;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #splash .dot {
+          animation: none;
+        }
+      }
+    </style>
     <script>
       // Áp theme trước khi vẽ để tránh nháy màu
       (function () {
@@ -28,7 +91,15 @@
     </script>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div id="splash" aria-hidden="true">
+        <div class="brand">
+          <div class="dot"></div>
+          <h1>Mở Dấu Việt</h1>
+          <p>Hành trình di sản qua mã QR</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

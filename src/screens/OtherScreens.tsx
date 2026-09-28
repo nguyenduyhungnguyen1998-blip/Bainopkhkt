@@ -94,12 +94,10 @@ export function PassportScreen() {
                 <div class="mdv-muted" style="font-size:var(--text-sm)">
                   {n}/{s.spots.length} {t(UI.spots, lang)}
                 </div>
-                {/* Hàng dấu từng điểm – kỷ niệm nhìn được thay vì chỉ con số */}
-                <span class="pstamp" aria-hidden="true">
-                  {s.spots.map((sp, i) => (
-                    <i key={sp.spotId} class={`pstamp__dot ${isSpotUnlocked(s.entityId, sp.spotId) ? 'pstamp__dot--on' : ''}`}>
-                      {i + 1}
-                    </i>
+                {/* Thanh tiến độ theo điểm – đoạn tô đầy = đã nhận dấu; màu theo mức hoàn thành của khu */}
+                <span class={`pprog ${done ? 'pprog--done' : n > 0 ? 'pprog--mid' : 'pprog--none'}`} aria-hidden="true">
+                  {s.spots.map((sp) => (
+                    <i key={sp.spotId} class={`pprog__seg ${isSpotUnlocked(s.entityId, sp.spotId) ? 'pprog__seg--on' : ''}`} />
                   ))}
                 </span>
               </div>

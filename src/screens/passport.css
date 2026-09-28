@@ -313,29 +313,26 @@
   text-align: center;
 }
 
-/* Hàng dấu từng điểm trong hộ chiếu – chấm đầy = đã ghé */
-.pstamp {
-  display: inline-flex;
-  gap: 5px;
-  margin-top: 6px;
+/* Thanh tiến độ từng điểm trong hộ chiếu – đoạn đầy = đã ghé; màu đổi theo mức khu (0/xám · giữa/vàng · đủ/ngọc) */
+.pprog {
+  display: flex;
+  gap: 4px;
+  margin-top: 7px;
+  width: 100%;
+  max-width: 230px;
 }
-.pstamp__dot {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1.5px dashed color-mix(in srgb, var(--color-muted) 55%, transparent);
-  color: var(--color-muted);
-  font-size: 9.5px;
-  font-weight: 700;
-  font-style: normal;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.pprog__seg {
+  flex: 1;
+  height: 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--color-muted) 32%, transparent);
+  transition: background 0.3s ease;
 }
-.pstamp__dot--on {
-  border: 1.5px solid var(--color-accent);
-  background: var(--color-accent);
-  color: #1b1409;
+.pprog--mid .pprog__seg--on {
+  background: var(--color-accent-secondary);
+}
+.pprog--done .pprog__seg--on {
+  background: var(--color-accent-tertiary);
 }
 
 /* Bảng điều khiển demo (#/admin): hàng điểm + nút mở/khóa/đặt quiz */

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportJson, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
 import type { Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
@@ -161,10 +161,10 @@ function BackupCard({ lang }: { lang: Lang }) {
   };
 
   const doExport = () => {
-    const blob = new Blob([exportPassportJson()], { type: 'application/json' });
+    const blob = new Blob([exportPassportCardHtml()], { type: 'text/html' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `ho-chieu-mo-dau-viet-${Date.now()}.json`;
+    a.download = `ho-chieu-mo-dau-viet-${new Date().toISOString().slice(0, 10)}.html`;
     a.click();
     URL.revokeObjectURL(a.href);
     flash(t(UI.backupExported, lang));
@@ -195,7 +195,7 @@ function BackupCard({ lang }: { lang: Lang }) {
         <div class="backup__preview">
           <p class="backup__pvtitle">{t(UI.backupPreviewTitle, lang)}</p>
           <p class="backup__pvmeta">
-            {preview.spots}/9 {t(UI.spots, lang)} · {preview.xp} XP
+            {preview.spots}/{SITES.reduce((n, s) => n + s.spots.length, 0)} {t(UI.spots, lang)} · {preview.xp} XP
             {preview.exportedAt ? ` · ${new Date(preview.exportedAt).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US')}` : ''}
           </p>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -220,7 +220,7 @@ function BackupCard({ lang }: { lang: Lang }) {
           </button>
         </div>
       )}
-      <input ref={fileRef} type="file" accept="application/json,.json" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doPick((e.target as HTMLInputElement).files?.[0])} />
+      <input ref={fileRef} type="file" accept=".html,.json,application/json,text/html" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doPick((e.target as HTMLInputElement).files?.[0])} />
       {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
     </section>
   );

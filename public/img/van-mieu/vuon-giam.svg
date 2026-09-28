@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="Vườn Giám">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1F5C3F"/><stop offset="1" stop-color="#0E3A2A"/></linearGradient>
+<pattern id="p" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M24 4 44 24 24 44 4 24Z" fill="none" stroke="#fff" stroke-opacity=".08" stroke-width="2"/></pattern></defs>
+<rect width="1200" height="800" fill="url(#g)"/><rect width="1200" height="800" fill="url(#p)"/>
+<circle cx="264" cy="240" r="176" fill="#fff" fill-opacity=".08"/>
+<circle cx="936" cy="560" r="240" fill="#fff" fill-opacity=".06"/>
+</svg>

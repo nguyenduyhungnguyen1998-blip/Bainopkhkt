@@ -635,3 +635,86 @@ a.dest__crumb--link:active {
 .dcard__avideo video {
   object-fit: contain;
 }
+
+/* Toast nhận dấu sau quét QR — khoảnh khắc thưởng rõ ràng, tự thu sau vài giây. */
+.dtoast {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(560px, calc(100vw - 24px));
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--card, #fff);
+  color: var(--ink, #1c1a17);
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+  animation: dtoast-in 0.28s ease;
+}
+.dtoast > svg {
+  color: #1a9e54;
+  flex: none;
+}
+.dtoast__txt {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.dtoast__txt b {
+  font-size: var(--text-sm, 0.9rem);
+}
+.dtoast__txt span {
+  font-size: var(--text-xs, 0.78rem);
+  color: var(--gold, #b8860b);
+  font-weight: 700;
+}
+.dtoast__link {
+  flex: none;
+  font-size: var(--text-xs, 0.78rem);
+  font-weight: 700;
+  color: var(--accent, #8c1d18);
+  text-decoration: underline;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+@keyframes dtoast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dtoast {
+    animation: none;
+  }
+}
+
+/* Bản đọc thuyết minh gập gọn — Nghe là cách chính, Đọc mở khi cần. */
+.dcard__scriptwrap {
+  margin-top: 10px;
+}
+.dcard__scriptwrap > summary {
+  cursor: pointer;
+  font-size: var(--text-xs, 0.78rem);
+  font-weight: 700;
+  color: var(--muted, #6b6357);
+  padding: 10px 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.dcard__scriptwrap > summary:hover {
+  color: var(--accent, #8c1d18);
+}
+.dcard__scriptwrap .dcard__script {
+  margin-top: 4px;
+}

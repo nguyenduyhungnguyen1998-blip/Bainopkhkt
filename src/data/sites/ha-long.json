@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/ha-long/hang-sung-sot.webp"
+          "image": "/img/ha-long/hang-sung-sot.webp",
+          "images": [
+            "/img/ha-long/hero.webp"
+          ]
         },
         {
           "type": "audio",

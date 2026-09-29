@@ -86,7 +86,10 @@ for (const f of files) {
     for (const card of spot.layoutSchema) {
       if (card.type === 'hero') hasHero = true;
       if (card.type === 'audio') hasAudio = true;
-      if ((card.type === 'hero' || card.type === 'image') && card.image) assets.add(card.image);
+      if ((card.type === 'hero' || card.type === 'image') && card.image) {
+        assets.add(card.image);
+        for (const extra of card.images ?? []) assets.add(extra);
+      }
       if (card.type === 'video') {
         if (card.poster) assets.add(card.poster);
         if (card.src) {

@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/hue/ngo-mon.webp"
+          "image": "/img/hue/ngo-mon.webp",
+          "images": [
+            "/img/hue/hero.webp"
+          ]
         },
         {
           "type": "audio",

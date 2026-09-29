@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/dinh-doc-lap/cong-chinh.webp"
+          "image": "/img/dinh-doc-lap/cong-chinh.webp",
+          "images": [
+            "/img/dinh-doc-lap/hero.webp"
+          ]
         },
         {
           "type": "audio",

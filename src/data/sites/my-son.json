@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/my-son/nhom-thap-b.webp"
+          "image": "/img/my-son/nhom-thap-b.webp",
+          "images": [
+            "/img/my-son/hero.webp"
+          ]
         },
         {
           "type": "audio",

@@ -177,6 +177,7 @@
             "type": { "const": "hero" },
             "size": { "$ref": "#/definitions/size" },
             "image": { "$ref": "#/definitions/assetPath" },
+            "images": { "type": "array", "items": { "$ref": "#/definitions/assetPath" } },
             "caption": { "$ref": "#/definitions/localized" }
           }
         },
@@ -264,6 +265,7 @@
             "type": { "const": "image" },
             "size": { "$ref": "#/definitions/size" },
             "image": { "$ref": "#/definitions/assetPath" },
+            "images": { "type": "array", "items": { "$ref": "#/definitions/assetPath" } },
             "caption": { "$ref": "#/definitions/localized" }
           }
         }

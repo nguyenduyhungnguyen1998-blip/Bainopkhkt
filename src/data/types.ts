@@ -15,6 +15,8 @@ export interface HeroCard {
   type: 'hero';
   size: CardSize;
   image: string;
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
+  images?: string[];
   caption?: Localized;
 }
 
@@ -52,6 +54,8 @@ export interface ImageCard {
   type: 'image';
   size: CardSize;
   image: string;
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
+  images?: string[];
   caption?: Localized;
 }
 

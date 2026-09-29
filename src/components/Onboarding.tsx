@@ -2,6 +2,7 @@ import { createPortal } from 'preact/compat';
 import { useEffect } from 'preact/hooks';
 import { UI, t, type Lang } from '../lib/i18n';
 import { routeHref } from '../lib/router';
+import { goCard, goTour } from '../lib/tour';
 import { asset } from '../lib/asset';
 import { Icon } from './Icon';
 import './tour.css';
@@ -43,17 +44,18 @@ export function WelcomeModal({ lang, onKnow, onTour }: { lang: Lang; onKnow: () 
   );
 }
 
-/** Menu nút ?: mở lại tour tương tác, thẻ 3 bước nhanh hoặc trang trợ giúp đầy đủ. */
+/** Menu nút ?: mở lại tour tương tác, thẻ 3 bước nhanh hoặc trang trợ giúp đầy đủ.
+    Dùng được ở mọi màn — tour/thẻ tự điều hướng về bản đồ khi cần. */
 export function HelpMenu({
   lang,
-  onTour,
-  onCard,
   onClose,
+  onTour = goTour,
+  onCard = goCard,
 }: {
   lang: Lang;
-  onTour: () => void;
-  onCard: () => void;
   onClose: () => void;
+  onTour?: () => void;
+  onCard?: () => void;
 }) {
   useOverlayFlag();
   return createPortal(

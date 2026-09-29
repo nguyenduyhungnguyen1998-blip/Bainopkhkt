@@ -86,9 +86,23 @@
           if (q) localStorage.setItem('mdv.theme', q);
           if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
           document.documentElement.dataset.theme = t;
-          var f = localStorage.getItem('mdv.font'); // cỡ chữ: lg / xl
-          if (f === 'lg' || f === 'xl') document.documentElement.dataset.font = f;
-          if (localStorage.getItem('mdv.contrast') === 'on') document.documentElement.dataset.contrast = 'on';
+          // Cỡ chữ % + độ phẳng nền %; migrate một lần từ khoá mức rời cũ.
+          var pct = function (key, legacyKey, legacyMap, dflt) {
+            var v = localStorage.getItem(key);
+            if (v != null && isFinite(+v)) return +v;
+            var lv = localStorage.getItem(legacyKey);
+            if (lv != null && lv in legacyMap) {
+              localStorage.setItem(key, String(legacyMap[lv]));
+              localStorage.removeItem(legacyKey);
+              return legacyMap[lv];
+            }
+            return dflt;
+          };
+          var fp = pct('mdv.fontPct', 'mdv.font', { md: 100, lg: 112, xl: 125 }, 100);
+          if (fp !== 100) document.documentElement.style.fontSize = fp + '%';
+          var fl = pct('mdv.flatPct', 'mdv.contrast', { on: 100, off: 0 }, 0);
+          if (fl > 0) document.documentElement.style.setProperty('--flat', String(fl / 100));
+          if (fl >= 100) document.documentElement.dataset.contrast = 'on';
         } catch (e) {}
       })();
     </script>

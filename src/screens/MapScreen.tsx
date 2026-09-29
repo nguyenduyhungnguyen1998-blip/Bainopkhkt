@@ -9,8 +9,8 @@ import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProg
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
-import { GuidedTour, type TourStep } from '../components/Tour';
 import { HelpMenu, WelcomeModal } from '../components/Onboarding';
+import { HINT_REQ_KEY, TOUR_REQ_KEY, WELCOME_KEY } from '../lib/tour';
 import { asset } from '../lib/asset';
 import { verifySignature } from '../lib/qr';
 import { isDebug } from '../lib/debug';
@@ -26,19 +26,6 @@ const FILTERS: { id: MapFocus; label: keyof typeof UI }[] = [
 
 const SEEN_KEY = 'mdv.seen';
 const HINT_KEY = 'mdv.hintDone';
-const WELCOME_KEY = 'mdv.welcomed'; // đã trả lời màn chào (biết hay chưa biết dùng)
-const TOUR_REQ_KEY = 'mdv.tourReq'; // cờ mở tour từ màn khác (#/help…)
-
-/** Tour spotlight quốc gia — soi từng chức năng trên bản đồ rồi kết bằng CTA bắt đầu. */
-const TOUR_STEPS: TourStep[] = [
-  { sel: ['.vnode--next', '.vnode'], icon: 'compass', title: UI.tourS1T, body: UI.tourS1B },
-  { sel: '.mscreen__searchbtn', icon: 'search', title: UI.tourS2T, body: UI.tourS2B },
-  { sel: '.mscreen__legend', icon: 'flag', title: UI.tourS3T, body: UI.tourS3B },
-  { sel: '.mscreen__counter', icon: 'passport', title: UI.tourS4T, body: UI.tourS4B },
-  { sel: '.mscreen__zoomctl', icon: 'locate', title: UI.tourS5T, body: UI.tourS5B },
-  { sel: '.mdv-dock', icon: 'layers', title: UI.tourS6T, body: UI.tourS6B },
-  { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
-];
 const SHEET_PEEK = 0.4; // 40% chiều cao màn hình
 const SHEET_FULL = 0.9; // 90% khi kéo lên
 const SITE_ZOOM_K = 4.6; // zoom sâu hơn mức này vào khu nhiều điểm -> mở sơ đồ cấp 2
@@ -55,7 +42,6 @@ export function MapScreen() {
   const [hintOn, setHintOn] = useState(false); // thẻ 3 bước – chỉ mở từ menu ? (lần đầu đã có màn chào)
   const [welcome, setWelcome] = useState(false);
   const [helpMenu, setHelpMenu] = useState(false);
-  const [tourOn, setTourOn] = useState(false);
   const actedRef = useRef(false); // khách đã tương tác trước khi màn chào kịp hiện → không chen vào
   const markActed = () => {
     actedRef.current = true;
@@ -82,17 +68,48 @@ export function MapScreen() {
     if (searchOn) searchInputRef.current?.focus();
   }, [searchOn]);
 
-  // Cờ mở tour từ màn khác (Trợ giúp → "Xem tour hướng dẫn").
+  // Chuẩn bị trước khi App mở tour: dọn overlay đang mở + bay camera về điểm kế tiếp
+  // để spotlight bước 1 soi đúng chỗ, rồi báo App qua 'mdv:tour-start'.
+  const prepTour = () => {
+    try {
+      localStorage.setItem(WELCOME_KEY, '1');
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    setWelcome(false);
+    setHelpMenu(false);
+    setHintOn(false);
+    setSearchOn(false);
+    setSelectedId(null);
+    if (siteLevel) exitSiteLevel();
+    const next = nodesRef.current.find((n) => n.status === 'next') ?? nodesRef.current.find((n) => n.status === 'active');
+    if (next) setFlyReq({ x: next.x, y: next.y, k: Math.max(tRef.current?.k ?? 1, 1.7), n: Date.now() });
+    window.setTimeout(() => window.dispatchEvent(new CustomEvent('mdv:tour-start')), next ? 750 : 60);
+  };
+
+  // Cờ mở tour / thẻ 3 bước từ màn khác (Trợ giúp, Hộ chiếu, Thử tài → nút ?).
   useEffect(() => {
     try {
       if (localStorage.getItem(TOUR_REQ_KEY)) {
         localStorage.removeItem(TOUR_REQ_KEY);
-        localStorage.setItem(WELCOME_KEY, '1');
-        setTourOn(true);
+        prepTour();
+      }
+      if (localStorage.getItem(HINT_REQ_KEY)) {
+        localStorage.removeItem(HINT_REQ_KEY);
+        setHintOn(true);
       }
     } catch {
       /* bộ nhớ riêng tư */
     }
+    const onTourReq = () => prepTour();
+    const onHintReq = () => setHintOn(true);
+    window.addEventListener('mdv:tour-request', onTourReq);
+    window.addEventListener('mdv:hint-request', onHintReq);
+    return () => {
+      window.removeEventListener('mdv:tour-request', onTourReq);
+      window.removeEventListener('mdv:hint-request', onHintReq);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Màn chào lần đầu: đợi intro camera hạ cánh (~2.8s) rồi mới hỏi — nhưng nếu khách
@@ -111,25 +128,6 @@ export function MapScreen() {
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // Mở tour: chắc chắn về đúng bản đồ quốc gia + dọn overlay đang mở để spotlight soi đúng chỗ.
-  const startTour = () => {
-    try {
-      localStorage.setItem(WELCOME_KEY, '1');
-    } catch {
-      /* bộ nhớ riêng tư */
-    }
-    setWelcome(false);
-    setHelpMenu(false);
-    setHintOn(false);
-    setSearchOn(false);
-    setSelectedId(null);
-    if (siteLevel) exitSiteLevel();
-    // Bay camera về điểm "kế tiếp" trước khi spotlight soi nó — ring đo sau khi hạ cánh.
-    const next = nodesRef.current.find((n) => n.status === 'next') ?? nodesRef.current.find((n) => n.status === 'active');
-    if (next) setFlyReq({ x: next.x, y: next.y, k: Math.max(tRef.current?.k ?? 1, 1.7), n: Date.now() });
-    window.setTimeout(() => setTourOn(true), next ? 750 : 60);
-  };
 
   const closeWelcome = () => {
     try {
@@ -749,11 +747,11 @@ export function MapScreen() {
         )}
       </section>
 
-      {welcome && <WelcomeModal lang={lang} onKnow={closeWelcome} onTour={startTour} />}
+      {welcome && <WelcomeModal lang={lang} onKnow={closeWelcome} onTour={prepTour} />}
       {helpMenu && (
         <HelpMenu
           lang={lang}
-          onTour={startTour}
+          onTour={prepTour}
           onCard={() => {
             setHelpMenu(false);
             setHintOn(true);
@@ -761,7 +759,6 @@ export function MapScreen() {
           onClose={() => setHelpMenu(false)}
         />
       )}
-      {tourOn && <GuidedTour steps={TOUR_STEPS} onDone={() => setTourOn(false)} />}
     </main>
   );
 }

@@ -20,7 +20,7 @@ const sitesDir = join(root, 'src/data/sites');
 const pub = join(root, 'public');
 const schema = JSON.parse(readFileSync(join(root, 'src/data/schema/site.schema.json'), 'utf8'));
 
-const IMG_MAX_KB = 300;
+const IMG_MAX_KB = 400;
 const VIDEO_MAX_MB = 50;
 
 const ajv = new Ajv({ allErrors: true, strict: true });

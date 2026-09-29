@@ -23,13 +23,17 @@ function openDb(): Promise<IDBDatabase | null> {
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE);
     };
+    // Nếu open bị block vô hạn (origin đang bị xoá, profile lỗi) thì fallback
+    // localStorage thay vì kẹt splash mãi — app vẫn boot được.
+    const timer = setTimeout(() => resolve(null), 1500);
     req.onsuccess = () => {
+      clearTimeout(timer);
       const db = req.result;
       db.onversionchange = () => db.close();
       resolve(db);
     };
-    req.onerror = () => resolve(null);
-    req.onblocked = () => resolve(null);
+    req.onerror = () => { clearTimeout(timer); resolve(null); };
+    req.onblocked = () => { clearTimeout(timer); resolve(null); };
   });
   return dbPromise;
 }

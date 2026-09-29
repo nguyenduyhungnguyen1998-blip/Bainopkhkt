@@ -184,6 +184,26 @@ html[data-no-blur='1'] .mdv-card {
   background: var(--color-surface-solid);
 }
 
+/* Cỡ chữ người dùng (Cài đặt): mọi token chữ đi qua rem nên chỉ cần đổi gốc. */
+html[data-font='lg'] {
+  font-size: 112.5%;
+}
+html[data-font='xl'] {
+  font-size: 125%;
+}
+
+/* Tương phản cao (Cài đặt): tắt ảnh nền mờ sau nội dung + giảm texture
+   trang trí — chữ đứng trên nền trơn, đọc được ngoài trời/máy chiếu. */
+html[data-contrast='on'] .spotbg,
+html[data-contrast='on'] .mdv-bg-pattern {
+  display: none;
+}
+html[data-contrast='on'] .mdv-card {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--color-surface-solid);
+}
+
 /* Nút */
 .mdv-btn {
   display: inline-flex;

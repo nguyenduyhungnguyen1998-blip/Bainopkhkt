@@ -396,6 +396,9 @@ export function MapScreen() {
         <button class="mdv-chip mscreen__searchbtn" onClick={() => setSearchOn(true)} aria-label={t(UI.search, lang)}>
           <Icon name="search" size={16} /> {t(UI.search, lang)}
         </button>
+        <button class="mdv-chip mscreen__helpbtn" onClick={() => setHintOn(true)} aria-label={t(UI.howto, lang)}>
+          <Icon name="help" size={16} />
+        </button>
       </div>
 
       <div class="mscreen__map">
@@ -520,17 +523,31 @@ export function MapScreen() {
           </div>
         )}
         {hintOn && (
-          <div class="mhint" role="status">
-            <Icon name="compass" size={18} />
-            <span>{t(UI.hintTap, lang)}</span>
-            {cinema && !obSkip && (
-              <button class="mhint__skip" onClick={dismissHint}>
-                {t(UI.skipOnboard, lang)}
+          <div class="mhint mhint--howto" role="dialog" aria-label={t(UI.howto, lang)}>
+            <div class="mhint__steps">
+              <span>
+                <Icon name="compass" size={15} /> {t(UI.howtoStep1, lang)}
+              </span>
+              <span>
+                <Icon name="qr" size={15} /> {t(UI.howtoStep2, lang)}
+              </span>
+              <span>
+                <Icon name="passport" size={15} /> {t(UI.howtoStep3, lang)}
+              </span>
+            </div>
+            <div class="mhint__row">
+              <button class="mdv-chip" onClick={dismissHint}>
+                {t(UI.gotIt, lang)}
               </button>
-            )}
-            <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
-              <Icon name="close" size={16} />
-            </button>
+              {cinema && !obSkip && (
+                <button class="mhint__skip" onClick={dismissHint}>
+                  {t(UI.skipOnboard, lang)}
+                </button>
+              )}
+              <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
+                <Icon name="close" size={16} />
+              </button>
+            </div>
           </div>
         )}
         {!levelSite && nextOffscreen && (

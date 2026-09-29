@@ -375,41 +375,82 @@ export interface Achievement {
   unlocked: boolean;
 }
 
-/** Huy hiệu thành tích độc lập với huy hiệu từng khu (demo P3 mở rộng thêm). */
+/**
+ * 12 danh hiệu: 7 cột mốc hành trình (dấu → khu → quiz, tăng dần độ khó)
+ * + 5 danh hiệu riêng của từng khu di sản (đủ hết điểm của khu mới được phong).
+ * Xếp theo trình tự hành trình để hộ chiếu đọc như một chuyện đi.
+ */
 export function computeAchievements(p: Progress = state): Achievement[] {
+  const stamps = Object.keys(p.unlocked).length;
   const touchedSites = SITES.filter((s) => siteUnlockedCount(s, p) > 0).length;
   const doneSites = SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length;
-  const answered = Object.keys(p.quizDone).length;
-  return [
+  // Bộ quiz của từng điểm: answered = đã mở quiz, correct = tổng câu đúng (best), perfect = có bộ trọn vẹn.
+  const quizSpots = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ s, sp })));
+  const answered = quizSpots.filter(({ s, sp }) => (p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0) > 0).length;
+  const correct = quizSpots.reduce((n, { s, sp }) => n + Math.min(p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0, sp.quiz!.length), 0);
+  const perfect = quizSpots.some(({ s, sp }) => (p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0) >= sp.quiz!.length);
+  const journey: Achievement[] = [
     {
       id: 'khoi-hanh',
       icon: 'flag',
       name: { vi: 'Khởi hành', en: 'First steps' },
-      need: { vi: 'Quét mã QR đầu tiên', en: 'Scan your first QR' },
-      unlocked: Object.keys(p.unlocked).length >= 1,
+      need: { vi: 'Nhận dấu đầu tiên', en: 'Collect your first stamp' },
+      unlocked: stamps >= 1,
+    },
+    {
+      id: 'lu-khach',
+      icon: 'compass',
+      name: { vi: 'Lữ khách', en: 'Wayfarer' },
+      need: { vi: 'Nhận 3 dấu', en: 'Collect 3 stamps' },
+      unlocked: stamps >= 3,
     },
     {
       id: 'tham-hiem',
-      icon: 'compass',
+      icon: 'map',
       name: { vi: 'Thám hiểm', en: 'Explorer' },
-      need: { vi: 'Chạm vào 3 khu di sản', en: 'Unlock spots in 3 sites' },
+      need: { vi: 'Ghé 3 khu di sản', en: 'Visit 3 heritage sites' },
       unlocked: touchedSites >= 3,
     },
     {
       id: 'si-tu',
-      icon: 'award',
+      icon: 'book',
       name: { vi: 'Sĩ tử', en: 'Challenger' },
       need: { vi: 'Trả lời 3 bộ câu hỏi', en: 'Finish 3 quizzes' },
       unlocked: answered >= 3,
     },
     {
+      id: 'trang-nguyen',
+      icon: 'spark',
+      name: { vi: 'Trạng nguyên', en: 'Valedictorian' },
+      need: { vi: 'Đúng hết một bộ câu hỏi', en: 'Ace one full quiz' },
+      unlocked: perfect,
+    },
+    {
       id: 'hoc-gia',
-      icon: 'book',
+      icon: 'award',
       name: { vi: 'Học giả', en: 'Scholar' },
+      need: { vi: 'Đúng 10 câu hỏi', en: 'Answer 10 questions' },
+      unlocked: correct >= 10,
+    },
+    {
+      id: 'dai-su-di-san',
+      icon: 'crown',
+      name: { vi: 'Đại sứ di sản', en: 'Heritage ambassador' },
       need: { vi: 'Hoàn thành cả 5 khu', en: 'Complete all 5 sites' },
       unlocked: doneSites === SITES.length,
     },
   ];
+  const siteBadges: Achievement[] = SITES.map((s) => ({
+    id: s.gamificationConfig.badge.id,
+    icon: s.gamificationConfig.badge.icon,
+    name: s.gamificationConfig.badge.name,
+    need: {
+      vi: `Đủ ${s.spots.length} dấu tại ${s.name.vi}`,
+      en: `All ${s.spots.length} stamps at ${s.name.en}`,
+    },
+    unlocked: p.badges.includes(s.gamificationConfig.badge.id) || siteUnlockedCount(s, p) === s.spots.length,
+  }));
+  return [...journey, ...siteBadges];
 }
 
 export function useProgress(): Progress {

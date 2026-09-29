@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'preact/compat';
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
-import { useRoute } from './lib/router';
+import { navigate, useRoute } from './lib/router';
 import { useOnline } from './lib/theme';
 import { UI, t, useLang } from './lib/i18n';
 import { Dock } from './components/Dock';
@@ -13,6 +13,8 @@ import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
 import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
+import { GuidedTour } from './components/Tour';
+import { TOUR_STEPS } from './lib/tour';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
 const DebugHud = lazy(() => import('./debug/hud').then((m) => ({ default: m.DebugHud })));
@@ -52,6 +54,19 @@ export function App() {
   const debug = useDebugFlag();
   const { hasUpdate } = useSwStatus();
   usePerfGuard();
+
+  // Tour sống ở App: đi xuyên route (bản đồ → vào trong điểm) mà không unmount.
+  // MapScreen phụ trách prep (bay camera/dọn overlay) rồi bắn 'mdv:tour-start'.
+  const [tourOn, setTourOn] = useState(false);
+  useEffect(() => {
+    const on = () => setTourOn(true);
+    window.addEventListener('mdv:tour-start', on);
+    return () => window.removeEventListener('mdv:tour-start', on);
+  }, []);
+  const endTour = () => {
+    setTourOn(false);
+    if (route.name !== 'map') navigate('map');
+  };
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
   // useLayoutEffect để cuộn chạy TRƯỚC paint – không còn 1 frame nội dung mới nằm giữa trang.
@@ -131,6 +146,7 @@ export function App() {
       <Celebrate />
       <DemoDock />
       <Dock route={route} />
+      {tourOn && <GuidedTour steps={TOUR_STEPS} onDone={endTour} />}
       {debug && (
         <Suspense fallback={null}>
           <DebugHud />

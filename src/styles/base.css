@@ -118,7 +118,7 @@ figcaption a {
   background-size: 420px 420px;
   background-position: center;
   color: var(--color-text);
-  opacity: 0.035;
+  opacity: calc(0.035 * (1 - var(--flat, 0)));
 }
 
 /* Khu vực màn hình */
@@ -169,13 +169,14 @@ figcaption a {
 /* Thẻ kính mờ */
 .mdv-card {
   position: relative;
-  background: var(--color-surface);
+  /* --flat (0..1, Cài đặt → độ phẳng nền): pha dần sang nền đặc + mất blur. */
+  background: color-mix(in srgb, var(--color-surface-solid) calc(var(--flat, 0) * 100%), var(--color-surface));
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-card);
   padding: var(--space-4);
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * (1 - var(--flat, 0))));
+  backdrop-filter: blur(calc(var(--glass-blur) * (1 - var(--flat, 0))));
 }
 
 html[data-no-blur='1'] .mdv-card {
@@ -184,16 +185,9 @@ html[data-no-blur='1'] .mdv-card {
   background: var(--color-surface-solid);
 }
 
-/* Cỡ chữ người dùng (Cài đặt): mọi token chữ đi qua rem nên chỉ cần đổi gốc. */
-html[data-font='lg'] {
-  font-size: 112.5%;
-}
-html[data-font='xl'] {
-  font-size: 125%;
-}
-
-/* Tương phản cao (Cài đặt): tắt ảnh nền mờ sau nội dung + giảm texture
-   trang trí — chữ đứng trên nền trơn, đọc được ngoài trời/máy chiếu. */
+/* Tương phản cao tối đa (Cài đặt → độ phẳng nền 100%): tắt hẳn ảnh nền mờ
+   sau nội dung + họa tiết trang trí — chữ đứng trên nền trơn, đọc được
+   ngoài trời/máy chiếu. Mức dưới 100% dùng biến --flat để làm phẳng dần. */
 html[data-contrast='on'] .spotbg,
 html[data-contrast='on'] .mdv-bg-pattern {
   display: none;
@@ -317,11 +311,11 @@ html {
   gap: 2px;
   padding: 6px;
   border-radius: var(--radius-pill);
-  background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface-solid) calc(var(--flat, 0) * 100%), var(--color-surface));
   border: 1px solid rgb(255 213 106 / 0.35);
   box-shadow: var(--shadow-card);
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(calc(var(--glass-blur) * (1 - var(--flat, 0))));
+  backdrop-filter: blur(calc(var(--glass-blur) * (1 - var(--flat, 0))));
   width: min(520px, calc(100% - var(--space-6)));
 }
 .mdv-dock__item {

@@ -86,6 +86,9 @@
           if (q) localStorage.setItem('mdv.theme', q);
           if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
           document.documentElement.dataset.theme = t;
+          var f = localStorage.getItem('mdv.font'); // cỡ chữ: lg / xl
+          if (f === 'lg' || f === 'xl') document.documentElement.dataset.font = f;
+          if (localStorage.getItem('mdv.contrast') === 'on') document.documentElement.dataset.contrast = 'on';
         } catch (e) {}
       })();
     </script>

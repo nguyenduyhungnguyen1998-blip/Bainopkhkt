@@ -12,6 +12,9 @@ export type Route =
   | { name: 'quiz'; at?: string }
   | { name: 'admin' }
   | { name: 'settings' }
+  | { name: 'help' }
+  | { name: 'about' }
+  | { name: 'sources' }
   | { name: 'notfound'; path: string };
 
 export function parseHash(hash: string): Route {
@@ -34,6 +37,12 @@ export function parseHash(hash: string): Route {
       return { name: 'admin' };
     case 'settings':
       return { name: 'settings' };
+    case 'help':
+      return { name: 'help' };
+    case 'about':
+      return { name: 'about' };
+    case 'sources':
+      return { name: 'sources' };
     default:
       return { name: 'notfound', path: raw };
   }
@@ -65,5 +74,8 @@ export const routeHref = {
   /** Bảng điều khiển demo – chỉ gõ URL, không nằm trong dock. */
   admin: '#/admin',
   settings: '#/settings',
+  help: '#/help',
+  about: '#/about',
+  sources: '#/sources',
   destination: (siteId: string, spotId?: string) => `#/d/${siteId}${spotId ? `/${spotId}` : ''}`,
 };

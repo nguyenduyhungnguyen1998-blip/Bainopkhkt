@@ -30,6 +30,8 @@ const PATHS: Record<string, string> = {
   leaf: 'M5 19c0-9 5-13 14-14-1 9-5 14-14 14Zm0 0c3-5 6-8 9-9',
   clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Zm0-14v6l4 2',
   share: 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13',
+  info: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14v.01M12 10v6',
+  help: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-2.5-12.5a2.5 2.5 0 1 1 4 2c-.9.7-1.5 1.2-1.5 2.5M12 17v.01',
   /* Icon nhận diện từng khu di sản (dùng trên node bản đồ + huy hiệu). */
   scroll: 'M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm3 4h4m-4 4h4m-4 4h6', // Văn Miếu – bia tiến sĩ
   wave: 'M3 18c2-2 4-2 6 0s4 2 6 0 4-2 6 0M12 4v7m0-7c2.4 0 4.3 1.9 4.8 4.4H12m0-4.4C9.6 4 7.7 5.9 7.2 8.4H12', // Hạ Long – thuyền trên sóng

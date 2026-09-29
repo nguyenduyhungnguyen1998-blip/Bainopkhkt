@@ -1,0 +1,333 @@
+/* Tour spotlight + màn chào – lớp cao nhất của app (z95 > dock 80, toast 90). */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+}
+.tour__dim {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgb(8 15 26 / 0.58);
+  -webkit-backdrop-filter: blur(1.5px);
+  backdrop-filter: blur(1.5px);
+}
+.tour__ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 18px;
+  border: 2px solid rgb(255 255 255 / 0.9);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.12),
+    0 0 26px rgb(255 213 106 / 0.35),
+    inset 0 0 18px rgb(255 255 255 / 0.08);
+  pointer-events: none;
+}
+.tour__tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.tour__tipin {
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 48px rgb(0 0 0 / 0.4);
+  padding: 14px 16px 13px;
+  animation: tour-tip-in 380ms var(--ease-out) both;
+}
+@keyframes tour-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+.tour__tiphead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: 6px;
+}
+.tour__tipicon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-accent-secondary) 18%, transparent);
+  color: var(--color-accent-secondary);
+  flex: none;
+}
+.tour__tiptitle {
+  font-size: var(--text-md);
+  flex: 1;
+  min-width: 0;
+}
+.tour__tipcount {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-weight: 700;
+}
+.tour__tipbody {
+  margin: 0 0 10px;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--color-text-muted);
+}
+.tour__dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.tour__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background var(--dur-fast), width var(--dur-fast);
+}
+.tour__dot--done {
+  background: var(--color-text-faint);
+}
+.tour__dot--on {
+  width: 20px;
+  border-radius: var(--radius-pill);
+  background: var(--color-accent-secondary);
+}
+.tour__ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tour__skip {
+  display: block;
+  margin: 2px auto -4px;
+  background: none;
+  border: 0;
+  color: var(--color-text-faint);
+  font: inherit;
+  font-size: var(--text-xs);
+  padding: 8px 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tour__skip:active {
+  color: var(--color-text);
+}
+.tour__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  min-height: 40px;
+  min-width: 0;
+  padding: 0 13px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform var(--dur-fast) var(--ease-out), background var(--dur-fast);
+}
+.tour__btn:active {
+  transform: scale(0.96);
+}
+.tour__btn--primary {
+  flex: 1;
+  justify-content: center;
+  background: var(--color-accent-primary);
+  color: #fff;
+}
+.tour__btn--ghost {
+  background: transparent;
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+.tour__mascot {
+  display: block;
+  width: 92px;
+  height: auto;
+  margin: -56px auto 4px;
+  border-radius: 22px;
+  box-shadow: 0 10px 26px rgb(0 0 0 / 0.35);
+  animation: tour-tip-in 420ms var(--ease-spring) both;
+}
+.tour__tip--finale .tour__tipin {
+  text-align: center;
+}
+.tour__tip--finale .tour__tiphead,
+.tour__tip--finale .tour__dots {
+  justify-content: center;
+}
+
+/* Màn chào & menu trợ giúp */
+.ob__back {
+  position: fixed;
+  inset: 0;
+  z-index: 96;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: var(--space-4);
+  background: rgb(8 15 26 / 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation: ob-fade 320ms var(--ease-out) both;
+}
+@keyframes ob-fade {
+  from {
+    opacity: 0;
+  }
+}
+.ob__card {
+  width: min(360px, 100%);
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.45);
+  padding: 0 20px 18px;
+  text-align: center;
+  animation: ob-pop 460ms var(--ease-spring) both;
+}
+@keyframes ob-pop {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94);
+  }
+}
+.ob__sticker {
+  display: block;
+  margin-top: -64px;
+}
+.ob__mascot {
+  width: 128px;
+  height: auto;
+  border-radius: 26px;
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.4);
+  animation: ob-wave 2.6s ease-in-out 0.5s infinite;
+  transform-origin: 50% 90%;
+}
+@keyframes ob-wave {
+  0%,
+  58%,
+  100% {
+    transform: rotate(0deg);
+  }
+  64% {
+    transform: rotate(-4deg) translateY(-2px);
+  }
+  70% {
+    transform: rotate(3deg);
+  }
+  76% {
+    transform: rotate(-2deg);
+  }
+  82% {
+    transform: rotate(0deg);
+  }
+}
+.ob__title {
+  margin: 12px 0 4px;
+  font-size: var(--text-lg);
+}
+.ob__ask {
+  margin: 0 0 16px;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.ob__ctl {
+  display: grid;
+  gap: 8px;
+}
+.ob__foot {
+  margin: 14px 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+.ob__menu {
+  width: min(360px, 100%);
+  background: var(--color-surface-solid);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.45);
+  padding: 12px;
+  animation: ob-pop 420ms var(--ease-spring) both;
+}
+.ob__menutitle {
+  margin: 4px 8px 10px;
+  font-size: var(--text-md);
+}
+.ob__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--dur-fast);
+}
+.ob__opt:active {
+  background: rgb(127 138 163 / 0.14);
+}
+.ob__opticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-accent-secondary) 16%, transparent);
+  color: var(--color-accent-secondary);
+  flex: none;
+}
+.ob__optxt {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+.ob__optxt b {
+  font-size: var(--text-sm);
+}
+.ob__optxt small {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+/* Trung tâm màn hình lớn hơn: chào giữa thay vì chân */
+@media (min-width: 700px) {
+  .ob__back {
+    align-items: center;
+  }
+}
+
+/* Banner cập nhật / offline không được đè lên màn chào, menu trợ giúp hay tour. */
+html[data-overlay='1'] .mdv-update-bar,
+html[data-overlay='1'] .mdv-offline-bar {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour__dim,
+  .tour__ring,
+  .tour__tip,
+  .tour__tipin,
+  .ob__card,
+  .ob__menu,
+  .ob__back,
+  .ob__mascot {
+    transition: none !important;
+    animation: none !important;
+  }
+}

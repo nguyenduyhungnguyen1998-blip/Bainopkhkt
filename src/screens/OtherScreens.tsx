@@ -10,7 +10,7 @@ import './passport.css';
 import { useContrast, useFontSize, useTheme } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
-import { routeHref } from '../lib/router';
+import { navigate, routeHref } from '../lib/router';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
 
@@ -547,6 +547,20 @@ export function HelpScreen() {
           <Icon name="back" />
         </a>
       </header>
+      <button
+        class="mdv-btn mdv-btn--primary"
+        style="width:100%;justify-content:center;margin-bottom:12px"
+        onClick={() => {
+          try {
+            localStorage.setItem('mdv.tourReq', '1');
+          } catch {
+            /* bộ nhớ riêng tư */
+          }
+          navigate('map');
+        }}
+      >
+        ▶ {t(UI.tourWatch, lang)}
+      </button>
       <section class="mdv-card">
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Bắt đầu trong 30 giây' : 'Start in 30 seconds'}</h2>
         <ol class="steplist">

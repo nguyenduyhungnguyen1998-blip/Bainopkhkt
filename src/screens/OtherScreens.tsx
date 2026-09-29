@@ -7,9 +7,10 @@ import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, qui
 import type { Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
-import { useContrast, useFontSize, useTheme } from '../lib/theme';
+import { useAmbientFlat, useFontScale, useTheme, FLAT_PCT_MAX, FONT_PCT_MAX, FONT_PCT_MIN } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
+import { HelpMenu } from '../components/Onboarding';
 import { navigate, routeHref } from '../lib/router';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
@@ -17,6 +18,7 @@ import { enableDemoDock } from '../components/DemoDock';
 export function PassportScreen() {
   const [lang] = useLang();
   const p = useProgress();
+  const [helpMenu, setHelpMenu] = useState(false);
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
   const pct = totalSpots ? doneSpots / totalSpots : 0;
@@ -29,8 +31,13 @@ export function PassportScreen() {
           <span class="mdv-eyebrow">{t(UI.passport, lang)}</span>
           <h1>{lang === 'vi' ? 'Hộ chiếu di sản' : 'Heritage passport'}</h1>
         </div>
-        <div class="mdv-badge mdv-badge--next">
-          {p.xp} XP
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="mdv-badge mdv-badge--next">
+            {p.xp} XP
+          </div>
+          <button class="mdv-chip" onClick={() => setHelpMenu(true)} aria-label={t(UI.howto, lang)}>
+            <Icon name="help" size={16} />
+          </button>
         </div>
       </header>
       <section class="mdv-card ppass__ringcard" aria-label={t(UI.yourJourney, lang)}>
@@ -120,6 +127,7 @@ export function PassportScreen() {
           );
         })}
       </div>
+      {helpMenu && <HelpMenu lang={lang} onClose={() => setHelpMenu(false)} />}
     </main>
   );
 }
@@ -235,6 +243,7 @@ function BackupCard({ lang }: { lang: Lang }) {
 export function QuizScreen({ at }: { at?: string }) {
   const [lang] = useLang();
   useProgress();
+  const [helpMenu, setHelpMenu] = useState(false);
   const [active, setActive] = useState<{ siteId: string; spotId: string } | null>(() => {
     // Deep link #/quiz?at=<site>/<spot> từ CTA "thử tài tại đây" — validate trước khi mở.
     const [siteId, spotId] = at?.split('/') ?? [];
@@ -255,6 +264,9 @@ export function QuizScreen({ at }: { at?: string }) {
           <span class="mdv-eyebrow">{t(UI.quiz, lang)}</span>
           <h1>{lang === 'vi' ? 'Thử tài sĩ tử' : 'Scholar challenge'}</h1>
         </div>
+        <button class="mdv-chip" onClick={() => setHelpMenu(true)} aria-label={t(UI.howto, lang)}>
+          <Icon name="help" size={16} />
+        </button>
       </header>
       <p class="mdv-muted">{t(UI.quizPickSpot, lang)}</p>
       <div class="quiz__list">
@@ -292,6 +304,7 @@ export function QuizScreen({ at }: { at?: string }) {
         })}
         {!spotsWithQuiz.length && <p class="mdv-muted">{t(UI.quizNoData, lang)}</p>}
       </div>
+      {helpMenu && <HelpMenu lang={lang} onClose={() => setHelpMenu(false)} />}
     </main>
   );
 }
@@ -432,11 +445,89 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   );
 }
 
+/* Dải màu của thanh %: xám → ngọc → vàng → cam theo mức tăng. */
+interface LevelBand {
+  to: number;
+  color: string;
+  name: { vi: string; en: string };
+}
+
+const FONT_BANDS: LevelBand[] = [
+  { to: 95, color: '#64748b', name: { vi: 'Nhỏ gọn', en: 'Compact' } },
+  { to: 108, color: '#0f766e', name: { vi: 'Vừa đọc', en: 'Standard' } },
+  { to: 120, color: '#b45309', name: { vi: 'Lớn', en: 'Large' } },
+  { to: Number.MAX_SAFE_INTEGER, color: '#c2410c', name: { vi: 'Rất lớn', en: 'Extra large' } },
+];
+
+const FLAT_BANDS: LevelBand[] = [
+  { to: 25, color: '#64748b', name: { vi: 'Giữ nền mờ', en: 'Keep ambience' } },
+  { to: 55, color: '#0f766e', name: { vi: 'Nhẹ', en: 'Subtle' } },
+  { to: 85, color: '#b45309', name: { vi: 'Vừa', en: 'Medium' } },
+  { to: Number.MAX_SAFE_INTEGER, color: '#c2410c', name: { vi: 'Nền đơn sắc', en: 'Solid' } },
+];
+
+/** Thanh trượt % có dải màu theo mức — phần đã kéo tô gradient band, còn lại xám. */
+function LevelSlider({
+  lang,
+  min,
+  max,
+  value,
+  bands,
+  onChange,
+  aria,
+}: {
+  lang: Lang;
+  min: number;
+  max: number;
+  value: number;
+  bands: LevelBand[];
+  onChange: (v: number) => void;
+  aria: string;
+}) {
+  const band = bands.find((b) => value <= b.to) ?? bands[bands.length - 1];
+  const fill = ((value - min) / (max - min)) * 100;
+  const stops = bands
+    .map((b, i) => {
+      const from = i === 0 ? 0 : Math.min(100, ((bands[i - 1].to - min) / (max - min)) * 100);
+      const to = Math.min(100, ((b.to - min) / (max - min)) * 100);
+      return `${b.color} ${from}%, ${b.color} ${to}%`;
+    })
+    .join(', ');
+  return (
+    <>
+      <span class="lv__meta">
+        <span class="lv__zone" style={{ color: band.color }}>
+          {t(band.name, lang)}
+        </span>
+        <span class="lv__val" style={{ background: band.color }}>
+          {value}%
+        </span>
+      </span>
+      <input
+        class="lv__range"
+        type="range"
+        min={min}
+        max={max}
+        step={1}
+        value={value}
+        aria-label={aria}
+        aria-valuetext={`${value}%`}
+        style={{
+          '--lv-fill': `${fill}%`,
+          '--lv-grad': `linear-gradient(90deg, ${stops})`,
+          '--lv-thumb': band.color,
+        }}
+        onInput={(e) => onChange(Number((e.target as HTMLInputElement).value))}
+      />
+    </>
+  );
+}
+
 export function SettingsScreen() {
   const [lang, setLang] = useLang();
   const [theme, setTheme] = useTheme();
-  const [font, setFont] = useFontSize();
-  const [hc, setHc] = useContrast();
+  const [fontPct, setFontPct] = useFontScale();
+  const [flatPct, setFlatPct] = useAmbientFlat();
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -472,23 +563,27 @@ export function SettingsScreen() {
           </div>
           <div class="setrow">
             <span class="setrow__lbl">{t(UI.fontSize, lang)}</span>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="mdv-chip" aria-pressed={font === 'md'} onClick={() => setFont('md')}>
-                {t(UI.fontDefault, lang)}
-              </button>
-              <button class="mdv-chip" aria-pressed={font === 'lg'} onClick={() => setFont('lg')}>
-                {t(UI.fontLarge, lang)}
-              </button>
-              <button class="mdv-chip" aria-pressed={font === 'xl'} onClick={() => setFont('xl')}>
-                {t(UI.fontXLarge, lang)}
-              </button>
-            </div>
+            <LevelSlider
+              lang={lang}
+              min={FONT_PCT_MIN}
+              max={FONT_PCT_MAX}
+              value={fontPct}
+              bands={FONT_BANDS}
+              onChange={setFontPct}
+              aria={t(UI.fontSize, lang)}
+            />
           </div>
           <div class="setrow">
-            <span class="setrow__lbl">{t(UI.highContrast, lang)}</span>
-            <button class="mdv-chip" aria-pressed={hc} onClick={() => setHc(!hc)}>
-              {hc ? (lang === 'vi' ? 'Đang bật' : 'On') : (lang === 'vi' ? 'Đang tắt' : 'Off')}
-            </button>
+            <span class="setrow__lbl">{t(UI.flatLevel, lang)}</span>
+            <LevelSlider
+              lang={lang}
+              min={0}
+              max={FLAT_PCT_MAX}
+              value={flatPct}
+              bands={FLAT_BANDS}
+              onChange={setFlatPct}
+              aria={t(UI.flatLevel, lang)}
+            />
           </div>
         </section>
 

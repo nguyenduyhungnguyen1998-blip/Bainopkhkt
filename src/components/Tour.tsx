@@ -13,6 +13,8 @@ export interface TourStep {
   body: Localized;
   /** 'finale' = thẻ kết có mascot + CTA lớn */
   kind?: 'finale';
+  /** Chạy khi bước này hiện — vd. điều hướng vào trong điểm để soi tính năng bên trong. */
+  enter?: () => void;
 }
 
 const PAD = 9;
@@ -51,6 +53,7 @@ export function GuidedTour({ steps, onDone }: { steps: TourStep[]; onDone: () =>
   // ngoài khung cuộn ngang), rồi đọc rect ở frame sau. Vòng đo lặp 350ms giữ ring
   // dính mục tiêu kể cả lúc camera bản đồ còn đang bay về điểm kế tiếp.
   useLayoutEffect(() => {
+    step.enter?.();
     let raf1 = 0;
     let raf2 = 0;
     const measure = () => {
@@ -78,6 +81,7 @@ export function GuidedTour({ steps, onDone }: { steps: TourStep[]; onDone: () =>
       window.clearInterval(tick);
       window.removeEventListener('resize', measure);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i, step.sel]);
 
   // Chiều cao tooltip thật (đổi theo bước/lang) để neo trên/dưới không bị lệch.

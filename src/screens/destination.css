@@ -845,14 +845,15 @@ a.dest__crumb--link:active {
   opacity: 0;
   transition: opacity 0.8s var(--ease-out, ease);
 }
+/* --bo: độ rõ nền đồng bộ theo theme; --flat (Cài đặt) làm mờ dần tới 0. */
 .spotbg img.is-in {
-  opacity: 0.58;
+  opacity: calc(0.58 * (1 - var(--flat, 0)));
 }
 :root[data-theme='dark'] .spotbg img {
   filter: blur(14px) saturate(1.15) brightness(0.72);
 }
 :root[data-theme='dark'] .spotbg img.is-in {
-  opacity: 0.5;
+  opacity: calc(0.5 * (1 - var(--flat, 0)));
 }
 
 @media (prefers-reduced-motion: reduce) {

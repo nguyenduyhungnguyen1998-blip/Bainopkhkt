@@ -13,6 +13,7 @@ import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
 import { useOnline } from '../lib/theme';
+import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
 import './destination.css';
 
@@ -366,6 +367,11 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             </div>
           </>
         )}
+        {!unlocked && (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.scanOkHint, lang)}
+          </p>
+        )}
         <button
           class="mdv-btn mdv-btn--primary dscan__cta"
           onClick={() => {
@@ -450,6 +456,8 @@ function CardView({ card, lang, initialAspect, onActiveImage }: { card: Card; la
 function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | ImageCard; lang: Lang; isHero: boolean; onActive?: (src: string) => void }) {
   const imgs = [card.image, ...(card.images ?? [])];
   const [idx, setIdx] = useState(0);
+  const [credOn, setCredOn] = useState(false);
+  const credit = IMAGE_CREDITS[imgs[idx]];
   const touched = useRef(false); // chỉ thẻ phụ (không phải hero) sync nền SAU khi khách tự vuốt
   const touchX = useRef<number | null>(null);
   const go = (d: number) => setIdx((i) => (i + d + imgs.length) % imgs.length);
@@ -496,8 +504,38 @@ function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | Imag
             </div>
           </>
         )}
+        {credit && (
+          <button
+            class="dgal__cred"
+            aria-label={t(UI.photoCreditAria, lang)}
+            aria-pressed={credOn}
+            onClick={() => setCredOn((v) => !v)}
+          >
+            <Icon name="info" size={15} />
+          </button>
+        )}
       </div>
       {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
+      {credOn && credit && (
+        <p class="dgal__credline">
+          {credit.author} ·{' '}
+          {credit.licenseUrl ? (
+            <a href={credit.licenseUrl} target="_blank" rel="noreferrer">
+              {credit.license}
+            </a>
+          ) : (
+            credit.license
+          )}
+          {' · '}
+          {credit.sourceUrl ? (
+            <a href={credit.sourceUrl} target="_blank" rel="noreferrer">
+              {t(UI.viewSource, lang)}
+            </a>
+          ) : (
+            credit.source
+          )}
+        </p>
+      )}
     </figure>
   );
 }

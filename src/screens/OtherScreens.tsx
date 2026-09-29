@@ -7,9 +7,11 @@ import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, qui
 import type { Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
-import { useTheme } from '../lib/theme';
+import { useContrast, useFontSize, useTheme } from '../lib/theme';
+import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
 import { routeHref } from '../lib/router';
+import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
 
 export function PassportScreen() {
@@ -60,6 +62,10 @@ export function PassportScreen() {
       </section>
 
       <section class="mdv-card ppass__quote">“{t(UI.journeyQuote, lang)}”</section>
+
+      <p class="mdv-muted ppass__note">
+        <Icon name="passport" size={13} /> {t(UI.storedLocally, lang)}
+      </p>
 
       {doneSpots === 0 && (
         <a class="mdv-btn mdv-btn--primary ppass__cta" href={routeHref.map}>
@@ -149,7 +155,7 @@ function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; tot
   );
 }
 
-/** Sao lưu & chuyển thiết bị (Cài đặt): xuất JSON có thông báo; nhập có xem trước + chọn gộp/thay thế. */
+/** Sao lưu & chuyển thiết bị (nhóm Hành trình trong Cài đặt): xuất/nhập có xem trước + chọn gộp/thay thế. */
 function BackupCard({ lang }: { lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -188,8 +194,8 @@ function BackupCard({ lang }: { lang: Lang }) {
   };
 
   return (
-    <section class="mdv-card">
-      <h2 style="font-size:var(--text-md);margin:0 0 4px">{t(UI.backupTitle, lang)}</h2>
+    <div>
+      <h3 style="font-size:var(--text-sm);margin:0 0 4px">{t(UI.backupTitle, lang)}</h3>
       <p class="mdv-muted" style="margin:0 0 10px;font-size:var(--text-sm)">{t(UI.backupDesc, lang)}</p>
       {preview ? (
         <div class="backup__preview">
@@ -222,7 +228,7 @@ function BackupCard({ lang }: { lang: Lang }) {
       )}
       <input ref={fileRef} type="file" accept=".html,.json,application/json,text/html" hidden aria-label={t(UI.importPassport, lang)} onChange={(e) => void doPick((e.target as HTMLInputElement).files?.[0])} />
       {msg && <p class="ppass__toolmsg" role="status">{msg}</p>}
-    </section>
+    </div>
   );
 }
 
@@ -429,6 +435,8 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
 export function SettingsScreen() {
   const [lang, setLang] = useLang();
   const [theme, setTheme] = useTheme();
+  const [font, setFont] = useFontSize();
+  const [hc, setHc] = useContrast();
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -439,41 +447,309 @@ export function SettingsScreen() {
       </header>
       <div style="display:grid;gap:var(--space-3)">
         <section class="mdv-card">
-          <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.theme, lang)}</h2>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="mdv-chip" aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')}>
-              <Icon name="moon" size={16} /> {t(UI.dark, lang)}
-            </button>
-            <button class="mdv-chip" aria-pressed={theme === 'light'} onClick={() => setTheme('light')}>
-              <Icon name="sun" size={16} /> {t(UI.light, lang)}
+          <h2 style="font-size:var(--text-md);margin:0 0 12px">{t(UI.groupDisplay, lang)}</h2>
+          <div class="setrow">
+            <span class="setrow__lbl">{t(UI.theme, lang)}</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="mdv-chip" aria-pressed={theme === 'dark'} onClick={() => setTheme('dark')}>
+                <Icon name="moon" size={16} /> {t(UI.dark, lang)}
+              </button>
+              <button class="mdv-chip" aria-pressed={theme === 'light'} onClick={() => setTheme('light')}>
+                <Icon name="sun" size={16} /> {t(UI.light, lang)}
+              </button>
+            </div>
+          </div>
+          <div class="setrow">
+            <span class="setrow__lbl">{t(UI.language, lang)}</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
+                Tiếng Việt
+              </button>
+              <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
+                English
+              </button>
+            </div>
+          </div>
+          <div class="setrow">
+            <span class="setrow__lbl">{t(UI.fontSize, lang)}</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="mdv-chip" aria-pressed={font === 'md'} onClick={() => setFont('md')}>
+                {t(UI.fontDefault, lang)}
+              </button>
+              <button class="mdv-chip" aria-pressed={font === 'lg'} onClick={() => setFont('lg')}>
+                {t(UI.fontLarge, lang)}
+              </button>
+              <button class="mdv-chip" aria-pressed={font === 'xl'} onClick={() => setFont('xl')}>
+                {t(UI.fontXLarge, lang)}
+              </button>
+            </div>
+          </div>
+          <div class="setrow">
+            <span class="setrow__lbl">{t(UI.highContrast, lang)}</span>
+            <button class="mdv-chip" aria-pressed={hc} onClick={() => setHc(!hc)}>
+              {hc ? (lang === 'vi' ? 'Đang bật' : 'On') : (lang === 'vi' ? 'Đang tắt' : 'Off')}
             </button>
           </div>
         </section>
+
         <section class="mdv-card">
-          <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.language, lang)}</h2>
-          <div style="display:flex;gap:8px">
-            <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
-              Tiếng Việt
-            </button>
-            <button class="mdv-chip" aria-pressed={lang === 'en'} onClick={() => setLang('en')}>
-              English
+          <h2 style="font-size:var(--text-md);margin:0 0 12px">{t(UI.groupJourney, lang)}</h2>
+          <p class="mdv-muted" style="font-size:var(--text-sm);margin:0 0 12px">
+            {t(UI.storedLocally, lang)}
+          </p>
+          <BackupCard lang={lang} />
+          <div class="setrow" style="margin-top:14px">
+            <span class="setrow__lbl">{lang === 'vi' ? 'Đặt lại' : 'Reset'}</span>
+            <button
+              class="mdv-btn mdv-btn--ghost"
+              onClick={() => {
+                if (confirm(lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?')) resetProgress();
+              }}
+            >
+              {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
             </button>
           </div>
         </section>
-        <BackupCard lang={lang} />
+
         <section class="mdv-card">
-          <h2 style="font-size:var(--text-md);margin:0 0 10px">{lang === 'vi' ? 'Dữ liệu' : 'Data'}</h2>
-          <button
-            class="mdv-btn mdv-btn--ghost"
-            onClick={() => {
-              if (confirm(lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?')) resetProgress();
-            }}
-          >
-            {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
-          </button>
+          <h2 style="font-size:var(--text-md);margin:0 0 6px">{t(UI.groupHelp, lang)}</h2>
+          <a class="setlink" href={routeHref.help}>
+            <Icon name="help" size={16} /> {t(UI.howto, lang)}
+            <Icon name="forward" size={14} />
+          </a>
+          <a class="setlink" href={routeHref.sources}>
+            <Icon name="info" size={16} /> {t(UI.sourcesTitle, lang)}
+            <Icon name="forward" size={14} />
+          </a>
+          <a class="setlink" href={routeHref.about}>
+            <Icon name="passport" size={16} /> {t(UI.about, lang)}
+            <Icon name="forward" size={14} />
+          </a>
         </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
       </div>
+    </main>
+  );
+}
+
+/** Trợ giúp (#/help): hướng dẫn dùng app cho người mới + FAQ ngắn. */
+export function HelpScreen() {
+  const [lang] = useLang();
+  const vi = lang === 'vi';
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">{t(UI.help, lang)}</span>
+          <h1>{t(UI.howto, lang)}</h1>
+        </div>
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.settings} aria-label={t(UI.back, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Bắt đầu trong 30 giây' : 'Start in 30 seconds'}</h2>
+        <ol class="steplist">
+          <li>
+            <Icon name="compass" size={16} /> {t(UI.howtoStep1, lang)}
+          </li>
+          <li>
+            <Icon name="qr" size={16} /> {t(UI.howtoStep2, lang)}
+          </li>
+          <li>
+            <Icon name="passport" size={16} /> {t(UI.howtoStep3, lang)}
+          </li>
+        </ol>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Quét tem QR' : 'Scanning a tag'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Mở camera điện thoại, hướng vào mã trên tem tại điểm di sản — link mở thẳng trang điểm. Khi mã được kiểm tra hợp lệ, chạm "Nhận dấu" để lưu chuyến ghé thăm và nhận XP.'
+            : 'Open your phone camera at a tag at the site — the link opens the spot page directly. Once the code checks out, tap "Collect stamp" to save the visit and earn XP.'}
+        </p>
+        <p class="steptext">
+          {vi
+            ? 'Camera không quét được? Vào bản đồ → Tìm kiếm → nhập mã 16 ký tự in dưới tem.'
+            : 'Camera trouble? On the map → Search → type the 16-character code printed under the tag.'}
+        </p>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Mất mạng & đổi máy' : 'Offline & switching devices'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Sau lần mở đầu, app chạy kể cả khi không có mạng. Dấu và XP lưu ngay trên thiết bị — không cần tài khoản.'
+            : 'After the first open, the app works fully offline. Stamps and XP stay on the device — no account needed.'}
+        </p>
+        <p class="steptext">
+          {vi
+            ? 'Đổi máy: Cài đặt → Sao lưu → tải thẻ hộ chiếu (.html) → máy mới mở app → Khôi phục → chọn file đó.'
+            : 'New phone: Settings → Backup → download the passport card (.html) → on the new device open the app → Restore → pick that file.'}
+        </p>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Câu hỏi thường gặp' : 'FAQ'}</h2>
+        <details class="steptext">
+          <summary>{vi ? 'Quét lại điểm đã có dấu?' : 'Re-scan a stamped spot?'}</summary>
+          <p>
+            {vi
+              ? 'Vẫn được — nội dung mở lại bình thường, chỉ không cộng thêm dấu/XP.'
+              : 'Fine — the content reopens normally; no extra stamp or XP is added.'}
+          </p>
+        </details>
+        <details class="steptext">
+          <summary>{vi ? 'Máy không đọc thuyết minh?' : 'No narration voice?'}</summary>
+          <p>
+            {vi
+              ? 'Một số máy thiếu giọng đọc — bản văn đầy đủ luôn nằm ngay dưới nút Nghe để đọc tay.'
+              : 'Some devices lack a speech voice — the full script sits right under the Play button to read.'}
+          </p>
+        </details>
+        <details class="steptext">
+          <summary>{vi ? 'Dữ liệu có gửi lên mạng không?' : 'Is my data uploaded?'}</summary>
+          <p>
+            {vi
+              ? 'Không. Toàn bộ hành trình chỉ nằm trong máy của bạn.'
+              : 'No. Your whole journey stays on your device.'}
+          </p>
+        </details>
+      </section>
+    </main>
+  );
+}
+
+/** Về sản phẩm (#/about): đội ngũ, mục đích, phạm vi thực — không quảng bá. */
+export function AboutScreen() {
+  const [lang] = useLang();
+  const vi = lang === 'vi';
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">{t(UI.about, lang)}</span>
+          <h1>Mở Dấu Việt</h1>
+        </div>
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.settings} aria-label={t(UI.back, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Sản phẩm này là gì?' : 'What is this?'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Đề tài khoa học kỹ thuật cấp thành phố của nhóm học sinh: biến mỗi điểm di sản thành một hướng dẫn viên số hai ngôn ngữ — quét tem QR là nghe được câu chuyện, nhận dấu vào hộ chiếu và tự kiểm tra bằng quiz. Chạy ngay trên web, không cần cài app, dùng được cả khi mất mạng.'
+            : 'A city-level science fair project by a student team: it turns every heritage stop into a bilingual digital guide — scan a tag to hear the story, collect a passport stamp and self-check with a quiz. Runs on the web, no install, works offline.'}
+        </p>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Phạm vi hiện tại' : 'Current scope'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Đây là một hành trình mẫu 10 điểm, làm sâu nhất tại Văn Miếu – Quốc Tử Giám (6 điểm trong khu), cùng 4 điểm mở rộng ở Dinh Độc Lập, Vịnh Hạ Long, Cố đô Huế và Thánh địa Mỹ Sơn. Chưa phải bản phủ đều cả nước.'
+            : 'This is a 10-stop sample journey, deepest at the Temple of Literature (6 in-site stops), plus single showcase stops at the Independence Palace, Ha Long Bay, Hue and My Son — not nationwide coverage.'}
+        </p>
+        <p class="steptext">
+          {vi
+            ? 'Bản thử nghiệm: hành trình lưu trên thiết bị, chưa có tài khoản đồng bộ; dùng Sao lưu để chuyển máy.'
+            : 'Preview build: journeys live on the device — no account sync yet; use Backup to move phones.'}
+        </p>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Tư liệu & ảnh' : 'Sources & photos'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Nội dung Văn Miếu biên soạn theo tư liệu chuẩn của nhóm; ảnh lấy từ Wikimedia Commons (ghi rõ tác giả & giấy phép) và video do nhóm tự quay.'
+            : 'Temple of Literature content follows the team’s verified material; photos come from Wikimedia Commons (author & license credited) and footage shot by the team.'}
+        </p>
+        <a class="mdv-btn mdv-btn--ghost" href={routeHref.sources}>
+          <Icon name="info" size={16} /> {t(UI.sourcesTitle, lang)}
+        </a>
+      </section>
+      <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
+    </main>
+  );
+}
+
+/** Nguồn (#/sources): sổ ghi công từng ảnh + tư liệu nội dung từng điểm. */
+export function SourcesScreen() {
+  const [lang] = useLang();
+  const vi = lang === 'vi';
+  const entries = Object.entries(IMAGE_CREDITS);
+  return (
+    <main class="mdv-screen">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow">{t(UI.about, lang)}</span>
+          <h1>{t(UI.sourcesTitle, lang)}</h1>
+        </div>
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.settings} aria-label={t(UI.back, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 4px">{t(UI.photoSources, lang)}</h2>
+        <p class="mdv-muted" style="font-size:var(--text-xs);margin:0 0 12px">
+          {vi
+            ? 'Ảnh Wikimedia Commons ghi kèm tác giả & giấy phép; phần còn lại là frame video do nhóm tự quay.'
+            : 'Wikimedia Commons photos carry author & license; the rest are frames from footage the team shot itself.'}
+        </p>
+        {entries.map(([path, c]) => (
+          <div key={path} class="srcrow">
+            <span class="srcrow__file">{path.replace('/img/', '')}</span>
+            <span class="srcrow__meta">
+              {c.author} ·{' '}
+              {c.licenseUrl ? (
+                <a href={c.licenseUrl} target="_blank" rel="noreferrer">
+                  {c.license}
+                </a>
+              ) : (
+                c.license
+              )}
+              {c.sourceUrl ? (
+                <>
+                  {' '}
+                  · <a href={c.sourceUrl} target="_blank" rel="noreferrer">{t(UI.viewSource, lang)}</a>
+                </>
+              ) : (
+                <> · {c.source}</>
+              )}
+              {c.note ? <> · <i>{t(c.note, lang)}</i></> : null}
+            </span>
+          </div>
+        ))}
+      </section>
+      {SITES.map((s) => {
+        const spots = s.spots.filter((sp) => sp.sources?.length);
+        if (!spots.length) return null;
+        return (
+          <section key={s.entityId} class="mdv-card">
+            <h2 style="font-size:var(--text-md);margin:0 0 10px">
+              {t(UI.contentSources, lang)} — {t(s.name, lang)}
+            </h2>
+            {spots.map((sp) => (
+              <div key={sp.spotId} style="margin-bottom:10px">
+                <b style="font-size:var(--text-sm)">{t(sp.name, lang)}</b>
+                <ul class="srclist">
+                  {sp.sources!.map((src) => (
+                    <li key={src.title}>
+                      {src.url ? (
+                        <a href={src.url} target="_blank" rel="noreferrer">
+                          {src.title}
+                        </a>
+                      ) : (
+                        src.title
+                      )}
+                      {src.reviewed === false && (
+                        <span class="srclist__pending">{t(UI.crossChecking, lang)}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        );
+      })}
     </main>
   );
 }

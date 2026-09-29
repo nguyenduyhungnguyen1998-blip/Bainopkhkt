@@ -11,7 +11,7 @@ import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
-import { AdminScreen, PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
+import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
@@ -92,6 +92,15 @@ export function App() {
       break;
     case 'settings':
       screen = <SettingsScreen />;
+      break;
+    case 'help':
+      screen = <HelpScreen />;
+      break;
+    case 'about':
+      screen = <AboutScreen />;
+      break;
+    case 'sources':
+      screen = <SourcesScreen />;
       break;
     default:
       screen = (

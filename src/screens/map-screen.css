@@ -255,6 +255,43 @@
   z-index: 35;
   animation: mhint-in var(--dur-slow) var(--ease-out);
 }
+/* Thẻ hướng dẫn 3 bước (lần đầu + nút ? mở lại): rộng hơn hint chip, xếp dọc. */
+.mhint--howto {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: min(340px, calc(100% - 24px));
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  font-weight: 500;
+}
+.mhint__steps {
+  display: grid;
+  gap: 7px;
+}
+.mhint__steps span {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+.mhint__steps svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-accent-secondary-text);
+}
+.mhint__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mhint__row .mhint__x {
+  margin-left: auto;
+}
+.mscreen__helpbtn {
+  flex: none;
+  padding-inline: 10px;
+}
 /* Tìm kiếm địa danh: sheet nổi trên bản đồ */
 .mscreen__searchbtn {
   flex: none;

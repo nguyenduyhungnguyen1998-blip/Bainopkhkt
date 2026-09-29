@@ -101,7 +101,9 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
+          // key theo spotId: đổi điểm cùng khu phải remount card — không thì gallery
+          // giữ idx cũ -> vượt độ dài ảnh của điểm mới = khung trống, nền cũng cũ.
+          <CardView key={`${spot.spotId}:${i}`} card={card} lang={lang} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
         ))}
       </div>
 

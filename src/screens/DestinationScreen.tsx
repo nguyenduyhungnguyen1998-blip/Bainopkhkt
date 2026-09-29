@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
-import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
+import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { asset } from '../lib/asset';
@@ -19,6 +19,7 @@ import './destination.css';
 export function DestinationScreen({ siteId, spotId, query }: { siteId: string; spotId?: string; query?: URLSearchParams }) {
   const [lang] = useLang();
   useProgress(); // re-render khi mở khóa
+  const [bgSrc, setBgSrc] = useState<string | null>(null); // ảnh đang xem -> nền mờ đồng bộ
   const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
   const found = siteOnly ? undefined : getSpot(siteId, spotId);
   if (siteOnly) return <SiteIntro site={siteOnly} />;
@@ -55,6 +56,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
   return (
     <main class="mdv-screen dest">
+      <SpotBg src={bgSrc} />
       <header class="dest__top">
         <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.back, lang)}>
           <Icon name="back" />
@@ -99,7 +101,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} initialAspect={query?.get('a')} />
+          <CardView key={i} card={card} lang={lang} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
         ))}
       </div>
 
@@ -421,15 +423,11 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang, initialAspect }: { card: Card; lang: Lang; initialAspect?: string | null }) {
+function CardView({ card, lang, initialAspect, onActiveImage }: { card: Card; lang: Lang; initialAspect?: string | null; onActiveImage?: (src: string) => void }) {
   switch (card.type) {
     case 'hero':
-      return (
-        <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={asset(card.image)} alt={t(card.caption, lang)} />
-          {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
-        </figure>
-      );
+    case 'image':
+      return <GalleryFigure card={card} lang={lang} isHero={card.type === 'hero'} onActive={onActiveImage} />;
     case 'aspects':
       return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
@@ -443,14 +441,79 @@ function CardView({ card, lang, initialAspect }: { card: Card; lang: Lang; initi
           <p>{t(card.text, lang)}</p>
         </div>
       );
-    case 'image':
-      return (
-        <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={asset(card.image)} alt={t(card.caption, lang)} loading="lazy" />
-          {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
-        </figure>
-      );
   }
+}
+
+/** Gallery ảnh của một điểm: xếp chồng + crossfade, nút ‹ › và vuốt ngang. */
+function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | ImageCard; lang: Lang; isHero: boolean; onActive?: (src: string) => void }) {
+  const imgs = [card.image, ...(card.images ?? [])];
+  const [idx, setIdx] = useState(0);
+  const touched = useRef(false); // chỉ thẻ phụ (không phải hero) sync nền SAU khi khách tự vuốt
+  const touchX = useRef<number | null>(null);
+  const go = (d: number) => setIdx((i) => (i + d + imgs.length) % imgs.length);
+  const userGo = (d: number) => {
+    touched.current = true;
+    go(d);
+  };
+  useEffect(() => {
+    if (onActive && (isHero || touched.current)) onActive(imgs[idx]);
+  }, [idx]);
+  const multi = imgs.length > 1;
+  return (
+    <figure class={`dcard dcard--hero dcard--${card.size} ${multi ? 'dcard--gal' : ''}`}>
+      <div
+        class="dgal"
+        onTouchStart={multi ? (e) => (touchX.current = e.touches[0].clientX) : undefined}
+        onTouchEnd={
+          multi
+            ? (e) => {
+                const x0 = touchX.current;
+                touchX.current = null;
+                if (x0 === null) return;
+                const dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dx) > 42) userGo(dx < 0 ? 1 : -1);
+              }
+            : undefined
+        }
+      >
+        {imgs.map((s, i) => (
+          <img key={s} src={asset(s)} alt={i === idx ? t(card.caption, lang) : ''} class={i === idx ? 'is-on' : ''} />
+        ))}
+        {multi && (
+          <>
+            <button class="dgal__nav dgal__nav--prev" onClick={() => userGo(-1)} aria-label={lang === 'vi' ? 'Ảnh trước' : 'Previous photo'}>
+              <Icon name="back" size={18} />
+            </button>
+            <button class="dgal__nav dgal__nav--next" onClick={() => userGo(1)} aria-label={lang === 'vi' ? 'Ảnh kế' : 'Next photo'}>
+              <Icon name="forward" size={18} />
+            </button>
+            <div class="dgal__dots" aria-hidden="true">
+              {imgs.map((_, i) => (
+                <i key={i} class={i === idx ? 'on' : ''} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
+    </figure>
+  );
+}
+
+/** Nền đồng bộ mờ: phủ kín viewport phía sau nội dung, crossfade khi đổi ảnh. */
+function SpotBg({ src }: { src: string | null }) {
+  const [layers, setLayers] = useState<string[]>([]);
+  useEffect(() => {
+    if (src) setLayers((l) => (l[l.length - 1] === src ? l : [...l.slice(-1), src]));
+  }, [src]);
+  if (!layers.length) return null;
+  return (
+    <div class="spotbg" aria-hidden="true">
+      {layers.map((s, i) => (
+        <img key={s} src={asset(s)} alt="" class={i === layers.length - 1 ? 'is-in' : ''} />
+      ))}
+    </div>
+  );
 }
 
 /** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */

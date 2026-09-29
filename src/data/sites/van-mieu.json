@@ -58,7 +58,11 @@
           "caption": {
             "vi": "Cổng tam quan hai tầng dẫn vào khu di tích",
             "en": "The two-storey triple gate at the entrance"
-          }
+          },
+          "images": [
+            "/img/van-mieu/toan-canh-truc-chinh.webp",
+            "/img/van-mieu/toan-canh-tren-cao.webp"
+          ]
         },
         {
           "type": "audio",
@@ -364,7 +368,11 @@
           "caption": {
             "vi": "Gác Khuê Văn – biểu tượng của Thủ đô Hà Nội",
             "en": "Khue Van Pavilion – the symbol of Hanoi"
-          }
+          },
+          "images": [
+            "/img/van-mieu/kvc-qua-dai-trung-mon.webp",
+            "/img/van-mieu/kvc-gac-cau-doi.webp"
+          ]
         },
         {
           "type": "audio",
@@ -619,7 +627,11 @@
           "caption": {
             "vi": "82 bia đá đặt trên lưng rùa quanh giếng Thiên Quang",
             "en": "82 stone steles on tortoise backs around the Well of Heavenly Clarity"
-          }
+          },
+          "images": [
+            "/img/van-mieu/bia-rua-doc-bia.webp",
+            "/img/van-mieu/bia-nha-bia-gieng.webp"
+          ]
         },
         {
           "type": "audio",
@@ -1390,17 +1402,25 @@
         "vi": "Khoảng xanh phía Tây khu di tích – phần đất Hồ Văn được trả lại năm 1940, mang tên của trường đại học đầu tiên nước ta.",
         "en": "The green quarter west of the complex – Literature Lake land returned in 1940, named after Vietnam's first university."
       },
-      "coords": [105.8335, 21.0263],
+      "coords": [
+        105.8335,
+        21.0263
+      ],
       "xp": 40,
       "layoutSchema": [
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/van-mieu/vuon-giam.webp",
+          "image": "/img/van-mieu/vuon-giam-bat-giac.webp",
           "caption": {
             "vi": "Vườn Giám – khoảng xanh phía Tây Văn Miếu – Quốc Tử Giám",
             "en": "Academy Garden – the green quarter west of Van Mieu – Quoc Tu Giam"
-          }
+          },
+          "images": [
+            "/img/van-mieu/vuon-giam-duong-di.webp",
+            "/img/van-mieu/vuon-giam-canh-quan.webp",
+            "/img/van-mieu/vuon-giam.webp"
+          ]
         },
         {
           "type": "audio",

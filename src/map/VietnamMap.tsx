@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { MAP_WIDTH, MAP_HEIGHT, VIETNAM_LAND_PATH, NEIGHBOUR_PATHS } from './vietnam-geometry';
-import { project, unproject, ARCHIPELAGOS } from './projection';
+import { project, unproject, ARCHIPELAGOS, ISLES } from './projection';
 import { smoothPath, bboxOf, fitBox, type Transform } from './geometry-utils';
 import { useMapGestures } from './useMapGestures';
 import { SITES } from '../data/content';
@@ -364,6 +364,12 @@ export function VietnamMap({
         <path class="vmap__coast-glow" d={VIETNAM_LAND_PATH} />
         <path class="vmap__land" d={VIETNAM_LAND_PATH} />
         <path class="vmap__land-tex" d={VIETNAM_LAND_PATH} fill="url(#vmap-land-tex)" />
+
+        {/* Đảo ven biển — trang trí lãnh thổ hình chữ S (không tương tác) */}
+        {ISLES.map((i, idx) => {
+          const [x, y] = project(i.lon, i.lat);
+          return <circle key={idx} class="vmap__isle" cx={x} cy={y} r={idx % 3 === 0 ? 2.4 : 1.7} />;
+        })}
 
         {/* Hoàng Sa – Trường Sa */}
         {archi.map((a) => (

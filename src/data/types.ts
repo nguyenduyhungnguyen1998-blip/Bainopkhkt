@@ -23,7 +23,13 @@ export interface HeroCard {
 export interface AspectsCard {
   type: 'aspects';
   size: CardSize;
-  aspects: { id: string; title: Localized; body: Localized; video?: { src: string; poster?: string; title?: Localized } }[];
+  aspects: {
+    id: string;
+    title: Localized;
+    body: Localized;
+    video?: { src: string; poster?: string; title?: Localized };
+    videoEn?: { src: string; poster?: string; title?: Localized };
+  }[];
 }
 
 export interface VideoCard {
@@ -31,6 +37,8 @@ export interface VideoCard {
   size: CardSize;
   /** Link nhúng (YouTube/Vimeo/MP4). Trống = hiện khung poster "sẽ cập nhật". */
   src?: string;
+  /** Bản tiếng Anh của clip (riêng file EN trên Drive); dùng khi lang==='en'. */
+  srcEn?: string;
   poster?: string;
   title: Localized;
 }
@@ -41,6 +49,10 @@ export interface AudioCard {
   /** Văn bản để Web Speech đọc; mỗi phần tử là một câu để tô sáng theo câu. */
   script: Record<Lang, string[]>;
   ambient?: 'wind-water' | 'temple-bell' | 'garden';
+  /** Bản thu sẵn (giọng đọc thật, thuyết minh đầy đủ) — khi có, phát file thay TTS. */
+  src?: string;
+  /** Bản thu tiếng Anh tương ứng. */
+  srcEn?: string;
 }
 
 export interface FactCard {

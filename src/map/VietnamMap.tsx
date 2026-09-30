@@ -43,6 +43,8 @@ interface Props {
   onboard: boolean;
   /** Tăng giá trị để ra lệnh bay về node "tiếp theo" (nút "Về hành trình"). */
   homeSignal: number;
+  /** Tăng giá trị để trả camera về khung toàn quốc (kết thúc tour, v.v.). */
+  allSignal?: number;
   /** {d, n}: đổi n để zoom quanh tâm khung nhìn (nút +/-, tiện cho người không pinch được). */
   zoomSignal?: { d: number; n: number };
   /** {x,y,k,n}: đổi n để camera "lao" vào điểm theo đường log-k (fly-to Earth). */
@@ -109,6 +111,7 @@ export function VietnamMap({
   lang,
   onboard,
   homeSignal,
+  allSignal,
   zoomSignal,
   flyRequest,
   onFlyDone,
@@ -292,6 +295,13 @@ export function VietnamMap({
     lastHome2.current = homeSignal;
     animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 600);
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const lastAll = useRef(allSignal);
+  useEffect(() => {
+    if (allSignal === lastAll.current) return;
+    lastAll.current = allSignal;
+    animateTo(ALL_TRANSFORM, 700);
+  }, [allSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fly-to: camera "lao" vào điểm theo đường log-k rồi báo xong (mở sơ đồ/điều hướng).
   // Seed undefined: remount sau sơ đồ khu mang flyRequest mới đặt cùng batch – phải chạy,

@@ -54,6 +54,7 @@ export function MapScreen() {
     }
   });
   const [homeSignal, setHomeSignal] = useState(0);
+  const [allSignal, setAllSignal] = useState(0);
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
   const [userLoc, setUserLoc] = useState<{ x: number; y: number } | null>(null);
   const [locMsg, setLocMsg] = useState<string | null>(null);
@@ -98,16 +99,23 @@ export function MapScreen() {
         localStorage.removeItem(HINT_REQ_KEY);
         setHintOn(true);
       }
+      if (localStorage.getItem('mdv.tourEnd')) {
+        localStorage.removeItem('mdv.tourEnd');
+        setAllSignal((n) => n + 1);
+      }
     } catch {
       /* bộ nhớ riêng tư */
     }
     const onTourReq = () => prepTour();
     const onHintReq = () => setHintOn(true);
+    const onTourEnd = () => setAllSignal((n) => n + 1);
     window.addEventListener('mdv:tour-request', onTourReq);
     window.addEventListener('mdv:hint-request', onHintReq);
+    window.addEventListener('mdv:tour-end', onTourEnd);
     return () => {
       window.removeEventListener('mdv:tour-request', onTourReq);
       window.removeEventListener('mdv:hint-request', onHintReq);
+      window.removeEventListener('mdv:tour-end', onTourEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -490,6 +498,7 @@ export function MapScreen() {
             lang={lang}
             onboard={cinema && !obSkip}
             homeSignal={homeSignal}
+            allSignal={allSignal}
             zoomSignal={zoomSignal}
             flyRequest={flyReq}
             userLoc={userLoc}
@@ -611,6 +620,9 @@ export function MapScreen() {
             <div class="mhint__row">
               <button class="mdv-chip" onClick={dismissHint}>
                 {t(UI.gotIt, lang)}
+              </button>
+              <button class="mdv-chip" onClick={prepTour}>
+                <Icon name="compass" size={14} /> {t(UI.tourDeepLink, lang)}
               </button>
               {cinema && !obSkip && (
                 <button class="mhint__skip" onClick={dismissHint}>
@@ -747,7 +759,17 @@ export function MapScreen() {
         )}
       </section>
 
-      {welcome && <WelcomeModal lang={lang} onKnow={closeWelcome} onTour={prepTour} />}
+      {welcome && (
+        <WelcomeModal
+          lang={lang}
+          onKnow={closeWelcome}
+          onTour={() => {
+            // "Chưa biết" → thẻ 3 bước nhanh (~20s); tour 13 bước chỉ mở từ nút ?
+            closeWelcome();
+            setHintOn(true);
+          }}
+        />
+      )}
       {helpMenu && (
         <HelpMenu
           lang={lang}

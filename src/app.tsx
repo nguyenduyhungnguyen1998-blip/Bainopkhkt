@@ -73,7 +73,17 @@ export function App() {
     setTourOn(false);
     // Tour bản đồ đầy đủ có thể đang đứng trong điểm → đưa về map; tour riêng của
     // một tab (Hộ chiếu/Thử tài) thì giữ nguyên màn đó.
-    if (tourSteps === TOUR_STEPS && route.name !== 'map') navigate('map');
+    if (tourSteps === TOUR_STEPS) {
+      // Tour bản đồ vừa bay camera vào điểm — kết thúc thì trả về khung toàn quốc
+      // để chip "Toàn quốc" đang chọn khớp với khung hình thật.
+      try {
+        localStorage.setItem('mdv.tourEnd', '1');
+      } catch {
+        /* bộ nhớ riêng tư */
+      }
+      window.dispatchEvent(new CustomEvent('mdv:tour-end'));
+      if (route.name !== 'map') navigate('map');
+    }
   };
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.

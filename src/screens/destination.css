@@ -229,6 +229,14 @@ a.dest__crumb--link:active {
   flex: none;
   color: var(--color-accent-secondary-text);
 }
+.dcard__dur {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
 .dvisit__note {
   margin: 6px 0 0;
   font-size: var(--text-xs);

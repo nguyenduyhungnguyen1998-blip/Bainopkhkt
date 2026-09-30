@@ -13,11 +13,11 @@ Video AI chỉ là khung nhúng chờ link – luôn có văn bản + TTS làm n
 
 | Phase | Nội dung | Exit criteria |
 |---|---|---|
-| **P0** Nền | Vite + TS + Preact, token 2 chế độ, font Be Vietnam Pro self-host, hash router, dock nổi, JSON Schema + dữ liệu 5 khu / 9 điểm QR, bản đồ chữ S bản 1, D1 HUD, D2 validator, D8 error log, CI | `npm run check` xanh; bản đồ pan/zoom/chạm được trên mobile; JS gzip < 120 KB |
+| **P0** Nền | Vite + TS + Preact, token 2 chế độ, font Be Vietnam Pro self-host, hash router, dock nổi, JSON Schema + dữ liệu 5 khu / 10 điểm QR, bản đồ chữ S bản 1, D1 HUD, D2 validator, D8 error log, CI | `npm run check` xanh; bản đồ pan/zoom/chạm được trên mobile; JS gzip < 120 KB |
 | **P1** Bản đồ | Node co giãn theo zoom, nhãn chống chồng, mức khu (sơ đồ điểm QR trong Văn Miếu), D9 Map Inspector, gesture polish, haptics | 60 fps khi kéo/pinch trên Android tầm trung; chuyển quốc gia ↔ khu mượt |
 | **P2** Điểm đến | Renderer thẻ JSON hoàn chỉnh, khung video (link thêm sau) + poster, ảnh thực địa, TTS Web Speech + watchdog (D3), Web Audio preset (D4) | Đọc được toàn bộ 5 điểm Văn Miếu VI/EN; TTS lỗi → rơi về văn bản trong < 1 s |
 | **P3** Gamification | IndexedDB (schemaVersion), QR HMAC tĩnh, XP/huy hiệu/hộ chiếu, quiz, D6 Journey Simulator | Quét QR (thật + mô phỏng) mở điểm; hộ chiếu xuất/nhập JSON |
-| **P4** Offline | Service Worker precache app shell + nội dung, video network-first, D5 SW Inspector | Tắt mạng vẫn dùng đủ bản đồ + 9 điểm; video rơi về TTS |
+| **P4** Offline | Service Worker precache app shell + nội dung, video network-first, D5 SW Inspector | Tắt mạng vẫn dùng đủ bản đồ + 10 điểm; video rơi về TTS |
 | **P5** Hoàn thiện | D7 Perf budget CI + Lighthouse, a11y (WCAG AA, 44 px), giảm hiệu ứng, kịch bản demo | Lighthouse PWA/Perf/A11y ≥ 90 trên Moto G4 profile |
 
 ## Hệ thống debugger

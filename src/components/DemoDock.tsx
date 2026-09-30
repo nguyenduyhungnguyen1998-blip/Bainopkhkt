@@ -378,7 +378,7 @@ export function DemoDock() {
               )}
               {ctx.kind === 'all-done' && (
                 <div class="dd__ctxtop">
-                  <b>Bản đồ · 9/9</b>
+                  <b>Bản đồ · 10/10</b>
                   <span>Hành trình hoàn tất — diễn lại finale ở tab Finale.</span>
                 </div>
               )}
@@ -581,7 +581,7 @@ export function DemoDock() {
                 ))}
                 <div class="dd__sitehead dd__sitehead--row">
                   <span class="dd__sitename">
-                    <b>Finale 9/9 toàn bộ</b> <i>{finaleSeen('mdv.finale.v1') ? 'đã xem' : ''}</i>
+                    <b>Finale 10/10 toàn bộ</b> <i>{finaleSeen('mdv.finale.v1') ? 'đã xem' : ''}</i>
                   </span>
                   <button class="dd__mini dd__mini--on" onClick={replayGrandFinale}>
                     Diễn lại

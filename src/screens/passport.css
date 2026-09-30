@@ -355,3 +355,55 @@
   color: var(--color-fg);
   font-weight: 600;
 }
+
+.ppass__focus {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 420px) {
+  .ppass__focus {
+    grid-template-columns: 1fr;
+  }
+}
+.ppass__focus--one {
+  grid-template-columns: 1fr;
+}
+.ppass__focus--one .ppass__focusitem--next {
+  border-left: none;
+  padding-left: 0;
+}
+.ppass__focusitem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ppass__focusitem b {
+  font-size: var(--text-sm);
+}
+.ppass__focusitem--next {
+  border-left: 2px solid var(--color-accent-secondary-text);
+  padding-left: 10px;
+}
+@media (max-width: 420px) {
+  .ppass__focusitem--next {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--color-border);
+    padding-top: 8px;
+  }
+}
+.ppass__focuslbl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-accent-secondary-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ppass__badgetoggle {
+  margin-top: 10px;
+}

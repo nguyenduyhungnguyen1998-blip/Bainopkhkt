@@ -103,7 +103,9 @@ export function DemoDock() {
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
   const quizSets = Object.keys(p.quizDone).length;
-  const eff = pos ?? defaultPos();
+  // Kẹp luôn vị trí đã lưu vào khung hình hiện tại — pos ghi từ màn rộng/xoay ngang
+  // trước đây nằm ngoài viewport thì nút bị trôi khỏi tầm nhìn (khách không thấy nút nào).
+  const eff = clampPos(pos ?? defaultPos());
 
   useEffect(() => {
     setEnabled(dockEnabled());
@@ -307,7 +309,7 @@ export function DemoDock() {
   })();
 
   return (
-    <div class="demodock" style={pos ? { left: `${pos.x}px`, top: `${pos.y}px`, right: 'auto', bottom: 'auto' } : undefined}>
+    <div class="demodock" style={pos ? { left: `${eff.x}px`, top: `${eff.y}px`, right: 'auto', bottom: 'auto' } : undefined}>
       {open && (
         <div class="demodock__panel" role="dialog" aria-label="Bảng điều khiển demo" style={panelStyle}>
           <div

@@ -39,7 +39,7 @@
       "qrId": "mdvq05",
       "name": {
         "vi": "Văn Miếu Môn",
-        "en": "Great Portico"
+        "en": "Van Mieu Mon (main gate)"
       },
       "hook": {
         "vi": "Cổng giữa năm xưa chỉ dành cho vua đi — quan lại và học trò phải đi hai cổng bên.",
@@ -107,7 +107,9 @@
               "To visit Van Mieu is to return to the roots of learning: bowing before humanity's knowledge, honouring the forebears who opened the realm of civilisation, and remembering devoted teachers.",
               "That spirit is the eternal torch lighting the way for Vietnamese learning to stride firmly with the times."
             ]
-          }
+          },
+          "src": "media/vm-audio-vi.m4a",
+          "srcEn": "media/vm-audio-en.m4a"
         },
         {
           "type": "aspects",
@@ -130,6 +132,14 @@
                   "vi": "Thuyết minh: Nguồn gốc & lịch sử Văn Miếu – Quốc Tử Giám",
                   "en": "Narrated tour: origins & history of Van Mieu – Quoc Tu Giam"
                 }
+              },
+              "videoEn": {
+                "src": "media/nguon-goc-lich-su-en.mp4",
+                "poster": "/media/nguon-goc-poster.jpg",
+                "title": {
+                  "vi": "Thuyết minh nguồn gốc & lịch sử (bản Anh)",
+                  "en": "Origins & history narration (English)"
+                }
               }
             },
             {
@@ -148,6 +158,14 @@
                 "title": {
                   "vi": "Thuyết minh: Kiến trúc Văn Miếu – Quốc Tử Giám",
                   "en": "Narrated tour: the architecture of Van Mieu – Quoc Tu Giam"
+                }
+              },
+              "videoEn": {
+                "src": "media/kien-truc-van-mieu-en.mp4",
+                "poster": "/media/kien-truc-poster.jpg",
+                "title": {
+                  "vi": "Thuyết minh kiến trúc (bản Anh)",
+                  "en": "Architecture narration (English)"
                 }
               }
             },
@@ -174,6 +192,28 @@
               }
             }
           ]
+        },
+        {
+          "type": "video",
+          "size": "lg",
+          "src": "media/vm-nhap-dao.mp4",
+          "srcEn": "media/vm-nhap-dao-en.mp4",
+          "poster": "/media/vm-nhap-dao-poster.jpg",
+          "title": {
+            "vi": "Clip thuyết minh Khu Nhập Đạo",
+            "en": "Narrated clip: Nhap Dao gate area"
+          }
+        },
+        {
+          "type": "video",
+          "size": "lg",
+          "src": "media/vm-tien-an.mp4",
+          "srcEn": "media/vm-tien-an-en.mp4",
+          "poster": "/media/vm-tien-an-poster.jpg",
+          "title": {
+            "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
+            "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
+          }
         },
         {
           "type": "fact",
@@ -349,7 +389,7 @@
       "qrId": "mdvq06",
       "name": {
         "vi": "Khuê Văn Các",
-        "en": "Constellation of Literature Pavilion"
+        "en": "Khue Van Cac (Literature Pavilion)"
       },
       "hook": {
         "vi": "Đây chính là ngôi gác in trên tờ 100.000 đồng đang nằm trong ví bạn.",
@@ -436,7 +476,10 @@
           "title": {
             "vi": "Clip thuyết minh Khuê Văn Các",
             "en": "Narrated clip: Khue Van Pavilion"
-          }
+          },
+          "src": "media/vm-thanh-dat.mp4",
+          "poster": "/media/vm-thanh-dat-poster.jpg",
+          "srcEn": "media/vm-thanh-dat-en.mp4"
         },
         {
           "type": "fact",
@@ -608,7 +651,7 @@
       "qrId": "mdvq07",
       "name": {
         "vi": "Vườn bia Tiến sĩ",
-        "en": "Garden of Doctoral Steles"
+        "en": "Vuon Bia Tien Si (Stelae Garden)"
       },
       "hook": {
         "vi": "82 tấm bia trên lưng rùa này là 'sổ danh sách' 700 năm các tiến sĩ Việt Nam — được UNESCO công nhận Tư liệu Thế giới.",
@@ -695,7 +738,10 @@
           "title": {
             "vi": "Clip thuyết minh Vườn bia",
             "en": "Narrated clip: Garden of Steles"
-          }
+          },
+          "src": "media/vm-vuon-bia.mp4",
+          "poster": "/media/vm-vuon-bia-poster.jpg",
+          "srcEn": "media/vm-vuon-bia-en.mp4"
         },
         {
           "type": "fact",
@@ -863,7 +909,7 @@
       "qrId": "mdvq08",
       "name": {
         "vi": "Đại Thành Môn & Điện Đại Thành",
-        "en": "Gate and Hall of Great Success"
+        "en": "Dai Thanh Mon & Dai Thanh Hall"
       },
       "hook": {
         "vi": "Phía sau cánh cổng này là nơi thờ Khổng Tử — trái tim của cả Văn Miếu.",
@@ -971,7 +1017,10 @@
           "title": {
             "vi": "Clip thuyết minh Điện Đại Thành",
             "en": "Narrated clip: Hall of Great Success"
-          }
+          },
+          "src": "media/vm-dai-thanh.mp4",
+          "poster": "/media/vm-dai-thanh-poster.jpg",
+          "srcEn": "media/vm-dai-thanh-en.mp4"
         }
       ],
       "sources": [
@@ -1233,7 +1282,10 @@
           "title": {
             "vi": "Clip thuyết minh Nhà Thái Học",
             "en": "Narrated clip: Thai Hoc House"
-          }
+          },
+          "src": "media/vm-thai-hoc.mp4",
+          "poster": "/media/vm-thai-hoc-poster.jpg",
+          "srcEn": "media/vm-thai-hoc-en.mp4"
         }
       ],
       "sources": [
@@ -1396,7 +1448,7 @@
       "qrId": "mdvq10",
       "name": {
         "vi": "Vườn Giám",
-        "en": "Academy Garden"
+        "en": "Vuon Giam (Academy Garden)"
       },
       "hook": {
         "vi": "Khoảng xanh phía Tây khu di tích – phần đất Hồ Văn được trả lại năm 1940, mang tên của trường đại học đầu tiên nước ta.",
@@ -1479,6 +1531,16 @@
               }
             }
           ]
+        },
+        {
+          "type": "video",
+          "size": "lg",
+          "src": "media/vm-vuon-giam.mp4",
+          "poster": "/media/vm-vuon-giam-poster.jpg",
+          "title": {
+            "vi": "Clip thuyết minh Vườn Giám",
+            "en": "Narrated clip: Giam Garden"
+          }
         },
         {
           "type": "fact",

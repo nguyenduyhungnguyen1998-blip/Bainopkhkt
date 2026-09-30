@@ -414,3 +414,13 @@
     opacity: 0;
   }
 }
+
+/* Chấm đảo ven biển — trang trí lãnh thổ hình chữ S */
+.vmap__isle {
+  fill: var(--color-land);
+  stroke: var(--color-accent-secondary);
+  stroke-opacity: 0.75;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.85;
+}

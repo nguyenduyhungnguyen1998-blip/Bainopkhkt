@@ -53,6 +53,47 @@
         position: relative;
         animation: splash-pulse 1.6s ease-out infinite;
       }
+      /* Thanh tải + mascot chạy song song: % thật theo mốc khởi động (--bp do main.tsx đẩy). */
+      #splash .track {
+        position: relative;
+        width: min(240px, 62vw);
+        height: 4px;
+        margin: 18px auto 0;
+        border-radius: 4px;
+        background: rgba(232, 217, 160, 0.22);
+      }
+      html[data-theme='light'] #splash .track {
+        background: rgba(90, 35, 32, 0.18);
+      }
+      #splash .track .fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: calc(var(--bp, 6) * 1%);
+        border-radius: 4px;
+        background: currentColor;
+        transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      #splash .runner {
+        position: absolute;
+        left: calc(var(--bp, 6) * 1%);
+        top: 10px;
+        width: 44px;
+        height: 44px;
+        transform: translateX(-50%);
+        transition: left 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: splash-run 0.6s ease-in-out infinite;
+        pointer-events: none;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+      }
+      @keyframes splash-run {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0) rotate(-4deg);
+        }
+        50% {
+          transform: translateX(-50%) translateY(4px) rotate(4deg);
+        }
+      }
       #splash .dot::after {
         content: '';
         position: absolute;
@@ -72,7 +113,8 @@
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #splash .dot {
+        #splash .dot,
+        #splash .runner {
           animation: none;
         }
       }
@@ -81,6 +123,11 @@
       // Áp theme trước khi vẽ để tránh nháy màu
       (function () {
         try {
+          // Mốc tiến độ thật: main.tsx gọi __bp(0-100) theo từng giai đoạn khởi động.
+          window.__bp = function (v) {
+            var s = document.getElementById('splash');
+            if (s) s.style.setProperty('--bp', Math.max(0, Math.min(100, v)));
+          };
           var q = new URLSearchParams(location.search).get('theme'); // ?theme=dark|light cho demo/chụp ảnh
           var t = q === 'dark' || q === 'light' ? q : localStorage.getItem('mdv.theme');
           if (q) localStorage.setItem('mdv.theme', q);
@@ -114,6 +161,10 @@
           <div class="dot"></div>
           <h1>Mở Dấu Việt</h1>
           <p>Hành trình di sản qua mã QR</p>
+          <div class="track">
+            <span class="fill"></span>
+            <img class="runner" src="img/mascot.webp" alt="" width="44" height="44" />
+          </div>
         </div>
       </div>
     </div>

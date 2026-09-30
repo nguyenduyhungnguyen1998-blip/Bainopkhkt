@@ -672,6 +672,10 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   };
 
   const prog = status === 'playing' || status === 'paused' ? ((sent + 1) / sentences.length) * 100 : status === 'done' ? 100 : 0;
+  // Ước lượng thời lượng từ số từ bản đọc (TTS ~170 từ/phút) — nhãn "≈N phút" gần nút Nghe.
+  const totalWords = sentences.join(' ').split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(totalWords / 170));
+  const durLabel = lang === 'vi' ? `≈ ${mins} phút` : `≈ ${mins} min`;
 
   return (
     <div class={`dcard dcard--audio dcard--${card.size}`}>
@@ -696,6 +700,9 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
             <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
           </button>
         )}
+        <span class="dcard__dur">
+          <Icon name="clock" size={12} /> {durLabel}
+        </span>
       </div>
       <div class="dcard__progbar" role="progressbar" aria-label={t(UI.audioProgress, lang)} aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
         <span style={{ width: `${prog}%` }} />

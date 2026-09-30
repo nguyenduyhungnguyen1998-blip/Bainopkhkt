@@ -95,3 +95,12 @@ export const QUIZ_TOUR_STEPS: TourStep[] = [
   { sel: '.quiz__row', icon: 'spark', title: UI.tourQ2T, body: UI.tourQ2B },
   { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
 ];
+
+/** Tour riêng trang điểm đến — nút ? khi khách đang đứng trong một điểm. */
+export const DEST_TOUR_STEPS: TourStep[] = [
+  { sel: ['.dcard--gal', '.dcard--hero'], icon: 'spark', title: UI.tourD1T, body: UI.tourD1B },
+  { sel: '.dcard__playbtn', icon: 'volume', title: UI.tourD2T, body: UI.tourD2B },
+  { sel: '.dcard__tabs', icon: 'book', title: UI.tourD3T, body: UI.tourD3B },
+  { sel: '.dvisit', icon: 'clock', title: UI.tourD4T, body: UI.tourD4B },
+  { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
+];

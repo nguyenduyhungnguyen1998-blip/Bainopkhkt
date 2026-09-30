@@ -15,12 +15,15 @@ import { startAmbient, stopAmbient } from '../lib/ambient';
 import { useOnline } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
+import { HelpMenu } from '../components/Onboarding';
+import { DEST_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import './destination.css';
 
 export function DestinationScreen({ siteId, spotId, query }: { siteId: string; spotId?: string; query?: URLSearchParams }) {
   const [lang] = useLang();
   useProgress(); // re-render khi mở khóa
   const [bgSrc, setBgSrc] = useState<string | null>(null); // ảnh đang xem -> nền mờ đồng bộ
+  const [helpMenu, setHelpMenu] = useState(false);
   const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
   const found = siteOnly ? undefined : getSpot(siteId, spotId);
   if (siteOnly) return <SiteIntro site={siteOnly} />;
@@ -69,7 +72,22 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         <span class={`mdv-badge ${unlocked ? 'mdv-badge--unlocked' : 'mdv-badge--locked'}`}>
           {unlocked ? `+${spot.xp} XP` : t(UI.locked, lang)}
         </span>
+        <button class="mdv-chip" onClick={() => setHelpMenu(true)} aria-label={t(UI.howto, lang)}>
+          <Icon name="help" size={16} />
+        </button>
       </header>
+      {helpMenu && (
+        <HelpMenu
+          lang={lang}
+          onClose={() => setHelpMenu(false)}
+          onTour={() => {
+            setHelpMenu(false);
+            goScreenTour(DEST_TOUR_STEPS);
+          }}
+          tourTitle={UI.helpMenuTourDest}
+          tourSub={UI.helpMenuTourDestSub}
+        />
+      )}
 
       {/* key spot+sig: remount mỗi QR mới — nếu không, reward/state của điểm trước
           sống sót khi đổi điểm cùng khu (component cha key theo siteId) và che nút xác nhận mới. */}
@@ -121,6 +139,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
           {site.visit.tickets && (
             <div class="dvisit__row"><Icon name="qr" size={16} /><span>{t(site.visit.tickets, lang)}</span></div>
           )}
+          <p class="dvisit__note">{t(UI.visitNote, lang)}</p>
         </section>
       )}
 
@@ -556,31 +575,48 @@ function SpotBg({ src }: { src: string | null }) {
   );
 }
 
-/** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
-function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
+/** Video local (media/*.mp4): cứ render — SW runtime-cache trả bản đã tải khi offline;
+ *  chỉ hiện ghi chú ngoại tuyến khi phát thật sự lỗi. */
+function LocalVideo({ src, poster, label, lang }: { src: string; poster?: string; label: string; lang: Lang }) {
   const online = useOnline();
-  // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
-  if (!card.src) return null;
-  if (!online) {
+  const [err, setErr] = useState(false);
+  if (err && !online) {
     return (
       <p class="dcard__vsoon">
         <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
       </p>
     );
   }
-  // src local (media/*.mp4 trong public/) → phát trực tiếp; https:// → embed iframe.
+  return (
+    <video
+      src={asset(src)}
+      poster={poster ? asset(poster) : undefined}
+      controls
+      playsInline
+      preload="metadata"
+      aria-label={label}
+      onError={() => setErr(true)}
+    />
+  );
+}
+
+/** Thẻ video: embed khi có link; chưa có link (hoặc video mạng ngoài lúc mất mạng) → gạch chú nhỏ. */
+function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
+  const online = useOnline();
+  // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
+  if (!card.src) return null;
   const local = !card.src.startsWith('http');
+  if (!local && !online) {
+    return (
+      <p class="dcard__vsoon">
+        <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
+      </p>
+    );
+  }
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
       {local ? (
-        <video
-          src={asset(card.src)}
-          poster={card.poster ? asset(card.poster) : undefined}
-          controls
-          playsInline
-          preload="metadata"
-          aria-label={t(card.title, lang)}
-        />
+        <LocalVideo src={card.src} poster={card.poster} label={t(card.title, lang)} lang={lang} />
       ) : (
         <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
@@ -719,18 +755,22 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
       <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
         {t(cur.body, lang)}
       </p>
-      {cur.video && online && (
+      {cur.video && (
         <div class="dcard__avideo">
           {cur.video.src.startsWith('http') ? (
-            <iframe src={cur.video.src} title={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+            online ? (
+              <iframe src={cur.video.src} title={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+            ) : (
+              <p class="dcard__vsoon">
+                <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
+              </p>
+            )
           ) : (
-            <video
-              src={asset(cur.video.src)}
-              poster={cur.video.poster ? asset(cur.video.poster) : undefined}
-              controls
-              playsInline
-              preload="metadata"
-              aria-label={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)}
+            <LocalVideo
+              src={cur.video.src}
+              poster={cur.video.poster}
+              label={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)}
+              lang={lang}
             />
           )}
         </div>

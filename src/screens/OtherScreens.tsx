@@ -20,11 +20,17 @@ export function PassportScreen() {
   const [lang] = useLang();
   const p = useProgress();
   const [helpMenu, setHelpMenu] = useState(false);
+  const [badgesOpen, setBadgesOpen] = useState(false);
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
   const pct = totalSpots ? doneSpots / totalSpots : 0;
   const RING_R = 56;
   const RING_C = 2 * Math.PI * RING_R;
+  const achs = computeAchievements(p);
+  const nextGoal = achs.find((a) => !a.unlocked);
+  const latestKey = Object.entries(p.unlocked).sort((a, b) => b[1] - a[1])[0]?.[0];
+  const latestSpot = latestKey ? getSpot(latestKey.split('/')[0], latestKey.split('/')[1]) : null;
+  const visibleAchs = badgesOpen ? achs : achs.filter((a) => a.unlocked || a === nextGoal);
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -69,6 +75,29 @@ export function PassportScreen() {
         </div>
       </section>
 
+      {(latestSpot || nextGoal) && (
+        <section class={`mdv-card ppass__focus ${latestSpot && nextGoal ? '' : 'ppass__focus--one'}`}>
+          {latestSpot && (
+            <div class="ppass__focusitem">
+              <span class="ppass__focuslbl">
+                <Icon name="passport" size={13} /> {t(UI.latestStamp, lang)}
+              </span>
+              <b>{t(latestSpot.spot.name, lang)}</b>
+              <small class="mdv-muted">{t(latestSpot.site.name, lang)}</small>
+            </div>
+          )}
+          {nextGoal && (
+            <div class="ppass__focusitem ppass__focusitem--next">
+              <span class="ppass__focuslbl">
+                <Icon name={nextGoal.icon} size={13} /> {t(UI.nextGoal, lang)}
+              </span>
+              <b>{t(nextGoal.name, lang)}</b>
+              <small class="mdv-muted">{t(nextGoal.need, lang)}</small>
+            </div>
+          )}
+        </section>
+      )}
+
       <section class="mdv-card ppass__quote">“{t(UI.journeyQuote, lang)}”</section>
 
       <p class="mdv-muted ppass__note">
@@ -86,7 +115,7 @@ export function PassportScreen() {
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
         <div class="ppass__badges">
-          {computeAchievements(p).map((a) => (
+          {visibleAchs.map((a) => (
             <div key={a.id} class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`} title={t(a.need, lang)}>
               <Icon name={a.icon} size={26} />
               <b>{t(a.name, lang)}</b>
@@ -95,6 +124,9 @@ export function PassportScreen() {
             </div>
           ))}
         </div>
+        <button class="mdv-chip ppass__badgetoggle" onClick={() => setBadgesOpen(!badgesOpen)}>
+          {badgesOpen ? t(UI.badgesHide, lang) : `${t(UI.badgesShowAll, lang)} · ${achs.length}`}
+        </button>
       </section>
       <div class="ppass__sitelist">
         {SITES.map((s) => {
@@ -697,8 +729,8 @@ export function HelpScreen() {
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Quét tem QR' : 'Scanning a tag'}</h2>
         <p class="steptext">
           {vi
-            ? 'Mở camera điện thoại, hướng vào mã trên tem tại điểm di sản — link mở thẳng trang điểm. Khi mã được kiểm tra hợp lệ, chạm "Nhận dấu" để lưu chuyến ghé thăm và nhận XP.'
-            : 'Open your phone camera at a tag at the site — the link opens the spot page directly. Once the code checks out, tap "Collect stamp" to save the visit and earn XP.'}
+            ? 'Mở camera điện thoại, hướng vào mã trên tem tại điểm di sản — link mở thẳng trang điểm. Khi mã hợp lệ, chọn một chủ đề muốn khám phá (hoặc nút Nhận dấu) — dấu và XP được lưu ngay.'
+            : 'Open your phone camera at a tag at the site — the link opens the spot page directly. Once the code checks out, pick a topic to explore (or the Stamp button) — your stamp and XP are saved instantly.'}
         </p>
         <p class="steptext">
           {vi
@@ -790,12 +822,26 @@ export function AboutScreen() {
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Tư liệu & ảnh' : 'Sources & photos'}</h2>
         <p class="steptext">
           {vi
-            ? 'Nội dung Văn Miếu biên soạn theo tư liệu chuẩn của nhóm; ảnh lấy từ Wikimedia Commons (ghi rõ tác giả & giấy phép) và video do nhóm tự quay.'
-            : 'Temple of Literature content follows the team’s verified material; photos come from Wikimedia Commons (author & license credited) and footage shot by the team.'}
+            ? 'Nội dung Văn Miếu biên soạn theo tư liệu nhóm sưu tầm và đang đối chiếu — mục chưa đối chiếu xong được ghi nhãn "đang đối chiếu" ngay trong app. Ảnh lấy từ Wikimedia Commons (ghi rõ tác giả & giấy phép) và khung hình trích từ video do nhóm tự quay.'
+            : 'Temple of Literature content is compiled from material the team gathered and is still cross-checking — unchecked items are labeled "cross-checking" in-app. Photos come from Wikimedia Commons (author & license credited) plus frames from footage shot by the team.'}
         </p>
         <a class="mdv-btn mdv-btn--ghost" href={routeHref.sources}>
           <Icon name="info" size={16} /> {t(UI.sourcesTitle, lang)}
         </a>
+      </section>
+      <section class="mdv-card">
+        <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Xác minh & phản hồi' : 'Verification & feedback'}</h2>
+        <p class="steptext">
+          {vi
+            ? 'Toàn bộ mã nguồn, tem QR và danh mục tư liệu mở công khai để đối chiếu. Mọi góp ý/sai sót xin gửi qua mục Issues của kho mã.'
+            : 'All code, QR tags and the media ledger are public for verification. Feedback or corrections go to the repository’s Issues page.'}
+        </p>
+        <a class="mdv-btn mdv-btn--ghost" href="https://github.com/nguyenduyhungnguyen1998-blip/Bainopkhkt" target="_blank" rel="noreferrer">
+          <Icon name="share" size={16} /> github.com/nguyenduyhungnguyen1998-blip/Bainopkhkt
+        </a>
+        <p class="mdv-muted" style="font-size:var(--text-xs);margin:8px 0 0">
+          {vi ? 'Cập nhật tháng 9/2026 · ' : 'Updated September 2026 · '}Mở Dấu Việt v{__APP_VERSION__}
+        </p>
       </section>
       <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
     </main>
@@ -807,6 +853,23 @@ export function SourcesScreen() {
   const [lang] = useLang();
   const vi = lang === 'vi';
   const entries = Object.entries(IMAGE_CREDITS);
+  // Ảnh → điểm đang dùng nó (để hiện tên điểm thay tên file .webp).
+  const spotOf = new Map<string, Spot>();
+  for (const s of SITES) {
+    for (const sp of s.spots) {
+      for (const m of JSON.stringify(sp).matchAll(/\/img\/[A-Za-z0-9._%\/-]+/g)) {
+        if (!spotOf.has(m[0])) spotOf.set(m[0], sp);
+      }
+    }
+  }
+  // Nhóm theo khu (thư mục /img/<site>/), khu nào trước theo thứ tự hành trình.
+  const groups = new Map<string, [string, (typeof entries)[number][1]][]>();
+  for (const e of entries) {
+    const key = e[0].split('/')[2] ?? 'other';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(e);
+  }
+  const orderedKeys = [...SITES.map((s) => s.entityId).filter((k) => groups.has(k)), ...[...groups.keys()].filter((k) => !SITES.some((s) => s.entityId === k))];
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -818,38 +881,67 @@ export function SourcesScreen() {
           <Icon name="back" />
         </a>
       </header>
-      <section class="mdv-card">
-        <h2 style="font-size:var(--text-md);margin:0 0 4px">{t(UI.photoSources, lang)}</h2>
-        <p class="mdv-muted" style="font-size:var(--text-xs);margin:0 0 12px">
-          {vi
-            ? 'Ảnh Wikimedia Commons ghi kèm tác giả & giấy phép; phần còn lại là frame video do nhóm tự quay.'
-            : 'Wikimedia Commons photos carry author & license; the rest are frames from footage the team shot itself.'}
-        </p>
-        {entries.map(([path, c]) => (
-          <div key={path} class="srcrow">
-            <span class="srcrow__file">{path.replace('/img/', '')}</span>
-            <span class="srcrow__meta">
-              {c.author} ·{' '}
-              {c.licenseUrl ? (
-                <a href={c.licenseUrl} target="_blank" rel="noreferrer">
-                  {c.license}
-                </a>
-              ) : (
-                c.license
-              )}
-              {c.sourceUrl ? (
-                <>
-                  {' '}
-                  · <a href={c.sourceUrl} target="_blank" rel="noreferrer">{t(UI.viewSource, lang)}</a>
-                </>
-              ) : (
-                <> · {c.source}</>
-              )}
-              {c.note ? <> · <i>{t(c.note, lang)}</i></> : null}
-            </span>
-          </div>
-        ))}
-      </section>
+      <p class="mdv-muted" style="font-size:var(--text-xs)">
+        {vi
+          ? 'Ảnh Wikimedia Commons ghi kèm tác giả & giấy phép; phần còn lại là frame video do nhóm tự quay (nhóm giữ tư liệu gốc).'
+          : 'Wikimedia Commons photos carry author & license; the rest are frames from footage the team shot itself (originals kept on file).'}
+      </p>
+      {orderedKeys.map((key) => {
+        const site = SITES.find((s) => s.entityId === key);
+        const list = groups.get(key)!;
+        return (
+          <section key={key} class="mdv-card">
+            <h2 style="font-size:var(--text-md);margin:0 0 10px">
+              {t(UI.photoSources, lang)} — {site ? t(site.name, lang) : vi ? 'Khác' : 'Other'}
+            </h2>
+            {list.map(([path, c]) => {
+              const sp = spotOf.get(path);
+              const label = sp
+                ? t(sp.name, lang)
+                : path
+                    .split('/')
+                    .pop()!
+                    .replace('.webp', '')
+                    .replace(/-/g, ' ');
+              return (
+                <div key={path} class="srcrow">
+                  <img class="srcrow__thumb" src={asset(path)} alt="" loading="lazy" />
+                  <span class="srcrow__txt">
+                    <span class="srcrow__file">{label}</span>
+                    <span class="srcrow__meta">
+                      {c.author} ·{' '}
+                      {c.licenseUrl ? (
+                        <a href={c.licenseUrl} target="_blank" rel="noreferrer">
+                          {c.license}
+                        </a>
+                      ) : (
+                        c.license
+                      )}
+                      {c.sourceUrl ? (
+                        <>
+                          {' '}
+                          ·{' '}
+                          <a href={c.sourceUrl} target="_blank" rel="noreferrer">
+                            {t(UI.viewSource, lang)}
+                          </a>
+                        </>
+                      ) : (
+                        <> · {c.source}</>
+                      )}
+                      {c.note ? (
+                        <>
+                          {' '}
+                          · <i>{t(c.note, lang)}</i>
+                        </>
+                      ) : null}
+                    </span>
+                  </span>
+                </div>
+              );
+            })}
+          </section>
+        );
+      })}
       {SITES.map((s) => {
         const spots = s.spots.filter((sp) => sp.sources?.length);
         if (!spots.length) return null;

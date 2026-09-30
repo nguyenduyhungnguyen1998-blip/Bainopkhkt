@@ -24,3 +24,21 @@ export const ARCHIPELAGOS = [
   { id: 'hoang-sa', name: { vi: 'QĐ. Hoàng Sa', en: 'Paracel Is.' }, lon: 112.0, lat: 16.5 },
   { id: 'truong-sa', name: { vi: 'QĐ. Trường Sa', en: 'Spratly Is.' }, lon: 114.0, lat: 10.0 },
 ] as const;
+
+/**
+ * Các đảo ven biển nổi tiếng — chấm trang trí cho lãnh thổ hình chữ S sống động.
+ * Tọa độ thật (kinh/vĩ); chỉ minh họa, không phải điểm chạm/nội dung.
+ */
+export const ISLES: { lon: number; lat: number }[] = [
+  { lon: 107.95, lat: 20.98 }, // Cô Tô
+  { lon: 107.05, lat: 20.78 }, // Cát Bà
+  { lon: 107.75, lat: 20.13 }, // Bạch Long Vĩ
+  { lon: 107.35, lat: 17.18 }, // Cồn Cỏ
+  { lon: 108.5, lat: 15.95 }, // Cù Lao Chàm
+  { lon: 109.12, lat: 15.38 }, // Lý Sơn
+  { lon: 108.95, lat: 10.53 }, // Phú Quý
+  { lon: 106.61, lat: 8.68 }, // Côn Đảo
+  { lon: 104.42, lat: 9.68 }, // Nam Du
+  { lon: 103.48, lat: 9.3 }, // Thổ Chu
+  { lon: 104.01, lat: 10.22 }, // Phú Quốc
+];

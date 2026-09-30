@@ -875,3 +875,14 @@ a.dest__crumb--link:active {
     transition: none;
   }
 }
+
+/* Thẻ âm thanh bản thu sẵn (audio chuẩn từ tư liệu) */
+.dcard__player{width:100%;max-width:520px;height:44px;border-radius:12px;outline:none}
+.dcard__player::-webkit-media-controls-panel{background:var(--color-surface-2,#fff)}
+.dcard__recnote{display:flex;align-items:center;gap:6px;margin:2px 0 0;font-size:var(--text-xs);color:var(--color-text-faint)}
+
+/* Trạng thái đang kiểm tra mã QR — luôn thấy phản hồi, không để trống */
+.dscan--checking{gap:10px}
+.dscan__spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff;animation:dscan-spin .7s linear infinite;flex:none}
+@keyframes dscan-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.dscan__spin{animation:none;border-top-color:transparent}}

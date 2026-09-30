@@ -201,9 +201,15 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
 
   useEffect(() => {
     let live = true;
-    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then((ok) => {
-      if (live) setState(ok ? 'ok' : 'bad');
-    });
+    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then(
+      (ok) => {
+        if (live) setState(ok ? 'ok' : 'bad');
+      },
+      // Môi trường lạ làm verify ném lỗi -> báo "mã lạ" thay vì panel chết vô hình.
+      () => {
+        if (live) setState('bad');
+      }
+    );
     return () => {
       live = false;
     };
@@ -259,7 +265,14 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (state === 'checking') return null;
+  if (state === 'checking') {
+    return (
+      <div class="dscan dscan--checking" role="status" aria-live="polite">
+        <span class="dscan__spin" aria-hidden="true" />
+        <span class="dscan__txt">{t(UI.verifyingCode, lang)}</span>
+      </div>
+    );
+  }
   // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
   // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
   if (dismissed) {
@@ -386,7 +399,11 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             </div>
           </>
         )}
-        {!unlocked && (
+        {unlocked ? (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)}
+          </p>
+        ) : (
           <p class="dscan__okhint">
             <Icon name="check" size={14} /> {t(UI.scanOkHint, lang)}
           </p>
@@ -603,9 +620,10 @@ function LocalVideo({ src, poster, label, lang }: { src: string; poster?: string
 /** Thẻ video: embed khi có link; chưa có link (hoặc video mạng ngoài lúc mất mạng) → gạch chú nhỏ. */
 function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   const online = useOnline();
+  const src = lang === 'en' && card.srcEn ? card.srcEn : card.src;
   // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
-  if (!card.src) return null;
-  const local = !card.src.startsWith('http');
+  if (!src) return null;
+  const local = !src.startsWith('http');
   if (!local && !online) {
     return (
       <p class="dcard__vsoon">
@@ -616,9 +634,9 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
       {local ? (
-        <LocalVideo src={card.src} poster={card.poster} label={t(card.title, lang)} lang={lang} />
+        <LocalVideo src={src} poster={card.poster} label={t(card.title, lang)} lang={lang} />
       ) : (
-        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+        <iframe src={src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
     </div>
   );
@@ -676,6 +694,34 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const totalWords = sentences.join(' ').split(/\s+/).filter(Boolean).length;
   const mins = Math.max(1, Math.round(totalWords / 170));
   const durLabel = lang === 'vi' ? `≈ ${mins} phút` : `≈ ${mins} min`;
+  // Bản thu sẵn (giọng đọc thật từ tư liệu chuẩn) — khi có thì phát file thay TTS.
+  const fileSrc = card.src ? asset(lang === 'en' && card.srcEn ? card.srcEn : card.src) : null;
+
+  if (fileSrc) {
+    return (
+      <div class={`dcard dcard--audio dcard--${card.size}`}>
+        <div class="dcard__audio-ctrl">
+          <audio class="dcard__player" src={fileSrc} controls preload="metadata" aria-label={t(UI.recordedNarration, lang)} />
+          {card.ambient && (
+            <button class={`mdv-chip ${ambientOn ? 'is-on' : ''}`} aria-pressed={ambientOn} onClick={toggleAmbient}>
+              <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
+            </button>
+          )}
+        </div>
+        <p class="dcard__recnote">
+          <Icon name="check" size={13} /> {t(UI.recordedNarration, lang)}
+        </p>
+        <details class="dcard__scriptwrap">
+          <summary>{t(UI.readScript, lang)}</summary>
+          <ol class="dcard__script">
+            {sentences.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <div class={`dcard dcard--audio dcard--${card.size}`}>
@@ -762,26 +808,25 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
       <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
         {t(cur.body, lang)}
       </p>
-      {cur.video && (
-        <div class="dcard__avideo">
-          {cur.video.src.startsWith('http') ? (
-            online ? (
-              <iframe src={cur.video.src} title={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+      {(() => {
+        const vid = lang === 'en' && cur.videoEn ? cur.videoEn : cur.video;
+        if (!vid) return null;
+        return (
+          <div class="dcard__avideo">
+            {vid.src.startsWith('http') ? (
+              online ? (
+                <iframe src={vid.src} title={vid.title ? t(vid.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+              ) : (
+                <p class="dcard__vsoon">
+                  <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
+                </p>
+              )
             ) : (
-              <p class="dcard__vsoon">
-                <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
-              </p>
-            )
-          ) : (
-            <LocalVideo
-              src={cur.video.src}
-              poster={cur.video.poster}
-              label={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)}
-              lang={lang}
-            />
-          )}
-        </div>
-      )}
+              <LocalVideo src={vid.src} poster={vid.poster} label={vid.title ? t(vid.title, lang) : t(cur.title, lang)} lang={lang} />
+            )}
+          </div>
+        );
+      })()}
       <div class="dcard__dots" aria-hidden="true">
         {card.aspects.map((a) => (
           <i key={a.id} class={a.id === cur.id ? 'on' : ''} />

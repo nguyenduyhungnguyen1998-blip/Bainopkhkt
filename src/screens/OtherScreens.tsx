@@ -11,6 +11,7 @@ import { useAmbientFlat, useFontScale, useTheme, FLAT_PCT_MAX, FONT_PCT_MAX, FON
 import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
+import { PASSPORT_TOUR_STEPS, QUIZ_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import { navigate, routeHref } from '../lib/router';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
@@ -127,7 +128,18 @@ export function PassportScreen() {
           );
         })}
       </div>
-      {helpMenu && <HelpMenu lang={lang} onClose={() => setHelpMenu(false)} />}
+      {helpMenu && (
+        <HelpMenu
+          lang={lang}
+          onClose={() => setHelpMenu(false)}
+          onTour={() => {
+            setHelpMenu(false);
+            goScreenTour(PASSPORT_TOUR_STEPS);
+          }}
+          tourTitle={UI.helpMenuTourPassport}
+          tourSub={UI.helpMenuTourPassportSub}
+        />
+      )}
     </main>
   );
 }
@@ -304,7 +316,18 @@ export function QuizScreen({ at }: { at?: string }) {
         })}
         {!spotsWithQuiz.length && <p class="mdv-muted">{t(UI.quizNoData, lang)}</p>}
       </div>
-      {helpMenu && <HelpMenu lang={lang} onClose={() => setHelpMenu(false)} />}
+      {helpMenu && (
+        <HelpMenu
+          lang={lang}
+          onClose={() => setHelpMenu(false)}
+          onTour={() => {
+            setHelpMenu(false);
+            goScreenTour(QUIZ_TOUR_STEPS);
+          }}
+          tourTitle={UI.helpMenuTourQuiz}
+          tourSub={UI.helpMenuTourQuizSub}
+        />
+      )}
     </main>
   );
 }

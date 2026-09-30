@@ -53,7 +53,17 @@ const openDemoSpot = () => {
   if (spot) navigate(`d/${site.entityId}/${spot.spotId}`);
 };
 
-/** 12 bước: 6 soi bản đồ → 5 soi bên trong điểm → 1 lời chốt. */
+/** Mở tour của riêng màn đang đứng (Hộ chiếu/Thử tài) — không rời tab. */
+export function goScreenTour(steps: TourStep[]): void {
+  try {
+    localStorage.setItem(WELCOME_KEY, '1');
+  } catch {
+    /* bộ nhớ riêng tư */
+  }
+  window.dispatchEvent(new CustomEvent('mdv:tour-start', { detail: { steps } }));
+}
+
+/** 13 bước: 6 soi bản đồ → 6 soi bên trong điểm → 1 lời chốt. */
 export const TOUR_STEPS: TourStep[] = [
   { sel: ['.vnode--next', '.vnode'], icon: 'compass', title: UI.tourS1T, body: UI.tourS1B, enter: toMap },
   { sel: '.mscreen__searchbtn', icon: 'search', title: UI.tourS2T, body: UI.tourS2B },
@@ -67,5 +77,21 @@ export const TOUR_STEPS: TourStep[] = [
   { sel: '.dcard__tabs', icon: 'book', title: UI.tourS10T, body: UI.tourS10B },
   { sel: '.dvisit', icon: 'clock', title: UI.tourS11T, body: UI.tourS11B },
   { sel: '.dchain', icon: 'quiz', title: UI.tourS12T, body: UI.tourS12B },
+  { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
+];
+
+/** Tour riêng màn Hộ chiếu — nút ? ở tab này hướng dẫn đúng thứ trên màn hình. */
+export const PASSPORT_TOUR_STEPS: TourStep[] = [
+  { sel: '.ppass__ringcard', icon: 'passport', title: UI.tourPP1T, body: UI.tourPP1B },
+  { sel: '.ppass__share', icon: 'share', title: UI.tourPP2T, body: UI.tourPP2B },
+  { sel: '.ppass__badges', icon: 'award', title: UI.tourPP3T, body: UI.tourPP3B },
+  { sel: '.ppass__sitelist', icon: 'map', title: UI.tourPP4T, body: UI.tourPP4B },
+  { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
+];
+
+/** Tour riêng màn Thử tài. */
+export const QUIZ_TOUR_STEPS: TourStep[] = [
+  { sel: '.quiz__list', icon: 'quiz', title: UI.tourQ1T, body: UI.tourQ1B },
+  { sel: '.quiz__row', icon: 'spark', title: UI.tourQ2T, body: UI.tourQ2B },
   { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },
 ];

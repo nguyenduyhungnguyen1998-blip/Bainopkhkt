@@ -51,11 +51,16 @@ export function HelpMenu({
   onClose,
   onTour = goTour,
   onCard = goCard,
+  tourTitle = UI.helpMenuTour,
+  tourSub = UI.helpMenuTourSub,
 }: {
   lang: Lang;
   onClose: () => void;
   onTour?: () => void;
   onCard?: () => void;
+  /** Nhãn của lựa chọn tour — đổi khi ? ở tab khác chạy tour riêng của tab đó. */
+  tourTitle?: { vi: string; en: string };
+  tourSub?: { vi: string; en: string };
 }) {
   useOverlayFlag();
   return createPortal(
@@ -67,8 +72,8 @@ export function HelpMenu({
             <Icon name="compass" size={20} />
           </span>
           <span class="ob__optxt">
-            <b>{t(UI.helpMenuTour, lang)}</b>
-            <small>{t(UI.helpMenuTourSub, lang)}</small>
+            <b>{t(tourTitle, lang)}</b>
+            <small>{t(tourSub, lang)}</small>
           </span>
           <Icon name="forward" size={17} />
         </button>

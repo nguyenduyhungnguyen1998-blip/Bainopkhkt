@@ -62,13 +62,24 @@ export function GuidedTour({ steps, onDone }: { steps: TourStep[]; onDone: () =>
         setBox(null);
         return;
       }
-      el.scrollIntoView({ block: 'nearest', inline: 'center' });
+      // 'center' thay 'nearest': target cuối trang (dvisit/dchain) phải lên giữa màn
+      // hình, không bị dock che hay ring clip khỏi viewport — lỗi thấy trên máy thật.
+      el.scrollIntoView({ block: 'center', inline: 'center' });
       const r = el.getBoundingClientRect();
       if (r.width === 0 && r.height === 0) {
         setBox(null);
         return;
       }
-      setBox({ x: r.left - PAD, y: r.top - PAD, w: r.width + PAD * 2, h: r.height + PAD * 2 });
+      // Kẹp khung sáng trong viewport: mục tiêu cao hơn màn hình (gallery trên
+      // máy ngang) thì ring ôm phần nhìn thấy thay vì tràn ra ngoài khung.
+      const cw = window.innerWidth;
+      const ch = window.innerHeight;
+      const cl = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+      const x0 = cl(r.left - PAD, 8, cw - 8);
+      const y0 = cl(r.top - PAD, 8, ch - 8);
+      const x1 = cl(r.right + PAD, 8, cw - 8);
+      const y1 = cl(r.bottom + PAD, 8, ch - 8);
+      setBox({ x: x0, y: y0, w: Math.max(24, x1 - x0), h: Math.max(24, y1 - y0) });
     };
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(measure);

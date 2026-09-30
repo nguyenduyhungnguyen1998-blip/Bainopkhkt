@@ -13,7 +13,7 @@ import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
 import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
-import { GuidedTour } from './components/Tour';
+import { GuidedTour, type TourStep } from './components/Tour';
 import { TOUR_STEPS } from './lib/tour';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
@@ -58,14 +58,22 @@ export function App() {
   // Tour sống ở App: đi xuyên route (bản đồ → vào trong điểm) mà không unmount.
   // MapScreen phụ trách prep (bay camera/dọn overlay) rồi bắn 'mdv:tour-start'.
   const [tourOn, setTourOn] = useState(false);
+  const [tourSteps, setTourSteps] = useState(TOUR_STEPS);
   useEffect(() => {
-    const on = () => setTourOn(true);
+    const on = (e: Event) => {
+      // detail.steps (nếu có) = tour riêng của màn đang đứng; mặc định tour bản đồ đầy đủ.
+      const steps = (e as CustomEvent<{ steps?: TourStep[] }>).detail?.steps;
+      setTourSteps(steps?.length ? steps : TOUR_STEPS);
+      setTourOn(true);
+    };
     window.addEventListener('mdv:tour-start', on);
     return () => window.removeEventListener('mdv:tour-start', on);
   }, []);
   const endTour = () => {
     setTourOn(false);
-    if (route.name !== 'map') navigate('map');
+    // Tour bản đồ đầy đủ có thể đang đứng trong điểm → đưa về map; tour riêng của
+    // một tab (Hộ chiếu/Thử tài) thì giữ nguyên màn đó.
+    if (tourSteps === TOUR_STEPS && route.name !== 'map') navigate('map');
   };
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
@@ -146,7 +154,7 @@ export function App() {
       <Celebrate />
       <DemoDock />
       <Dock route={route} />
-      {tourOn && <GuidedTour steps={TOUR_STEPS} onDone={endTour} />}
+      {tourOn && <GuidedTour steps={tourSteps} onDone={endTour} />}
       {debug && (
         <Suspense fallback={null}>
           <DebugHud />

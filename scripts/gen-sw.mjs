@@ -64,7 +64,7 @@ self.addEventListener('fetch', (e) => {
 
   // Asset cùng origin trong precache: cache-first (đổi VERSION khi build mới → cache mới).
   if (url.origin === location.origin) {
-    const mediaLike = /\.(mp4|m4a|mp3|webm|wav)(\?|$)/i.test(url.pathname);
+    const mediaLike = /[.](mp4|m4a|mp3|webm|wav)$/i.test(url.pathname);
     e.respondWith(
       caches.match(req, { ignoreSearch: url.pathname === OFFLINE_URL }).then(
         (hit) =>

@@ -2,7 +2,8 @@
 .demodock {
   position: fixed;
   right: 12px;
-  bottom: calc(var(--dock-h, 76px) + 14px);
+  /* +84px: nhích lên trên counter/legend của bản đồ (cùng mốc defaultPos -160 trong JS) */
+  bottom: calc(var(--dock-h, 76px) + 84px);
   z-index: 60;
   pointer-events: none; /* chỉ các con mới nhận chạm */
 }

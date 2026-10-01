@@ -26,8 +26,11 @@ export function useConfirm() {
 
 export function ConfirmSheet({ ask, lang, onClose }: { ask: ConfirmAsk | null; lang: Lang; onClose: () => void }) {
   const okRef = useRef<HTMLButtonElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (ask) okRef.current?.focus();
+    // Hành động phá hủy → focus nút Hủy (phím tắt an toàn mặc định);
+    // hành động thường → focus nút xác nhận.
+    if (ask) (ask.danger ? cancelRef : okRef).current?.focus();
   }, [ask]);
   useEffect(() => {
     if (!ask) return;
@@ -44,7 +47,7 @@ export function ConfirmSheet({ ask, lang, onClose }: { ask: ConfirmAsk | null; l
         <h2 class="confirm__title">{ask.title}</h2>
         {ask.body && <p class="confirm__body">{ask.body}</p>}
         <div class="confirm__btns">
-          <button class="mdv-btn mdv-btn--ghost" onClick={onClose}>
+          <button ref={cancelRef} class="mdv-btn mdv-btn--ghost" onClick={onClose}>
             {t(UI.cancel, lang)}
           </button>
           <button

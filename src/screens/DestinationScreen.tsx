@@ -678,6 +678,13 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
     []
   );
 
+  // Bản thu/video khác vừa phát → narration dừng (audio-bus, một nguồn âm thanh cùng lúc).
+  useEffect(() => {
+    const off = () => playerRef.current?.stop();
+    window.addEventListener('mdv:pause-narration', off);
+    return () => window.removeEventListener('mdv:pause-narration', off);
+  }, []);
+
   const toggle = () => {
     if (!speechSupported()) {
       setStatus('failed');

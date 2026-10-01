@@ -73,7 +73,7 @@ export const TOUR_STEPS: TourStep[] = [
   { sel: '.mdv-dock', icon: 'layers', title: UI.tourS6T, body: UI.tourS6B },
   { sel: '.dest__spots', icon: 'map', title: UI.tourS7T, body: UI.tourS7B, enter: openDemoSpot },
   { sel: ['.dcard--gal', '.dcard--hero'], icon: 'spark', title: UI.tourS8T, body: UI.tourS8B },
-  { sel: '.dcard__playbtn', icon: 'volume', title: UI.tourS9T, body: UI.tourS9B },
+  { sel: ['.dcard__playbtn', '.dcard__player'], icon: 'volume', title: UI.tourS9T, body: UI.tourS9B },
   { sel: '.dcard__tabs', icon: 'book', title: UI.tourS10T, body: UI.tourS10B },
   { sel: '.dvisit', icon: 'clock', title: UI.tourS11T, body: UI.tourS11B },
   { sel: '.dchain', icon: 'quiz', title: UI.tourS12T, body: UI.tourS12B },
@@ -99,7 +99,7 @@ export const QUIZ_TOUR_STEPS: TourStep[] = [
 /** Tour riêng trang điểm đến — nút ? khi khách đang đứng trong một điểm. */
 export const DEST_TOUR_STEPS: TourStep[] = [
   { sel: ['.dcard--gal', '.dcard--hero'], icon: 'spark', title: UI.tourD1T, body: UI.tourD1B },
-  { sel: '.dcard__playbtn', icon: 'volume', title: UI.tourD2T, body: UI.tourD2B },
+  { sel: ['.dcard__playbtn', '.dcard__player'], icon: 'volume', title: UI.tourD2T, body: UI.tourD2B },
   { sel: '.dcard__tabs', icon: 'book', title: UI.tourD3T, body: UI.tourD3B },
   { sel: '.dvisit', icon: 'clock', title: UI.tourD4T, body: UI.tourD4B },
   { icon: 'spark', title: UI.tourEndT, body: UI.tourEndB, kind: 'finale' },

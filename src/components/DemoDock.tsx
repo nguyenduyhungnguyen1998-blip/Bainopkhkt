@@ -282,8 +282,16 @@ export function DemoDock() {
   const wantLeft = eff.x + FAB > window.innerWidth - 350 ? eff.x + FAB - PW : eff.x;
   const panelLeft = Math.min(Math.max(4, wantLeft), Math.max(4, window.innerWidth - PW - 4));
   panelStyle.left = `${panelLeft - eff.x}px`;
-  if (eff.y > window.innerHeight * 0.55) panelStyle.bottom = 'calc(100% + 8px)';
-  else panelStyle.top = 'calc(100% + 8px)';
+  // Mở về phía còn nhiều chỗ hơn + kẹp chiều cao panel theo chỗ thật (không tràn mép đối diện).
+  const spaceBelow = window.innerHeight - eff.y - FAB;
+  const spaceAbove = eff.y;
+  if (spaceBelow >= spaceAbove) {
+    panelStyle.top = 'calc(100% + 8px)';
+    panelStyle.maxHeight = `${Math.max(160, spaceBelow - 16)}px`;
+  } else {
+    panelStyle.bottom = 'calc(100% + 8px)';
+    panelStyle.maxHeight = `${Math.max(160, spaceAbove - 16)}px`;
+  }
 
   const achievements = computeAchievements(p);
 

@@ -90,6 +90,8 @@ export class SpeechPlayer {
     this.index = -1;
     this.cancelled = false;
     this.setStatus('loading');
+    // Bắt đầu đọc = chiếm kênh âm thanh: tạm dừng bản thu/video đang phát (audio-bus).
+    window.dispatchEvent(new CustomEvent('mdv:pause-media'));
     this.speakNext(0);
   }
 
@@ -144,6 +146,7 @@ export class SpeechPlayer {
 
   resume() {
     if (this.status === 'paused') {
+      window.dispatchEvent(new CustomEvent('mdv:pause-media'));
       speechSynthesis.resume();
       this.setStatus('playing');
     }

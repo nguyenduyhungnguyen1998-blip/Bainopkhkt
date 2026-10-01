@@ -8,9 +8,11 @@ import { installErrorLog } from './debug/errorlog';
 import { initProgress } from './lib/progress';
 import { resolveQrRedirect } from './lib/qr';
 import { registerSw } from './lib/sw';
+import { installAudioBus } from './lib/audio-bus';
 
 installErrorLog();
 registerSw();
+installAudioBus();
 // Mốc tiến độ khởi động cho thanh tải trên splash (window.__bp gắn trong index.html).
 const boot = (v: number) => (window as unknown as { __bp?: (v: number) => void }).__bp?.(v);
 boot(45);

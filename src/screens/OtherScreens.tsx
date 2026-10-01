@@ -4,7 +4,7 @@ import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
-import type { Progress } from '../lib/progress';
+import type { Achievement, Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
 import { useAmbientFlat, useFontScale, useTheme, FLAT_PCT_MAX, FONT_PCT_MAX, FONT_PCT_MIN } from '../lib/theme';
@@ -22,6 +22,18 @@ export function PassportScreen() {
   const p = useProgress();
   const [helpMenu, setHelpMenu] = useState(false);
   const [badgesOpen, setBadgesOpen] = useState(false);
+  const [openAch, setOpenAch] = useState<Achievement | null>(null);
+  const achPopRef = useRef<HTMLDivElement>(null);
+  // Popover danh hiệu: focus khi mở + Esc/tap nền để đóng.
+  useEffect(() => {
+    if (!openAch) return;
+    achPopRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpenAch(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [openAch]);
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
   const pct = totalSpots ? doneSpots / totalSpots : 0;
@@ -117,12 +129,18 @@ export function PassportScreen() {
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
         <div class="ppass__badges">
           {visibleAchs.map((a) => (
-            <div key={a.id} class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`} title={t(a.need, lang)}>
+            <button
+              key={a.id}
+              type="button"
+              class={`ppass__badge ${a.unlocked ? '' : 'ppass__badge--locked'}`}
+              onClick={() => setOpenAch(a)}
+              aria-label={`${t(a.name, lang)} — ${a.unlocked ? t(UI.earned, lang) : t(UI.badgeLocked, lang)}`}
+            >
               <Icon name={a.icon} size={26} />
               <b>{t(a.name, lang)}</b>
               <small class="ppass__need">{t(a.need, lang)}</small>
               <small>{a.unlocked ? t(UI.earned, lang) : t(UI.badgeLocked, lang)}</small>
-            </div>
+            </button>
           ))}
         </div>
         <button class="mdv-chip ppass__badgetoggle" onClick={() => setBadgesOpen(!badgesOpen)}>
@@ -161,6 +179,21 @@ export function PassportScreen() {
           );
         })}
       </div>
+      {openAch && (
+        <div class="ppass__popwrap" role="dialog" aria-modal="true" aria-label={t(openAch.name, lang)} onClick={() => setOpenAch(null)}>
+          <div class="ppass__pop" ref={achPopRef} tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+            <Icon name={openAch.icon} size={44} />
+            <b class="ppass__popname">{t(openAch.name, lang)}</b>
+            <span class={`mdv-badge ${openAch.unlocked ? 'mdv-badge--unlocked' : 'mdv-badge--locked'}`}>
+              {openAch.unlocked ? t(UI.earned, lang) : t(UI.badgeLocked, lang)}
+            </span>
+            <p class="mdv-muted ppass__popneed">{t(openAch.need, lang)}</p>
+            <button class="mdv-btn mdv-btn--primary" onClick={() => setOpenAch(null)}>
+              {t(UI.dismiss, lang)}
+            </button>
+          </div>
+        </div>
+      )}
       {helpMenu && (
         <HelpMenu
           lang={lang}
@@ -685,6 +718,35 @@ export function SettingsScreen() {
               {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
             </button>
           </div>
+          <div class="setrow" style="margin-top:14px">
+            <span class="setrow__lbl">{lang === 'vi' ? 'Dữ liệu tải sẵn' : 'Downloaded data'}</span>
+            <button
+              class="mdv-btn mdv-btn--ghost"
+              onClick={() =>
+                setAsk({
+                  title:
+                    lang === 'vi'
+                      ? 'Xóa bộ nhớ đệm và tải lại? Ảnh/audio sẽ tải lại khi có mạng.'
+                      : 'Clear cached content and reload? Media will download again when online.',
+                  ok: lang === 'vi' ? 'Xóa & tải lại' : 'Clear & reload',
+                  act: () => {
+                    void (async () => {
+                      try {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map((k) => caches.delete(k)));
+                        const regs = await navigator.serviceWorker?.getRegistrations();
+                        await Promise.all((regs ?? []).map((r) => r.unregister()));
+                      } finally {
+                        location.reload();
+                      }
+                    })();
+                  },
+                })
+              }
+            >
+              {lang === 'vi' ? 'Xóa bộ nhớ đệm' : 'Clear cache'}
+            </button>
+          </div>
         </section>
 
         <section class="mdv-card">
@@ -703,7 +765,7 @@ export function SettingsScreen() {
           </a>
         </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
-          {t(UI.appName, lang)} v{__APP_VERSION__}
+          {t(UI.appName, lang)} v{__APP_VERSION__} · {__BUILD_STAMP__}
         </p>
       </div>
       <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
@@ -872,11 +934,11 @@ export function AboutScreen() {
         </a>
         <p class="mdv-muted" style="font-size:var(--text-xs);margin:8px 0 0">
           {vi ? 'Cập nhật tháng 9/2026 · ' : 'Updated September 2026 · '}
-          {t(UI.appName, lang)} v{__APP_VERSION__}
+          {t(UI.appName, lang)} v{__APP_VERSION__} · {__BUILD_STAMP__}
         </p>
       </section>
       <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
-        {t(UI.appName, lang)} v{__APP_VERSION__}
+        {t(UI.appName, lang)} v{__APP_VERSION__} · {__BUILD_STAMP__}
       </p>
     </main>
   );

@@ -58,7 +58,7 @@ export const UI = {
   locked: { vi: 'Chưa ghé thăm', en: 'Not visited' },
   next: { vi: 'Điểm kế tiếp', en: 'Next stop' },
   unlocked: { vi: 'Đã mở', en: 'Unlocked' },
-  offline: { vi: 'Đang ngoại tuyến – nội dung đã lưu vẫn dùng được', en: 'Offline – saved content still works' },
+  offline: { vi: 'Đang ngoại tuyến — phần đã tải vẫn dùng được', en: 'Offline — downloaded parts still work' },
   all: { vi: 'Toàn quốc', en: 'All' },
   north: { vi: 'Bắc', en: 'North' },
   central: { vi: 'Trung', en: 'Central' },

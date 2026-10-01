@@ -48,6 +48,8 @@ export interface AudioCard {
   size: CardSize;
   /** Văn bản để Web Speech đọc; mỗi phần tử là một câu để tô sáng theo câu. */
   script: Record<Lang, string[]>;
+  /** Câu nối thêm CHỈ khi khu đã hoàn thành (lời chúc mừng — không đọc khi khách ghé lẻ). */
+  scriptComplete?: Record<Lang, string[]>;
   ambient?: 'wind-water' | 'temple-bell' | 'garden';
   /** Bản thu sẵn (giọng đọc thật, thuyết minh đầy đủ) — khi có, phát file thay TTS. */
   src?: string;

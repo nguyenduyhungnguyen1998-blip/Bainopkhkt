@@ -197,9 +197,8 @@ export function revokeBadge(badgeId: string, refundXp = 0): void {
 }
 
 /**
- * Công cụ demo: thu hồi một danh hiệu — gỡ trạng thái tạo ra nó để diễn lại khoảnh khắc phong.
- * Danh hiệu hành trình không lưu riêng: quiz-driven (Sĩ tử/Trạng nguyên/Học giả) → xóa điểm quiz;
- * còn lại (dấu/khu) → gỡ hết dấu. Huy hiệu khu → revokeBadge.
+ * Công cụ demo: thu hồi một danh hiệu — gỡ TỐI THIỂU trạng thái cần thiết để danh hiệu
+ * lại khóa (không dọn sạch như trước). Huy hiệu khu → revokeBadge.
  */
 export function revokeAchievement(id: string): void {
   const siteBadge = SITES.find((s) => s.gamificationConfig.badge.id === id);
@@ -207,8 +206,80 @@ export function revokeAchievement(id: string): void {
     revokeBadge(id, siteBadge.gamificationConfig.completionBonusXp);
     return;
   }
-  if (id === 'si-tu' || id === 'trang-nguyen' || id === 'hoc-gia') clearQuizResults();
-  else relockAll();
+  const quizSpots = SITES.flatMap((s) =>
+    s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ key: `${s.entityId}/${sp.spotId}`, total: sp.quiz!.length }))
+  );
+  const totalCorrect = (qd: Record<string, number>) =>
+    quizSpots.reduce((n, { key, total }) => n + Math.min(qd[key] ?? 0, total), 0);
+
+  switch (id) {
+    case 'khoi-hanh':
+      // Danh hiệu "dấu đầu tiên" — muốn khóa lại thì bắt buộc về 0 dấu.
+      commit({ ...state, unlocked: {} });
+      return;
+    case 'lu-khach': {
+      // Cần <3 dấu: gỡ các dấu mở gần nhất, giữ lại 2 dấu đầu tiên.
+      const keep = Object.entries(state.unlocked)
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, 2)
+        .map(([k]) => k);
+      commit({ ...state, unlocked: Object.fromEntries(keep.map((k) => [k, state.unlocked[k]])) });
+      return;
+    }
+    case 'tham-hiem': {
+      // Cần ≤2 khu có dấu: gỡ dấu của các khu ghé gần nhất, giữ 2 khu đầu tiên.
+      const firstVisit = new Map<string, number>();
+      for (const [k, ts] of Object.entries(state.unlocked)) {
+        const s = k.split('/')[0];
+        firstVisit.set(s, Math.min(firstVisit.get(s) ?? ts, ts));
+      }
+      const keepSites = new Set(
+        [...firstVisit.entries()].sort((a, b) => a[1] - b[1]).slice(0, 2).map(([s]) => s)
+      );
+      commit({
+        ...state,
+        unlocked: Object.fromEntries(Object.entries(state.unlocked).filter(([k]) => keepSites.has(k.split('/')[0]))),
+      });
+      return;
+    }
+    case 'si-tu': {
+      // Cần <3 bộ quiz đã trả lời: xóa kết quả mới nhất, giữ 2 bộ đầu.
+      const keys = Object.keys(state.quizDone).filter((k) => state.quizDone[k] > 0);
+      const drop = new Set(keys.slice(2));
+      commit({ ...state, quizDone: Object.fromEntries(Object.entries(state.quizDone).filter(([k]) => !drop.has(k))) });
+      return;
+    }
+    case 'trang-nguyen': {
+      // Phá "đúng hết một bộ": hạ một bộ đang điểm tuyệt đối xuống thiếu 1 câu.
+      const perfect = quizSpots.find(({ key, total }) => (state.quizDone[key] ?? 0) >= total);
+      if (!perfect) return;
+      commit({ ...state, quizDone: { ...state.quizDone, [perfect.key]: perfect.total - 1 } });
+      return;
+    }
+    case 'hoc-gia': {
+      // Cần tổng đúng <10: gỡ kết quả từng bộ cho tới khi dưới ngưỡng.
+      const quizDone = { ...state.quizDone };
+      for (const k of Object.keys(quizDone)) {
+        if (totalCorrect(quizDone) < 10) break;
+        delete quizDone[k];
+      }
+      commit({ ...state, quizDone });
+      return;
+    }
+    case 'dai-su-di-san': {
+      // Phá "đủ 5 khu": bỏ dấu mới nhất của một khu đã xong + tước luôn huy hiệu khu đó.
+      const s = SITES.find((x) => siteUnlockedCount(x) === x.spots.length);
+      if (!s) return;
+      const keys = s.spots.map((sp) => `${s.entityId}/${sp.spotId}`).filter((k) => k in state.unlocked);
+      const last = keys.sort((a, b) => state.unlocked[b] - state.unlocked[a])[0];
+      const unlocked = { ...state.unlocked };
+      delete unlocked[last];
+      commit({ ...state, unlocked, badges: state.badges.filter((b) => b !== s.gamificationConfig.badge.id) });
+      return;
+    }
+    default:
+      return;
+  }
 }
 
 export const QUIZ_XP_PER_CORRECT = 5;

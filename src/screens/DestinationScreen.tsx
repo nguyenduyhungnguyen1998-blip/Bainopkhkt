@@ -483,13 +483,13 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
     }
   };
 
-  // Cuộn: vào chi tiết -> lưu vị trí + về đầu; quay lại danh sách -> trả đúng chỗ.
-  // (?e bị loại khỏi routeKey ở App nên đóng/mở chi tiết không reset cuộn.)
+  // Cuộn: bấm mở mục -> LƯU vị trí ngay trong click (đợi tới effect thì trình duyệt
+  // đã kẹp scrollY theo trang chi tiết ngắn hơn); vào chi tiết -> về đầu; quay lại
+  // danh sách -> trả đúng chỗ. (?e không nằm trong routeKey nên App không reset.)
   const savedScroll = useRef(0);
   const hadEntry = useRef(false);
   useLayoutEffect(() => {
     if (entry) {
-      savedScroll.current = window.scrollY;
       window.scrollTo(0, 0);
       hadEntry.current = true;
     } else if (hadEntry.current) {
@@ -601,7 +601,7 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
                   <section class="xplr" aria-label={branch === 'danhNhan' ? t(UI.exploreDanhNhan, lang) : t(UI.exploreKhuVuc, lang)}>
                     <div class="xplr__list">
                       {(branch === 'danhNhan' ? ex.danhNhan : ex.khuVuc).map((e) => (
-                        <a key={e.id} class="xplr__row" href={`#/d/${site.entityId}?e=${e.id}`}>
+                        <a key={e.id} class="xplr__row" href={`#/d/${site.entityId}?e=${e.id}`} onClick={() => (savedScroll.current = window.scrollY)}>
                           <span class="xplr__rt">{t(e.title, lang)}</span>
                           <span class="xplr__rl">{leadOf(t(e.body, lang))}</span>
                           {e.spotId ? (

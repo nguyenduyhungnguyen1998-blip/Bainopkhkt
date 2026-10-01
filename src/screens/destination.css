@@ -908,10 +908,10 @@ a.dest__crumb--link:active {
 /* minmax(0,…) bắt buộc: câu dẫn nowrap muốn min-content rộng — nếu để auto/1fr
    grid sẽ xếp track theo nội dung và tràn ngang mọi viewport. */
 .xplr__list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
-.xplr__row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);text-decoration:none}
+.xplr__row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--radius-md);border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);text-decoration:none;overflow:hidden}
 .xplr__row:hover{border-color:var(--color-accent-secondary)}
 .xplr__row>svg{flex:none;color:var(--color-text-faint);margin-left:auto}
-.xplr__rt{flex:none;font-size:var(--text-sm);font-weight:700}
+.xplr__rt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--text-sm);font-weight:700}
 .xplr__rl{flex:1;min-width:0;font-size:var(--text-xs);color:var(--color-text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xplr__done{flex:none;display:inline-flex;align-items:center;gap:3px;font-size:var(--text-xs);font-weight:700;color:var(--color-accent-secondary-text)}
 .xplr__chip{flex:none;font-size:10px;font-weight:800;letter-spacing:.06em;padding:2px 6px;border-radius:999px;border:1px solid var(--color-border);color:var(--color-text-faint)}

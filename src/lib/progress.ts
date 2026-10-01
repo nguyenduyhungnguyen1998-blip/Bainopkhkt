@@ -112,6 +112,10 @@ export function isSpotUnlocked(siteId: string, spotId: string): boolean {
 export interface UnlockResult {
   alreadyUnlocked: boolean;
   gainedXp: number;
+  /** XP của riêng dấu điểm (để UI tách '+40 nhận dấu' khỏi '+80 hoàn thành'). */
+  spotXp: number;
+  /** XP thưởng hoàn thành khu (0 nếu khu chưa đủ dấu). */
+  bonusXp: number;
   newBadge?: Site['gamificationConfig']['badge'];
   siteCompleted: boolean;
 }
@@ -120,9 +124,9 @@ export interface UnlockResult {
 export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   const site = SITES.find((s) => s.entityId === siteId);
   const spot = site?.spots.find((s) => s.spotId === spotId);
-  if (!site || !spot) return { alreadyUnlocked: false, gainedXp: 0, siteCompleted: false };
+  if (!site || !spot) return { alreadyUnlocked: false, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
   const key = `${siteId}/${spotId}`;
-  if (key in state.unlocked) return { alreadyUnlocked: true, gainedXp: 0, siteCompleted: false };
+  if (key in state.unlocked) return { alreadyUnlocked: true, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
 
   const unlocked = { ...state.unlocked, [key]: Date.now() };
   let gained = spot.xp;
@@ -136,7 +140,14 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   }
   const before = state;
   commit({ ...state, unlocked, xp: state.xp + gained, badges });
-  const result: UnlockResult = { alreadyUnlocked: false, gainedXp: gained, newBadge, siteCompleted: completed };
+  const result: UnlockResult = {
+    alreadyUnlocked: false,
+    gainedXp: gained,
+    spotXp: spot.xp,
+    bonusXp: completed ? site.gamificationConfig.completionBonusXp : 0,
+    newBadge,
+    siteCompleted: completed,
+  };
   // Chuỗi ăn mừng (sóng lan, vẽ đường, toast) lắng nghe sự kiện này — phát ra dù mở từ QR, HUD hay demo.
   window.dispatchEvent(new CustomEvent<UnlockResult & { siteId: string; spotId: string }>('mdv:unlock', { detail: { ...result, siteId, spotId } }));
   announceNewAchievements(before);

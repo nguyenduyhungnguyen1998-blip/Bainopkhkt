@@ -32,6 +32,15 @@
     "siteMap": { "$ref": "#/definitions/siteMap" },
     "visit": { "$ref": "#/definitions/visit" },
     "summary": { "$ref": "#/definitions/localized" },
+    "explore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["khuVuc", "danhNhan"],
+      "properties": {
+        "khuVuc": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/exploreEntry" } },
+        "danhNhan": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/exploreEntry" } }
+      }
+    },
     "gamificationConfig": {
       "type": "object",
       "additionalProperties": false,
@@ -67,6 +76,18 @@
         "src": { "type": "string", "format": "uri-reference" },
         "poster": { "$ref": "#/definitions/assetPath" },
         "title": { "$ref": "#/definitions/localized" }
+      }
+    },
+    "exploreEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "body"],
+      "properties": {
+        "id": { "$ref": "#/definitions/slug" },
+        "title": { "$ref": "#/definitions/localized" },
+        "body": { "$ref": "#/definitions/localized" },
+        "spotId": { "$ref": "#/definitions/slug" },
+        "aspect": { "$ref": "#/definitions/slug" }
       }
     },
     "localized": {

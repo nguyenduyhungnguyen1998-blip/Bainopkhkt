@@ -218,11 +218,15 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   // Esc đóng panel QR như nút ✕ (khách dùng bàn phím/máy chiếu).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setDismissed(true);
+      if (e.key === 'Escape') {
+        setDismissed(true);
+        // Esc trên tem sai = nút ✕: bỏ chữ ký xấu khỏi URL, reload không hồi sinh cảnh báo.
+        if (state === 'bad') navigate(`d/${site.entityId}/${spot.spotId}`, true);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [state, site.entityId, spot.spotId]);
 
   // Bỏ chữ ký khỏi URL mà giữ lựa chọn aspect ?a= – reload không hồi sinh panel/toast.
   const dropSig = () => {
@@ -231,7 +235,8 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   };
 
   const doUnlock = () => {
-    if (unlocked) return;
+    // Chỉ mở dấu khi chữ ký đã verify ok — không đường nào vào được với tem sai.
+    if (unlocked || state !== 'ok') return;
     const r = unlockSpot(site.entityId, spot.spotId);
     setReward(r.gainedXp);
     setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
@@ -276,7 +281,9 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
   // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
   if (dismissed) {
-    if (unlocked) return null;
+    // Thanh xác nhận gọn chỉ tồn tại khi chữ ký đã verify ok — tem sai/đang kiểm
+    // khi đóng panel thì không còn cửa mở dấu nào (bấm Esc trên tem sai từng cấp dấu).
+    if (unlocked || state !== 'ok') return null;
     return (
       <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
         <Icon name="check" size={18} />

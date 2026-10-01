@@ -87,7 +87,7 @@ const clampPos = (p: Pos): Pos => ({
 /** Vị trí mặc định (góc phải, ngay trên counter/legend của bản đồ). */
 const defaultPos = (): Pos => ({
   x: Math.max(6, window.innerWidth - 12 - FAB),
-  y: Math.max(6, window.innerHeight - 112 - FAB),
+  y: Math.max(6, window.innerHeight - 160 - FAB),
 });
 
 export function DemoDock() {
@@ -466,7 +466,7 @@ export function DemoDock() {
                     onClick={() =>
                       setAsk({
                         title: 'Gỡ dấu mọi điểm?',
-                        body: 'Giữ XP, huy hiệu và điểm quiz.',
+                        body: 'XP của từng dấu bị trừ lại; giữ huy hiệu và điểm quiz.',
                         ok: 'Gỡ hết',
                         danger: true,
                         act: relockAll,

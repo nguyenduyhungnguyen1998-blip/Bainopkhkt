@@ -89,7 +89,7 @@ export function Celebrate() {
   const [burst, setBurst] = useState(0);
   const [badge, setBadge] = useState<{ name: string; seq: number } | null>(null);
   const [finale, setFinale] = useState(false);
-  const [siteFin, setSiteFin] = useState<Site | null>(null);
+  const [siteFin, setSiteFin] = useState<{ site: Site; spotXp: number; bonusXp: number; totalXp: number } | null>(null);
   const badgeTimer = useRef(0);
   const finaleCardRef = useRef<HTMLDivElement>(null);
   const siteCardRef = useRef<HTMLDivElement>(null);
@@ -129,7 +129,8 @@ export function Celebrate() {
         // Đủ dấu một khu (nhưng chưa 9/9 toàn bộ) -> khoảnh khắc kết hành trình khu riêng.
         markSiteFinSeen(d.siteId);
         const s = SITES.find((x) => x.entityId === d.siteId);
-        if (s) setSiteFin(s);
+        // Gom kết quả vào chính thẻ hoàn thành — không trông chờ toast bị che bên dưới.
+        if (s) setSiteFin({ site: s, spotXp: d.spotXp, bonusXp: d.bonusXp, totalXp: getProgress().xp });
       }
     };
     // Danh hiệu hành trình (quiz/XP/dấu) đạt qua mọi đường — confetti + banner tên danh hiệu.
@@ -205,20 +206,29 @@ export function Celebrate() {
         </div>
       )}
       {siteFin && (
-        <div class="finale" role="dialog" aria-modal="true" aria-label={t(UI.siteDoneTitle)}>
+        <div class="finale" role="dialog" aria-modal="true" aria-label={`${t(UI.siteDoneTitle)} ${t(siteFin.site.name)}`}>
           <div class="finale__card finale__card--site" ref={siteCardRef} tabIndex={-1}>
             <div class="finale__icon">
               <Icon name="award" size={46} />
             </div>
-            <h2>{t(UI.siteDoneTitle)}</h2>
-            <p class="mdv-muted">
-              {t(siteFin.name)} — {t(UI.siteDoneBody)}
-            </p>
+            <h2>
+              {t(UI.siteDoneTitle)} {t(siteFin.site.name)}
+            </h2>
+            <p class="mdv-muted">{t(UI.siteDoneBody)}</p>
             <div class="finale__stats">
-              <b>{siteFin.spots.length}/{siteFin.spots.length}</b>
+              <b>{siteFin.site.spots.length}/{siteFin.site.spots.length}</b>
               <span>{t(UI.spots)}</span>
               <i />
-              <b>{t(siteFin.gamificationConfig.badge.name)}</b>
+              <b>+{siteFin.spotXp} XP</b>
+              <span>{t(UI.siteDoneStamp)}</span>
+              <i />
+              <b>+{siteFin.bonusXp} XP</b>
+              <span>{t(UI.siteDoneBonus)}</span>
+              <i />
+              <b>{siteFin.totalXp} XP</b>
+              <span>{t(UI.totalXp)}</span>
+              <i />
+              <b>{t(siteFin.site.gamificationConfig.badge.name)}</b>
             </div>
             <a class="mdv-btn mdv-btn--primary finale__cta" href={routeHref.passport} onClick={() => setSiteFin(null)}>
               <Icon name="passport" size={18} /> {t(UI.viewStamp)}

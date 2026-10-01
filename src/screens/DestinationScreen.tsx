@@ -2,7 +2,7 @@
  * Trang điểm đến – P2 renderer bento đầy đủ (hero/aspects vuốt/video poster/audio TTS/fact/ảnh)
  * + luồng quét QR có chữ ký (P3): `?s=<sig>` hợp lệ -> xác nhận -> mở khóa; sai -> từ chối lịch sự.
  */
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
 import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard, ExploreEntry } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
@@ -26,7 +26,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
   const [helpMenu, setHelpMenu] = useState(false);
   const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
   const found = siteOnly ? undefined : getSpot(siteId, spotId);
-  if (siteOnly) return <SiteIntro site={siteOnly} />;
+  if (siteOnly) return <SiteIntro site={siteOnly} query={query} />;
   if (!found) {
     return (
       <main class="mdv-screen">
@@ -278,31 +278,6 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
       </div>
     );
   }
-  // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
-  // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
-  if (dismissed) {
-    // Thanh xác nhận gọn chỉ tồn tại khi chữ ký đã verify ok — tem sai/đang kiểm
-    // khi đóng panel thì không còn cửa mở dấu nào (bấm Esc trên tem sai từng cấp dấu).
-    if (unlocked || state !== 'ok') return null;
-    return (
-      <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
-        <Icon name="check" size={18} />
-        <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
-        <button
-          class="mdv-btn mdv-btn--primary dscan__cta"
-          onClick={() => {
-            const r = unlockSpot(site.entityId, spot.spotId);
-            setReward(r.gainedXp);
-            setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
-            if (navigator.vibrate) navigator.vibrate(30);
-          }}
-        >
-          {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
-        </button>
-      </div>
-    );
-  }
-
   if (state === 'bad') {
     return (
       <div class="dscan dscan--bad" role="alert">
@@ -324,6 +299,8 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   }
 
   if (reward !== null) {
+    // Toast nhận thưởng được xét TRƯỚC nhánh dismissed: đóng bảng chọn rồi nhận
+    // qua thanh gọn vẫn phải hiện đầy đủ (tên điểm + XP + tổng + hộ chiếu).
     return (
       <div class="dtoast" role="status">
         <Icon name="check" size={22} />
@@ -347,6 +324,24 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
           aria-label={t(UI.dismiss, lang)}
         >
           ✕
+        </button>
+      </div>
+    );
+  }
+
+  // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
+  // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
+  if (dismissed) {
+    // Thanh xác nhận gọn chỉ tồn tại khi chữ ký đã verify ok — tem sai/đang kiểm
+    // khi đóng panel thì không còn cửa mở dấu nào (bấm Esc trên tem sai từng cấp dấu).
+    // Nhận qua đường này đi chung doUnlock -> toast + tổng XP y như CTA chính.
+    if (unlocked || state !== 'ok') return null;
+    return (
+      <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
+        <Icon name="check" size={18} />
+        <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
+        <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={doUnlock}>
+          {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
         </button>
       </div>
     );
@@ -414,7 +409,10 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
         )}
         {unlocked ? (
           <p class="dscan__okhint">
-            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)}
+            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)} · {t(UI.totalXp, lang)} {getProgress().xp} XP ·{' '}
+            <a class="dscan__plink" href={routeHref.passport}>
+              {t(UI.viewStamp, lang)}
+            </a>
           </p>
         ) : (
           <p class="dscan__okhint">
@@ -444,25 +442,94 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
  * hero 40%, chọn ngôn ngữ, CTA đỏ bắt đầu. (Một hình thức khám phá duy nhất:
  * nút Nghe + bản đọc gập gọn nằm ngay trong trang điểm.)
  */
-function SiteIntro({ site }: { site: Site }) {
+type ExploreBranch = 'khuVuc' | 'danhNhan';
+
+const branchKey = (siteId: string) => `mdv.xplr.${siteId}`;
+function savedBranch(siteId: string): ExploreBranch | null {
+  try {
+    const b = localStorage.getItem(branchKey(siteId));
+    return b === 'danhNhan' || b === 'khuVuc' ? b : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Câu dẫn của mục lục = câu đầu của chính bài (không biên soạn chữ mới). */
+function leadOf(text: string): string {
+  const m = /[.!?]\s/.exec(text);
+  return m && m.index > 0 ? text.slice(0, m.index + 1) : text;
+}
+
+/**
+ * Màn vào khu (G): tên + ảnh vừa + một câu mô tả, rồi HAI lựa chọn ngang hàng
+ * "Khu vực"/"Danh nhân" — không CTA chung mở sẵn điểm đầu. Danh sách chỉ hiện
+ * sau khi khách chọn nhóm; mỗi mục = tên + một câu dẫn + trạng thái dấu, bấm vào
+ * mở chi tiết riêng (?e=) khớp đúng mục đã chọn. Nghe/Đọc nằm ở chi tiết.
+ */
+function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
   const [lang, setLang] = useLang();
-  const first = site.spots[0];
+  const ex = site.explore;
+  const entryId = query?.get('e') ?? null;
+  const all = ex ? [...ex.khuVuc, ...ex.danhNhan] : [];
+  const entry = all.find((x) => x.id === entryId);
+  const entryBranch: ExploreBranch | null = ex && entry ? (ex.danhNhan.includes(entry) ? 'danhNhan' : 'khuVuc') : null;
+  const [branch, setBranch] = useState<ExploreBranch | null>(() => savedBranch(site.entityId));
+  const pickBranch = (b: ExploreBranch) => {
+    setBranch(b);
+    try {
+      localStorage.setItem(branchKey(site.entityId), b);
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+  };
+
+  // Cuộn: vào chi tiết -> lưu vị trí + về đầu; quay lại danh sách -> trả đúng chỗ.
+  // (?e bị loại khỏi routeKey ở App nên đóng/mở chi tiết không reset cuộn.)
+  const savedScroll = useRef(0);
+  const hadEntry = useRef(false);
+  useLayoutEffect(() => {
+    if (entry) {
+      savedScroll.current = window.scrollY;
+      window.scrollTo(0, 0);
+      hadEntry.current = true;
+    } else if (hadEntry.current) {
+      window.scrollTo(0, savedScroll.current);
+      hadEntry.current = false;
+    }
+  }, [entry]);
+
+  // Nghe một mục: player dùng chung — đổi mục tự dừng, rời trang dừng hẳn.
+  const playerRef = useRef<SpeechPlayer | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  useEffect(() => () => playerRef.current?.stop(), []);
+  const listen = (e: ExploreEntry) => {
+    if (!speechSupported()) return;
+    if (!playerRef.current) playerRef.current = new SpeechPlayer();
+    const p = playerRef.current;
+    if (playingId === e.id) {
+      p.stop();
+      return;
+    }
+    p.play([t(e.body, lang)], lang, {
+      onStatus: (s) => {
+        if (s !== 'playing' && s !== 'paused') setPlayingId(null);
+      },
+    });
+    setPlayingId(e.id);
+  };
+
+  const closeEntry = () => {
+    if (entryBranch) pickBranch(entryBranch);
+    navigate(`d/${site.entityId}`, true); // replace: 'e' đi, quay lại đúng danh sách
+  };
+  const spotOf = (e: ExploreEntry) => site.spots.find((s) => s.spotId === e.spotId);
+
   return (
     <main class="mdv-screen dest dintro">
       <header class="dintro__top">
         <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.back, lang)}>
           <Icon name="back" />
         </a>
-      </header>
-      <figure class="dintro__hero">
-        <img src={asset(site.heroImage)} alt={t(site.name, lang)} />
-      </figure>
-      <div class="dintro__body">
-        <span class="mdv-eyebrow">{t(site.province, lang)}</span>
-        <h1>{t(site.name, lang)}</h1>
-        <p class="mdv-muted">{t(site.summary, lang)}</p>
-
-        <h2 class="dintro__h">{t(UI.chooseLang, lang)}</h2>
         <div class="dintro__langs">
           <button class="mdv-chip" aria-pressed={lang === 'vi'} onClick={() => setLang('vi')}>
             Tiếng Việt
@@ -471,87 +538,99 @@ function SiteIntro({ site }: { site: Site }) {
             English
           </button>
         </div>
+      </header>
 
-        <button class="mdv-btn mdv-btn--primary dintro__cta" onClick={() => first && navigate(`d/${site.entityId}/${first.spotId}`)}>
-          {t(UI.startExploring, lang)}
-        </button>
+      {entry ? (
+        <article class="xplrd">
+          <button type="button" class="xplrd__back" onClick={closeEntry}>
+            <Icon name="back" size={16} /> {t(UI.exploreBack, lang)}
+          </button>
+          <span class="mdv-eyebrow">{entryBranch === 'danhNhan' ? t(UI.exploreDanhNhan, lang) : t(UI.exploreKhuVuc, lang)}</span>
+          <h1 class="xplrd__h">{t(entry.title, lang)}</h1>
+          <p class="xplrd__body">{t(entry.body, lang)}</p>
+          <div class="xplr__acts">
+            {speechSupported() && (
+              <button type="button" class="mdv-chip" aria-pressed={playingId === entry.id} onClick={() => listen(entry)}>
+                <Icon name={playingId === entry.id ? 'pause' : 'play'} size={14} />
+                {playingId === entry.id ? t(UI.pause, lang) : t(UI.play, lang)}
+              </button>
+            )}
+            {entry.spotId ? (
+              <a
+                class="xplr__go"
+                href={`${routeHref.destination(site.entityId, entry.spotId)}${entry.aspect ? `?a=${entry.aspect}` : ''}`}
+              >
+                {entryBranch === 'danhNhan' ? t(UI.exploreShrine, lang) : t(UI.exploreVisitSpot, lang)}: {t(spotOf(entry)?.name ?? entry.title, lang)}{' '}
+                <Icon name="forward" size={13} />
+              </a>
+            ) : (
+              <span class="xplr__ref">{t(UI.exploreRefOnly, lang)}</span>
+            )}
+            {entry.spotId && isSpotUnlocked(site.entityId, entry.spotId) && (
+              <span class="xplr__done">
+                <Icon name="check" size={13} /> {t(UI.gotStamp, lang)}
+              </span>
+            )}
+          </div>
+        </article>
+      ) : (
+        <>
+          <figure class="dintro__hero">
+            <img src={asset(site.heroImage)} alt={t(site.name, lang)} />
+          </figure>
+          <div class="dintro__body">
+            <span class="mdv-eyebrow">{t(site.province, lang)}</span>
+            <h1>{t(site.name, lang)}</h1>
+            <p class="mdv-muted">{t(site.summary, lang)}</p>
 
-        {site.explore && <ExploreDirectory site={site} lang={lang} />}
-      </div>
+            {ex ? (
+              <>
+                <div class="xplr__branches" role="group" aria-label={t(UI.exploreWhat, lang)}>
+                  <button type="button" class={`xplr__branch ${branch === 'khuVuc' ? 'xplr__branch--on' : ''}`} onClick={() => pickBranch('khuVuc')}>
+                    <Icon name="locate" size={18} />
+                    <b>{t(UI.exploreKhuVuc, lang)}</b>
+                    <small>{ex.khuVuc.length}</small>
+                  </button>
+                  <button type="button" class={`xplr__branch ${branch === 'danhNhan' ? 'xplr__branch--on' : ''}`} onClick={() => pickBranch('danhNhan')}>
+                    <Icon name="spark" size={18} />
+                    <b>{t(UI.exploreDanhNhan, lang)}</b>
+                    <small>{ex.danhNhan.length}</small>
+                  </button>
+                </div>
+                {branch && (
+                  <section class="xplr" aria-label={branch === 'danhNhan' ? t(UI.exploreDanhNhan, lang) : t(UI.exploreKhuVuc, lang)}>
+                    <div class="xplr__list">
+                      {(branch === 'danhNhan' ? ex.danhNhan : ex.khuVuc).map((e) => (
+                        <a key={e.id} class="xplr__row" href={`#/d/${site.entityId}?e=${e.id}`}>
+                          <span class="xplr__rt">{t(e.title, lang)}</span>
+                          <span class="xplr__rl">{leadOf(t(e.body, lang))}</span>
+                          {e.spotId ? (
+                            isSpotUnlocked(site.entityId, e.spotId) ? (
+                              <span class="xplr__done">
+                                <Icon name="check" size={13} /> {t(UI.gotStamp, lang)}
+                              </span>
+                            ) : (
+                              <span class="xplr__chip">QR</span>
+                            )
+                          ) : (
+                            <span class="xplr__ref">{t(UI.exploreRefOnly, lang)}</span>
+                          )}
+                          <Icon name="forward" size={15} />
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </>
+            ) : (
+              <a class="mdv-btn mdv-btn--primary dintro__cta" href={routeHref.destination(site.entityId, site.spots[0]?.spotId ?? '')}>
+                {t(UI.startExploring, lang)}
+              </a>
+            )}
+          </div>
+        </>
+      )}
     </main>
-  );
-}
-
-/**
- * Mục lục nội dung cấp khu (F): "Khu vực" (địa điểm, 8 mục gồm Hồ Văn tham khảo) tách
- * khỏi "Danh nhân" (con người). Mỗi mục là một khối Đọc (body luôn hiển thị) + Nghe
- * (TTS đọc chính body đó — cùng nội dung, hai chế độ tiêu thụ, không nhân đôi bản) +
- * link tới điểm QR tương ứng nếu có tem.
- */
-function ExploreDirectory({ site, lang }: { site: Site; lang: Lang }) {
-  const ex = site.explore!;
-  const playerRef = useRef<SpeechPlayer | null>(null);
-  const [playingId, setPlayingId] = useState<string | null>(null);
-  useEffect(() => () => playerRef.current?.stop(), []);
-
-  const listen = (id: string, text: string) => {
-    if (!speechSupported()) return;
-    if (!playerRef.current) playerRef.current = new SpeechPlayer();
-    const p = playerRef.current;
-    if (playingId === id) {
-      p.stop();
-      return;
-    }
-    p.play([text], lang, {
-      onStatus: (s) => {
-        if (s !== 'playing' && s !== 'paused') setPlayingId(null);
-      },
-    });
-    setPlayingId(id);
-  };
-
-  const renderGroup = (title: string, list: ExploreEntry[]) => (
-    <section class="xplr" aria-label={title}>
-      <h2 class="xplr__h">{title}</h2>
-      <div class="xplr__list">
-        {list.map((e) => (
-          <article key={e.id} class="xplr__item">
-            <h3 class="xplr__t">{t(e.title, lang)}</h3>
-            <p class="xplr__b">{t(e.body, lang)}</p>
-            <div class="xplr__acts">
-              {speechSupported() && (
-                <button
-                  type="button"
-                  class="mdv-chip"
-                  aria-pressed={playingId === e.id}
-                  onClick={() => listen(e.id, t(e.body, lang))}
-                >
-                  <Icon name={playingId === e.id ? 'pause' : 'play'} size={14} />
-                  {playingId === e.id ? t(UI.pause, lang) : t(UI.play, lang)}
-                </button>
-              )}
-              {e.spotId ? (
-                <a
-                  class="xplr__go"
-                  href={`${routeHref.destination(site.entityId, e.spotId)}${e.aspect ? `?a=${e.aspect}` : ''}`}
-                >
-                  {t(UI.exploreGoSpot, lang)} <Icon name="forward" size={13} />
-                </a>
-              ) : (
-                <span class="xplr__ref">{t(UI.exploreRefOnly, lang)}</span>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-
-  return (
-    <>
-      {renderGroup(t(UI.exploreKhuVuc, lang), ex.khuVuc)}
-      {renderGroup(t(UI.exploreDanhNhan, lang), ex.danhNhan)}
-    </>
   );
 }
 

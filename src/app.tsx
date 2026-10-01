@@ -88,8 +88,17 @@ export function App() {
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
   // useLayoutEffect để cuộn chạy TRƯỚC paint – không còn 1 frame nội dung mới nằm giữa trang.
+  // Khoá cuộn không tính `s` (gỡ chữ ký sau nhận dấu) và `e` (chi tiết mục lục cấp
+  // khu tự quản cuộn) — nếu không, mỗi lần gỡ sig/mở mục trang lại văng về đầu.
+  const scrollQuery = (() => {
+    if (route.name !== 'destination') return '';
+    const q = new URLSearchParams(route.query);
+    q.delete('s');
+    q.delete('e');
+    return q.toString();
+  })();
   const routeKey =
-    route.name === 'destination' ? `d:${route.siteId}/${route.spotId ?? ''}?${route.query}` : route.name === 'notfound' ? route.path : route.name;
+    route.name === 'destination' ? `d:${route.siteId}/${route.spotId ?? ''}?${scrollQuery}` : route.name === 'notfound' ? route.path : route.name;
   useLayoutEffect(() => {
     window.scrollTo(0, 0);
   }, [routeKey]);

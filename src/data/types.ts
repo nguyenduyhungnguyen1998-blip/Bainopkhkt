@@ -15,13 +15,21 @@ export interface HeroCard {
   type: 'hero';
   size: CardSize;
   image: string;
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
+  images?: string[];
   caption?: Localized;
 }
 
 export interface AspectsCard {
   type: 'aspects';
   size: CardSize;
-  aspects: { id: string; title: Localized; body: Localized; video?: { src: string; poster?: string; title?: Localized } }[];
+  aspects: {
+    id: string;
+    title: Localized;
+    body: Localized;
+    video?: { src: string; poster?: string; title?: Localized };
+    videoEn?: { src: string; poster?: string; title?: Localized };
+  }[];
 }
 
 export interface VideoCard {
@@ -29,6 +37,8 @@ export interface VideoCard {
   size: CardSize;
   /** Link nhúng (YouTube/Vimeo/MP4). Trống = hiện khung poster "sẽ cập nhật". */
   src?: string;
+  /** Bản tiếng Anh của clip (riêng file EN trên Drive); dùng khi lang==='en'. */
+  srcEn?: string;
   poster?: string;
   title: Localized;
 }
@@ -39,6 +49,10 @@ export interface AudioCard {
   /** Văn bản để Web Speech đọc; mỗi phần tử là một câu để tô sáng theo câu. */
   script: Record<Lang, string[]>;
   ambient?: 'wind-water' | 'temple-bell' | 'garden';
+  /** Bản thu sẵn (giọng đọc thật, thuyết minh đầy đủ) — khi có, phát file thay TTS. */
+  src?: string;
+  /** Bản thu tiếng Anh tương ứng. */
+  srcEn?: string;
 }
 
 export interface FactCard {
@@ -52,6 +66,8 @@ export interface ImageCard {
   type: 'image';
   size: CardSize;
   image: string;
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
+  images?: string[];
   caption?: Localized;
 }
 
@@ -84,6 +100,8 @@ export interface SiteMapNode {
   x: number;
   y: number;
   labelSide?: 'left' | 'right';
+  /** Điểm nằm ngoài trục hành trình chính (vườn, góc phụ) — không vẽ vạch ranh giới sân trước nó. */
+  offAxis?: boolean;
 }
 
 /** Trang trí vẽ thêm trên sơ đồ cấp 2 (giếng, tường phụ, …), neo theo khu. */

@@ -9,6 +9,8 @@ import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProg
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { Icon } from '../components/Icon';
+import { HelpMenu, WelcomeModal } from '../components/Onboarding';
+import { HINT_REQ_KEY, TOUR_REQ_KEY, WELCOME_KEY } from '../lib/tour';
 import { asset } from '../lib/asset';
 import { verifySignature } from '../lib/qr';
 import { isDebug } from '../lib/debug';
@@ -37,13 +39,13 @@ export function MapScreen() {
   const [selectedId, setSelectedId] = useState<string | null>(mapMem?.sel ?? null);
   const [focus, setFocus] = useState<MapFocus>(mapMem?.focus ?? 'all');
   const [siteLevel, setSiteLevel] = useState<string | null>(mapMem?.site ?? null); // entityId của khu đang xem sơ đồ
-  const [hintOn, setHintOn] = useState(() => {
-    try {
-      return !localStorage.getItem(HINT_KEY);
-    } catch {
-      return true;
-    }
-  });
+  const [hintOn, setHintOn] = useState(false); // thẻ 3 bước – chỉ mở từ menu ? (lần đầu đã có màn chào)
+  const [welcome, setWelcome] = useState(false);
+  const [helpMenu, setHelpMenu] = useState(false);
+  const actedRef = useRef(false); // khách đã tương tác trước khi màn chào kịp hiện → không chen vào
+  const markActed = () => {
+    actedRef.current = true;
+  };
   const [cinema] = useState(() => {
     try {
       return !localStorage.getItem(SEEN_KEY);
@@ -52,6 +54,7 @@ export function MapScreen() {
     }
   });
   const [homeSignal, setHomeSignal] = useState(0);
+  const [allSignal, setAllSignal] = useState(0);
   const [zoomSignal, setZoomSignal] = useState({ d: 1, n: 0 });
   const [userLoc, setUserLoc] = useState<{ x: number; y: number } | null>(null);
   const [locMsg, setLocMsg] = useState<string | null>(null);
@@ -65,6 +68,84 @@ export function MapScreen() {
   useEffect(() => {
     if (searchOn) searchInputRef.current?.focus();
   }, [searchOn]);
+
+  // Chuẩn bị trước khi App mở tour: dọn overlay đang mở + bay camera về điểm kế tiếp
+  // để spotlight bước 1 soi đúng chỗ, rồi báo App qua 'mdv:tour-start'.
+  const prepTour = () => {
+    try {
+      localStorage.setItem(WELCOME_KEY, '1');
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    setWelcome(false);
+    setHelpMenu(false);
+    setHintOn(false);
+    setSearchOn(false);
+    setSelectedId(null);
+    if (siteLevel) exitSiteLevel();
+    const next = nodesRef.current.find((n) => n.status === 'next') ?? nodesRef.current.find((n) => n.status === 'active');
+    if (next) setFlyReq({ x: next.x, y: next.y, k: Math.max(tRef.current?.k ?? 1, 1.7), n: Date.now() });
+    window.setTimeout(() => window.dispatchEvent(new CustomEvent('mdv:tour-start')), next ? 750 : 60);
+  };
+
+  // Cờ mở tour / thẻ 3 bước từ màn khác (Trợ giúp, Hộ chiếu, Thử tài → nút ?).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(TOUR_REQ_KEY)) {
+        localStorage.removeItem(TOUR_REQ_KEY);
+        prepTour();
+      }
+      if (localStorage.getItem(HINT_REQ_KEY)) {
+        localStorage.removeItem(HINT_REQ_KEY);
+        setHintOn(true);
+      }
+      if (localStorage.getItem('mdv.tourEnd')) {
+        localStorage.removeItem('mdv.tourEnd');
+        setAllSignal((n) => n + 1);
+      }
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    const onTourReq = () => prepTour();
+    const onHintReq = () => setHintOn(true);
+    const onTourEnd = () => setAllSignal((n) => n + 1);
+    window.addEventListener('mdv:tour-request', onTourReq);
+    window.addEventListener('mdv:hint-request', onHintReq);
+    window.addEventListener('mdv:tour-end', onTourEnd);
+    return () => {
+      window.removeEventListener('mdv:tour-request', onTourReq);
+      window.removeEventListener('mdv:hint-request', onHintReq);
+      window.removeEventListener('mdv:tour-end', onTourEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Màn chào lần đầu: đợi intro camera hạ cánh (~2.8s) rồi mới hỏi — nhưng nếu khách
+  // đã tự thao tác trước đó (chạm node/mở search/menu ?) thì không chen vào nữa.
+  useEffect(() => {
+    let known = true;
+    try {
+      known = !!localStorage.getItem(WELCOME_KEY);
+    } catch {
+      /* hiện màn chào cho chắc */
+    }
+    if (known) return;
+    const id = setTimeout(() => {
+      if (!actedRef.current) setWelcome(true);
+    }, cinema ? 2800 : 450);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const closeWelcome = () => {
+    try {
+      localStorage.setItem(WELCOME_KEY, '1');
+    } catch {
+      /* bộ nhớ riêng tư */
+    }
+    setWelcome(false);
+    markSeen(); // intro camera nếu còn chạy thì cũng thôi hỏi nữa
+  };
 
   // Thông báo vị trí tự tắt sau 3s.
   useEffect(() => {
@@ -393,8 +474,11 @@ export function MapScreen() {
               {t(UI[f.label], lang)}
             </button>
           ))}
-        <button class="mdv-chip mscreen__searchbtn" onClick={() => setSearchOn(true)} aria-label={t(UI.search, lang)}>
+        <button class="mdv-chip mscreen__searchbtn" onClick={() => { markActed(); setSearchOn(true); }} aria-label={t(UI.search, lang)}>
           <Icon name="search" size={16} /> {t(UI.search, lang)}
+        </button>
+        <button class="mdv-chip mscreen__helpbtn" onClick={() => { markActed(); setHelpMenu(true); }} aria-label={t(UI.howto, lang)}>
+          <Icon name="help" size={16} />
         </button>
       </div>
 
@@ -414,6 +498,7 @@ export function MapScreen() {
             lang={lang}
             onboard={cinema && !obSkip}
             homeSignal={homeSignal}
+            allSignal={allSignal}
             zoomSignal={zoomSignal}
             flyRequest={flyReq}
             userLoc={userLoc}
@@ -422,7 +507,7 @@ export function MapScreen() {
               flyDone.current();
             }}
             initialTransform={mountT}
-            onSelect={(id) => { setSelectedId(id); if (hintOn) dismissHint(); }}
+            onSelect={(id) => { markActed(); setSelectedId(id); if (hintOn) dismissHint(); }}
             onTransform={onMapTransform}
             onOnboardDone={markSeen}
           />
@@ -520,17 +605,34 @@ export function MapScreen() {
           </div>
         )}
         {hintOn && (
-          <div class="mhint" role="status">
-            <Icon name="compass" size={18} />
-            <span>{t(UI.hintTap, lang)}</span>
-            {cinema && !obSkip && (
-              <button class="mhint__skip" onClick={dismissHint}>
-                {t(UI.skipOnboard, lang)}
+          <div class="mhint mhint--howto" role="dialog" aria-label={t(UI.howto, lang)}>
+            <div class="mhint__steps">
+              <span>
+                <Icon name="compass" size={15} /> {t(UI.howtoStep1, lang)}
+              </span>
+              <span>
+                <Icon name="qr" size={15} /> {t(UI.howtoStep2, lang)}
+              </span>
+              <span>
+                <Icon name="passport" size={15} /> {t(UI.howtoStep3, lang)}
+              </span>
+            </div>
+            <div class="mhint__row">
+              <button class="mdv-chip" onClick={dismissHint}>
+                {t(UI.gotIt, lang)}
               </button>
-            )}
-            <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
-              <Icon name="close" size={16} />
-            </button>
+              <button class="mdv-chip" onClick={prepTour}>
+                <Icon name="compass" size={14} /> {t(UI.tourDeepLink, lang)}
+              </button>
+              {cinema && !obSkip && (
+                <button class="mhint__skip" onClick={dismissHint}>
+                  {t(UI.skipOnboard, lang)}
+                </button>
+              )}
+              <button class="mhint__x" aria-label={t(UI.dismiss, lang)} onClick={dismissHint}>
+                <Icon name="close" size={16} />
+              </button>
+            </div>
           </div>
         )}
         {!levelSite && nextOffscreen && (
@@ -656,6 +758,29 @@ export function MapScreen() {
           </>
         )}
       </section>
+
+      {welcome && (
+        <WelcomeModal
+          lang={lang}
+          onKnow={closeWelcome}
+          onTour={() => {
+            // "Chưa biết" → thẻ 3 bước nhanh (~20s); tour 13 bước chỉ mở từ nút ?
+            closeWelcome();
+            setHintOn(true);
+          }}
+        />
+      )}
+      {helpMenu && (
+        <HelpMenu
+          lang={lang}
+          onTour={prepTour}
+          onCard={() => {
+            setHelpMenu(false);
+            setHintOn(true);
+          }}
+          onClose={() => setHelpMenu(false)}
+        />
+      )}
     </main>
   );
 }

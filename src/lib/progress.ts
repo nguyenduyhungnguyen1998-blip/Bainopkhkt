@@ -28,16 +28,25 @@ const LS_KEY = 'mdv.progress.v1';
 const IDB_KEY = 'progress';
 const EMPTY: Progress = { schemaVersion: 2, unlocked: {}, quizDone: {}, xp: 0, badges: [] };
 
+/** Khóa điểm hợp lệ hiện hữu — dữ liệu sao lưu/nhập có khóa lạ (điểm đổi tên, bản app mới hơn) bị loại ra khỏi số đếm. */
+const KNOWN_SPOTS = new Set(SITES.flatMap((s) => s.spots.map((sp) => `${s.entityId}/${sp.spotId}`)));
+
 /** Chấp nhận bản v1 (localStorage cũ, thiếu quizDone) lẫn v2. Trả null nếu không hợp lệ. */
 function migrate(raw: unknown): Progress | null {
   if (!raw || typeof raw !== 'object') return null;
   const p = raw as { schemaVersion?: number } & Omit<Partial<Progress>, 'schemaVersion'>;
   if (p.schemaVersion !== 1 && p.schemaVersion !== 2) return null;
   if (!p.unlocked || typeof p.unlocked !== 'object') return null;
+  // Chỉ giữ khóa điểm tồn tại thật — khóa lạ làm phình số dấu và có thể bắn nhầm finale/danh hiệu.
+  const unlocked: Record<string, number> = {};
+  for (const [k, v] of Object.entries(p.unlocked)) if (KNOWN_SPOTS.has(k) && typeof v === 'number') unlocked[k] = v;
+  const quizDone: Record<string, number> = {};
+  if (p.quizDone && typeof p.quizDone === 'object')
+    for (const [k, v] of Object.entries(p.quizDone)) if (KNOWN_SPOTS.has(k) && typeof v === 'number') quizDone[k] = v;
   return {
     schemaVersion: 2,
-    unlocked: p.unlocked,
-    quizDone: p.quizDone && typeof p.quizDone === 'object' ? p.quizDone : {},
+    unlocked,
+    quizDone,
     xp: typeof p.xp === 'number' ? p.xp : 0,
     badges: Array.isArray(p.badges) ? p.badges : [],
   };
@@ -237,10 +246,95 @@ export function exportPassportJson(): string {
   );
 }
 
+const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+/**
+ * Bản sao "thẻ hộ chiếu": file .html tự chứa — du khách mở lên thấy ngay hành trình của mình
+ * (đẹp, in/chia sẻ được), đồng thời nhúng JSON vào <script id="mdv-backup"> để app nhập lại được.
+ */
+export function exportPassportCardHtml(): string {
+  const exportedAt = new Date();
+  const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
+  const doneSpots = Object.keys(state.unlocked).length;
+  const pct = totalSpots ? Math.round((doneSpots / totalSpots) * 100) : 0;
+  const dateVi = exportedAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const siteRows = SITES.map((site) => {
+    const n = site.spots.filter((sp) => `${site.entityId}/${sp.spotId}` in state.unlocked).length;
+    const cls = n === site.spots.length ? 'done' : n > 0 ? 'mid' : 'none';
+    const segs = site.spots
+      .map((sp) => {
+        const on = `${site.entityId}/${sp.spotId}` in state.unlocked;
+        return `<span class="seg${on ? ' on' : ''}">${on ? '✓' : ''}<em>${escHtml(sp.name.vi)}</em></span>`;
+      })
+      .join('');
+    const badge = state.badges.includes(site.gamificationConfig.badge.id)
+      ? `<span class="badge">🏅 ${escHtml(site.gamificationConfig.badge.name.vi)}</span>`
+      : '';
+    return `<li class="site ${cls}">
+      <div class="site__head"><b>${escHtml(site.name.vi)}</b>${badge}<span class="cnt">${n}/${site.spots.length} điểm</span></div>
+      <div class="segs">${segs}</div>
+    </li>`;
+  }).join('');
+
+  const payload = exportPassportJson().replace(/</g, '\\u003c');
+  return `<!DOCTYPE html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hộ chiếu Mở Dấu Việt</title><style>
+*{box-sizing:border-box;margin:0}body{font-family:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;background:#f4f1ea;color:#2a2019;padding:24px;display:flex;justify-content:center}
+.card{max-width:520px;width:100%;background:#fffdf8;border-radius:22px;padding:30px 26px;box-shadow:0 12px 40px rgb(60 40 10 / .14);border:1.5px solid #e5d9bf}
+.brand{text-align:center;letter-spacing:.24em;font-size:12px;font-weight:700;color:#b23a2e}
+h1{text-align:center;font-size:24px;margin:6px 0 2px;letter-spacing:.02em}
+.sub{text-align:center;font-size:12.5px;color:#8a7f6f;margin-bottom:20px}
+.stats{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,#fdf6e3,#f8ecd2);border:1px solid #e8dcc0;border-radius:16px;padding:16px 18px;margin-bottom:18px}
+.ring{flex:none;width:84px;height:84px;border-radius:50%;background:conic-gradient(#c8941a ${pct}%,#e3d8c1 0);display:grid;place-items:center}
+.ring i{width:62px;height:62px;border-radius:50%;background:#fffdf8;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:15px}
+.stats .nums{flex:1}.stats .big{font-size:26px;font-weight:800}.stats .lbl{font-size:12px;color:#8a7f6f}
+.xp{float:right;text-align:right}.xp b{color:#b23a2e;font-size:22px}
+ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+.site{border:1px solid #e9dfc9;border-radius:14px;padding:10px 12px;background:#fff}
+.site__head{display:flex;align-items:baseline;gap:8px;font-size:13.5px}.site__head b{flex:1}
+.cnt{font-size:12px;color:#8a7f6f;white-space:nowrap}
+.badge{font-size:11px;background:#fdf1d7;color:#8a6408;border-radius:8px;padding:2px 7px;white-space:nowrap}
+.segs{display:flex;gap:4px;margin-top:8px}
+.seg{flex:1;min-width:0;height:26px;border-radius:8px;background:#eee6d4;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;position:relative}
+.seg em{font-style:normal;font-size:8.5px;color:#8a7f6f;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+.site.mid .seg.on{background:#ffd56a}.site.done .seg.on{background:#7fd8b0}
+.seg.on em{color:#4a3c10}.site.done .seg.on em{color:#0c4a2e}
+.seg.on{font-weight:700;color:#4a3c10}.site.done .seg.on{color:#0c4a2e}
+.foot{margin-top:20px;font-size:11.5px;color:#8a7f6f;text-align:center;line-height:1.55}
+.foot b{color:#b23a2e}
+@media print{body{padding:0}.card{box-shadow:none}}
+</style></head><body><div class="card">
+<div class="brand">MỞ DẤU VIỆT</div>
+<h1>Hộ chiếu hành trình</h1>
+<p class="sub">Heritage Journey Passport — ${dateVi}</p>
+<div class="stats">
+  <div class="ring"><i>${pct}%</i></div>
+  <div class="nums"><div class="big">${doneSpots}/${totalSpots} điểm</div><div class="lbl">đã nhận dấu trên hành trình</div></div>
+  <div class="xp"><b>${state.xp}</b><div class="lbl">XP</div></div>
+</div>
+<ul>${siteRows}</ul>
+<p class="foot">Để chuyển tiến độ sang thiết bị khác: mở app <b>Mở Dấu Việt</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
+</div>
+<script type="application/json" id="mdv-backup">${payload}</script>
+</body></html>`;
+}
+
+/** Tách JSON bản sao: chấp nhận cả file .json thuần lẫn thẻ hộ chiếu .html (đọc khối nhúng). */
+export function extractBackupJson(text: string): string | null {
+  const t = text.trim();
+  if (t.startsWith('{')) return t;
+  const m = text.match(/<script[^>]*id=["']mdv-backup["'][^>]*>([\s\S]*?)<\/script>/);
+  return m ? m[1].trim() : null;
+}
+
 /** Nhập hộ chiếu: chỉ chấp nhận đúng kind + schemaVersion hỗ trợ. Trả false nếu file lạ. */
 export function importPassportJson(json: string): boolean {
   try {
-    const raw = JSON.parse(json) as { kind?: string; progress?: unknown };
+    const text = extractBackupJson(json);
+    if (!text) return false;
+    const raw = JSON.parse(text) as { kind?: string; progress?: unknown };
     if (raw?.kind !== 'passport') return false;
     const p = migrate(raw.progress);
     if (!p) return false;
@@ -254,7 +348,9 @@ export function importPassportJson(json: string): boolean {
 /** Đọc file sao lưu mà không ghi đè – trả tóm tắt để hiện bản xem trước trước khi xác nhận. */
 export function previewPassportJson(json: string): { progress: Progress; spots: number; xp: number; exportedAt: string | null } | null {
   try {
-    const raw = JSON.parse(json) as { kind?: string; progress?: unknown; exportedAt?: string };
+    const text = extractBackupJson(json);
+    if (!text) return null;
+    const raw = JSON.parse(text) as { kind?: string; progress?: unknown; exportedAt?: string };
     if (raw?.kind !== 'passport') return null;
     const p = migrate(raw.progress);
     if (!p) return null;
@@ -288,41 +384,82 @@ export interface Achievement {
   unlocked: boolean;
 }
 
-/** Huy hiệu thành tích độc lập với huy hiệu từng khu (demo P3 mở rộng thêm). */
+/**
+ * 12 danh hiệu: 7 cột mốc hành trình (dấu → khu → quiz, tăng dần độ khó)
+ * + 5 danh hiệu riêng của từng khu di sản (đủ hết điểm của khu mới được phong).
+ * Xếp theo trình tự hành trình để hộ chiếu đọc như một chuyện đi.
+ */
 export function computeAchievements(p: Progress = state): Achievement[] {
+  const stamps = Object.keys(p.unlocked).length;
   const touchedSites = SITES.filter((s) => siteUnlockedCount(s, p) > 0).length;
   const doneSites = SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length;
-  const answered = Object.keys(p.quizDone).length;
-  return [
+  // Bộ quiz của từng điểm: answered = đã mở quiz, correct = tổng câu đúng (best), perfect = có bộ trọn vẹn.
+  const quizSpots = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ s, sp })));
+  const answered = quizSpots.filter(({ s, sp }) => (p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0) > 0).length;
+  const correct = quizSpots.reduce((n, { s, sp }) => n + Math.min(p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0, sp.quiz!.length), 0);
+  const perfect = quizSpots.some(({ s, sp }) => (p.quizDone[`${s.entityId}/${sp.spotId}`] ?? 0) >= sp.quiz!.length);
+  const journey: Achievement[] = [
     {
       id: 'khoi-hanh',
       icon: 'flag',
       name: { vi: 'Khởi hành', en: 'First steps' },
-      need: { vi: 'Quét mã QR đầu tiên', en: 'Scan your first QR' },
-      unlocked: Object.keys(p.unlocked).length >= 1,
+      need: { vi: 'Nhận dấu đầu tiên', en: 'Collect your first stamp' },
+      unlocked: stamps >= 1,
+    },
+    {
+      id: 'lu-khach',
+      icon: 'compass',
+      name: { vi: 'Lữ khách', en: 'Wayfarer' },
+      need: { vi: 'Nhận 3 dấu', en: 'Collect 3 stamps' },
+      unlocked: stamps >= 3,
     },
     {
       id: 'tham-hiem',
-      icon: 'compass',
+      icon: 'map',
       name: { vi: 'Thám hiểm', en: 'Explorer' },
-      need: { vi: 'Chạm vào 3 khu di sản', en: 'Unlock spots in 3 sites' },
+      need: { vi: 'Ghé 3 khu di sản', en: 'Visit 3 heritage sites' },
       unlocked: touchedSites >= 3,
     },
     {
       id: 'si-tu',
-      icon: 'award',
+      icon: 'book',
       name: { vi: 'Sĩ tử', en: 'Challenger' },
       need: { vi: 'Trả lời 3 bộ câu hỏi', en: 'Finish 3 quizzes' },
       unlocked: answered >= 3,
     },
     {
+      id: 'trang-nguyen',
+      icon: 'spark',
+      name: { vi: 'Trạng nguyên', en: 'Valedictorian' },
+      need: { vi: 'Đúng hết một bộ câu hỏi', en: 'Ace one full quiz' },
+      unlocked: perfect,
+    },
+    {
       id: 'hoc-gia',
-      icon: 'book',
+      icon: 'award',
       name: { vi: 'Học giả', en: 'Scholar' },
+      need: { vi: 'Đúng 10 câu hỏi', en: 'Answer 10 questions' },
+      unlocked: correct >= 10,
+    },
+    {
+      id: 'dai-su-di-san',
+      icon: 'crown',
+      name: { vi: 'Đại sứ di sản', en: 'Heritage ambassador' },
       need: { vi: 'Hoàn thành cả 5 khu', en: 'Complete all 5 sites' },
       unlocked: doneSites === SITES.length,
     },
   ];
+  const siteBadges: Achievement[] = SITES.map((s) => ({
+    id: s.gamificationConfig.badge.id,
+    icon: s.gamificationConfig.badge.icon,
+    name: s.gamificationConfig.badge.name,
+    need: {
+      vi: `Đủ ${s.spots.length} dấu tại ${s.name.vi}`,
+      en: `All ${s.spots.length} stamps at ${s.name.en}`,
+    },
+    unlocked: p.badges.includes(s.gamificationConfig.badge.id) || siteUnlockedCount(s, p) === s.spots.length,
+  }));
+  return [...journey, ...siteBadges];
 }
 
 export function useProgress(): Progress {

@@ -334,6 +334,14 @@
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
+/* Mảng vườn/cây xanh (vd Vườn Giám phía Tây) — đặt sau node cùng toạ độ. */
+.smap__garden {
+  fill: color-mix(in srgb, var(--color-accent-tertiary) 16%, transparent);
+  stroke: var(--color-accent-tertiary);
+  stroke-opacity: 0.35;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .vnode__pulse,
@@ -405,4 +413,14 @@
     animation: none;
     opacity: 0;
   }
+}
+
+/* Chấm đảo ven biển — trang trí lãnh thổ hình chữ S */
+.vmap__isle {
+  fill: var(--color-land);
+  stroke: var(--color-accent-secondary);
+  stroke-opacity: 0.75;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.85;
 }

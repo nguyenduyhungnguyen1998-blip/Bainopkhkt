@@ -16,7 +16,7 @@
     20.91
   ],
   "journeyOrder": 2,
-  "heroImage": "/img/ha-long/hero.svg",
+  "heroImage": "/img/ha-long/hero.webp",
   "tint": "#1d4f4a",
   "summary": {
     "vi": "Gần 2.000 đảo đá vôi giữa biển xanh – Di sản thiên nhiên thế giới được UNESCO công nhận năm 1994.",
@@ -39,7 +39,7 @@
       "qrId": "mdvq02",
       "name": {
         "vi": "Hang Sửng Sốt",
-        "en": "Surprise Cave"
+        "en": "Sung Sot Cave (Surprise Cave)"
       },
       "hook": {
         "vi": "Đừng quên ngửa lên: trần khoang cuối cao như một nhà hát tự nhiên giữa vịnh.",
@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/ha-long/hero.svg"
+          "image": "/img/ha-long/hang-sung-sot.webp",
+          "images": [
+            "/img/ha-long/hero.webp"
+          ]
         },
         {
           "type": "audio",

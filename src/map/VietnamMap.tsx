@@ -10,7 +10,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { MAP_WIDTH, MAP_HEIGHT, VIETNAM_LAND_PATH, NEIGHBOUR_PATHS } from './vietnam-geometry';
-import { project, unproject, ARCHIPELAGOS } from './projection';
+import { project, unproject, ARCHIPELAGOS, ISLES } from './projection';
 import { smoothPath, bboxOf, fitBox, type Transform } from './geometry-utils';
 import { useMapGestures } from './useMapGestures';
 import { SITES } from '../data/content';
@@ -43,6 +43,8 @@ interface Props {
   onboard: boolean;
   /** Tăng giá trị để ra lệnh bay về node "tiếp theo" (nút "Về hành trình"). */
   homeSignal: number;
+  /** Tăng giá trị để trả camera về khung toàn quốc (kết thúc tour, v.v.). */
+  allSignal?: number;
   /** {d, n}: đổi n để zoom quanh tâm khung nhìn (nút +/-, tiện cho người không pinch được). */
   zoomSignal?: { d: number; n: number };
   /** {x,y,k,n}: đổi n để camera "lao" vào điểm theo đường log-k (fly-to Earth). */
@@ -109,6 +111,7 @@ export function VietnamMap({
   lang,
   onboard,
   homeSignal,
+  allSignal,
   zoomSignal,
   flyRequest,
   onFlyDone,
@@ -293,6 +296,13 @@ export function VietnamMap({
     animateTo(focusPoint(nextNode.x, nextNode.y, HOME_ZOOM), 600);
   }, [homeSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const lastAll = useRef(allSignal);
+  useEffect(() => {
+    if (allSignal === lastAll.current) return;
+    lastAll.current = allSignal;
+    animateTo(ALL_TRANSFORM, 700);
+  }, [allSignal, animateTo]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Fly-to: camera "lao" vào điểm theo đường log-k rồi báo xong (mở sơ đồ/điều hướng).
   // Seed undefined: remount sau sơ đồ khu mang flyRequest mới đặt cùng batch – phải chạy,
   // nếu gieo bằng flyRequest hiện tại effect sẽ nuốt mất lượt bay đầu tiên.
@@ -354,6 +364,12 @@ export function VietnamMap({
         <path class="vmap__coast-glow" d={VIETNAM_LAND_PATH} />
         <path class="vmap__land" d={VIETNAM_LAND_PATH} />
         <path class="vmap__land-tex" d={VIETNAM_LAND_PATH} fill="url(#vmap-land-tex)" />
+
+        {/* Đảo ven biển — trang trí lãnh thổ hình chữ S (không tương tác) */}
+        {ISLES.map((i, idx) => {
+          const [x, y] = project(i.lon, i.lat);
+          return <circle key={idx} class="vmap__isle" cx={x} cy={y} r={idx % 3 === 0 ? 2.4 : 1.7} />;
+        })}
 
         {/* Hoàng Sa – Trường Sa */}
         {archi.map((a) => (

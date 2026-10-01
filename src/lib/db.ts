@@ -13,7 +13,7 @@ let dbPromise: Promise<IDBDatabase | null> | null = null;
 function openDb(): Promise<IDBDatabase | null> {
   if (dbPromise) return dbPromise;
   dbPromise = new Promise((resolve) => {
-    if (!('indexedDB' in window)) return resolve(null);
+    if (typeof indexedDB === 'undefined') return resolve(null);
     let req: IDBOpenDBRequest;
     try {
       req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -23,13 +23,17 @@ function openDb(): Promise<IDBDatabase | null> {
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(STORE)) req.result.createObjectStore(STORE);
     };
+    // Nếu open bị block vô hạn (origin đang bị xoá, profile lỗi) thì fallback
+    // localStorage thay vì kẹt splash mãi — app vẫn boot được.
+    const timer = setTimeout(() => resolve(null), 1500);
     req.onsuccess = () => {
+      clearTimeout(timer);
       const db = req.result;
       db.onversionchange = () => db.close();
       resolve(db);
     };
-    req.onerror = () => resolve(null);
-    req.onblocked = () => resolve(null);
+    req.onerror = () => { clearTimeout(timer); resolve(null); };
+    req.onblocked = () => { clearTimeout(timer); resolve(null); };
   });
   return dbPromise;
 }

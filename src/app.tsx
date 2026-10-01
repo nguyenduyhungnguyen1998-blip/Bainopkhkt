@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'preact/compat';
 import { useEffect, useLayoutEffect, useState } from 'preact/hooks';
-import { useRoute } from './lib/router';
+import { navigate, useRoute } from './lib/router';
 import { useOnline } from './lib/theme';
 import { UI, t, useLang } from './lib/i18n';
 import { Dock } from './components/Dock';
@@ -11,8 +11,10 @@ import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
-import { AdminScreen, PassportScreen, QuizScreen, SettingsScreen } from './screens/OtherScreens';
+import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
+import { GuidedTour, type TourStep } from './components/Tour';
+import { TOUR_STEPS } from './lib/tour';
 
 // Debug HUD tách chunk riêng: chỉ tải khi ?debug=1 hoặc localStorage mdv.debug=1
 const DebugHud = lazy(() => import('./debug/hud').then((m) => ({ default: m.DebugHud })));
@@ -52,6 +54,37 @@ export function App() {
   const debug = useDebugFlag();
   const { hasUpdate } = useSwStatus();
   usePerfGuard();
+
+  // Tour sống ở App: đi xuyên route (bản đồ → vào trong điểm) mà không unmount.
+  // MapScreen phụ trách prep (bay camera/dọn overlay) rồi bắn 'mdv:tour-start'.
+  const [tourOn, setTourOn] = useState(false);
+  const [tourSteps, setTourSteps] = useState(TOUR_STEPS);
+  useEffect(() => {
+    const on = (e: Event) => {
+      // detail.steps (nếu có) = tour riêng của màn đang đứng; mặc định tour bản đồ đầy đủ.
+      const steps = (e as CustomEvent<{ steps?: TourStep[] }>).detail?.steps;
+      setTourSteps(steps?.length ? steps : TOUR_STEPS);
+      setTourOn(true);
+    };
+    window.addEventListener('mdv:tour-start', on);
+    return () => window.removeEventListener('mdv:tour-start', on);
+  }, []);
+  const endTour = () => {
+    setTourOn(false);
+    // Tour bản đồ đầy đủ có thể đang đứng trong điểm → đưa về map; tour riêng của
+    // một tab (Hộ chiếu/Thử tài) thì giữ nguyên màn đó.
+    if (tourSteps === TOUR_STEPS) {
+      // Tour bản đồ vừa bay camera vào điểm — kết thúc thì trả về khung toàn quốc
+      // để chip "Toàn quốc" đang chọn khớp với khung hình thật.
+      try {
+        localStorage.setItem('mdv.tourEnd', '1');
+      } catch {
+        /* bộ nhớ riêng tư */
+      }
+      window.dispatchEvent(new CustomEvent('mdv:tour-end'));
+      if (route.name !== 'map') navigate('map');
+    }
+  };
 
   // Đổi màn hình (kể cả đổi điểm trong cùng khu) → trả cuộn về đầu trang.
   // useLayoutEffect để cuộn chạy TRƯỚC paint – không còn 1 frame nội dung mới nằm giữa trang.
@@ -93,6 +126,15 @@ export function App() {
     case 'settings':
       screen = <SettingsScreen />;
       break;
+    case 'help':
+      screen = <HelpScreen />;
+      break;
+    case 'about':
+      screen = <AboutScreen />;
+      break;
+    case 'sources':
+      screen = <SourcesScreen />;
+      break;
     default:
       screen = (
         <main class="mdv-screen">
@@ -122,6 +164,7 @@ export function App() {
       <Celebrate />
       <DemoDock />
       <Dock route={route} />
+      {tourOn && <GuidedTour steps={tourSteps} onDone={endTour} />}
       {debug && (
         <Suspense fallback={null}>
           <DebugHud />

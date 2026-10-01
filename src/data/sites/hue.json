@@ -16,7 +16,7 @@
     16.4698
   ],
   "journeyOrder": 3,
-  "heroImage": "/img/hue/hero.svg",
+  "heroImage": "/img/hue/hero.webp",
   "tint": "#3f2a56",
   "summary": {
     "vi": "Kinh đô của triều Nguyễn (1802–1945), Di sản văn hóa thế giới đầu tiên của Việt Nam.",
@@ -39,7 +39,7 @@
       "qrId": "mdvq03",
       "name": {
         "vi": "Ngọ Môn",
-        "en": "Noon Gate"
+        "en": "Ngo Mon Gate (Meridian Gate)"
       },
       "hook": {
         "vi": "Cổng giữa chỉ dành cho vua đi; trên nóc là Ngũ Phụng Lầu — nơi vua ngự các lễ lớn.",
@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/hue/hero.svg"
+          "image": "/img/hue/ngo-mon.webp",
+          "images": [
+            "/img/hue/hero.webp"
+          ]
         },
         {
           "type": "audio",

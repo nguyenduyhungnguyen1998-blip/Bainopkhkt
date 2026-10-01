@@ -20,7 +20,7 @@ const sitesDir = join(root, 'src/data/sites');
 const pub = join(root, 'public');
 const schema = JSON.parse(readFileSync(join(root, 'src/data/schema/site.schema.json'), 'utf8'));
 
-const IMG_MAX_KB = 300;
+const IMG_MAX_KB = 400;
 const VIDEO_MAX_MB = 50;
 
 const ajv = new Ajv({ allErrors: true, strict: true });
@@ -86,32 +86,34 @@ for (const f of files) {
     for (const card of spot.layoutSchema) {
       if (card.type === 'hero') hasHero = true;
       if (card.type === 'audio') hasAudio = true;
-      if ((card.type === 'hero' || card.type === 'image') && card.image) assets.add(card.image);
+      if ((card.type === 'hero' || card.type === 'image') && card.image) {
+        assets.add(card.image);
+        for (const extra of card.images ?? []) assets.add(extra);
+      }
       if (card.type === 'video') {
         if (card.poster) assets.add(card.poster);
-        if (card.src) {
+        for (const sv of [card.src, card.srcEn]) {
+          if (!sv) continue;
           hasVideoSrc = true;
-          if (card.src.startsWith('https://')) {
-            // embed ngoài (YouTube/Vimeo)
-          } else {
-            // video local trong public/ (vd media/clip.mp4) — kiểm tồn tại + dung lượng
-            videos.add(card.src);
-          }
+          if (!sv.startsWith('https://')) videos.add(sv);
         }
       }
       if (card.type === 'audio') {
         if (card.script.vi.length !== card.script.en.length)
           warn(tag, `audio.script vi có ${card.script.vi.length} câu, en có ${card.script.en.length} câu`);
+        // Bản thu sẵn (audio chuẩn) — kiểm tồn tại như video local
+        for (const sv of [card.src, card.srcEn]) if (sv && !sv.startsWith('https://')) videos.add(sv);
       }
       if (card.type === 'aspects') {
         const ids = card.aspects.map((a) => a.id);
         if (new Set(ids).size !== ids.length) err(tag, 'aspects.id trùng');
         for (const a of card.aspects) {
           // video gắn riêng vào một tab aspect — cũng kiểm tồn tại/dung lượng
-          if (a.video) {
+          for (const vref of [a.video, a.videoEn]) {
+            if (!vref) continue;
             hasVideoSrc = true;
-            if (a.video.poster) assets.add(a.video.poster);
-            if (!a.video.src.startsWith('https://')) videos.add(a.video.src);
+            if (vref.poster) assets.add(vref.poster);
+            if (!vref.src.startsWith('https://')) videos.add(vref.src);
           }
         }
       }

@@ -15,6 +15,7 @@ import { useTheme } from '../lib/theme';
 import {
   clearQuizResults,
   computeAchievements,
+  getProgress,
   grantXp,
   isSpotUnlocked,
   quizBest,
@@ -102,7 +103,9 @@ export function DemoDock() {
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
   const doneSpots = Object.keys(p.unlocked).length;
   const quizSets = Object.keys(p.quizDone).length;
-  const eff = pos ?? defaultPos();
+  // Kẹp luôn vị trí đã lưu vào khung hình hiện tại — pos ghi từ màn rộng/xoay ngang
+  // trước đây nằm ngoài viewport thì nút bị trôi khỏi tầm nhìn (khách không thấy nút nào).
+  const eff = clampPos(pos ?? defaultPos());
 
   useEffect(() => {
     setEnabled(dockEnabled());
@@ -171,14 +174,21 @@ export function DemoDock() {
 
   /**
    * Danh hiệu thành tích là hàm của trạng thái thật (không lưu riêng) nên "Đạt luôn"
-   * = làm đúng điều kiện thật: mở điểm đầu tiên / chạm 3 khu / làm 3 bộ quiz / mở hết.
+   * = làm đúng điều kiện thật của từng danh hiệu trong computeAchievements.
    */
   const earnAchievement = (id: string) => {
+    const unlockUntil = (n: number) => {
+      for (const s of SITES) for (const sp of s.spots) {
+        if (Object.keys(getProgress().unlocked).length >= n) return;
+        if (!isSpotUnlocked(s.entityId, sp.spotId)) unlockSpot(s.entityId, sp.spotId);
+      }
+    };
     if (id === 'khoi-hanh') {
-      const next = SITES.flatMap((s) => s.spots.map((sp) => [s, sp] as const)).find(
-        ([s, sp]) => !isSpotUnlocked(s.entityId, sp.spotId)
-      );
-      if (next) unlockSpot(next[0].entityId, next[1].spotId);
+      unlockUntil(1);
+      return;
+    }
+    if (id === 'lu-khach') {
+      unlockUntil(3);
       return;
     }
     if (id === 'tham-hiem') {
@@ -200,7 +210,25 @@ export function DemoDock() {
         }
       return;
     }
-    if (id === 'hoc-gia') unlockAll();
+    if (id === 'trang-nguyen') {
+      // Đúng hết một bộ: chọn bộ chưa trọn vẹn đầu tiên rồi ghi điểm tuyệt đối.
+      const target = SITES.flatMap((s) => s.spots.map((sp) => [s, sp] as const)).find(
+        ([s, sp]) => sp.quiz?.length && (quizBest(s.entityId, sp.spotId) ?? 0) < sp.quiz!.length
+      );
+      if (target) recordQuizResult(target[0].entityId, target[1].spotId, target[1].quiz!.length, target[1].quiz!.length);
+      return;
+    }
+    if (id === 'hoc-gia') {
+      // Đúng 10 câu: ghi điểm đúng dồn các bộ quiz cho tới khi đủ.
+      const quizSpots = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => [s, sp] as const));
+      for (const [s, sp] of quizSpots) {
+        const correct = quizSpots.reduce((n, [a, b]) => n + Math.min(getProgress().quizDone[`${a.entityId}/${b.spotId}`] ?? 0, b.quiz!.length), 0);
+        if (correct >= 10) return;
+        if ((quizBest(s.entityId, sp.spotId) ?? 0) < sp.quiz!.length) recordQuizResult(s.entityId, sp.spotId, sp.quiz!.length, sp.quiz!.length);
+      }
+      return;
+    }
+    if (id === 'dai-su-di-san') unlockAll();
   };
 
   /**
@@ -281,7 +309,7 @@ export function DemoDock() {
   })();
 
   return (
-    <div class="demodock" style={pos ? { left: `${pos.x}px`, top: `${pos.y}px`, right: 'auto', bottom: 'auto' } : undefined}>
+    <div class="demodock" style={pos ? { left: `${eff.x}px`, top: `${eff.y}px`, right: 'auto', bottom: 'auto' } : undefined}>
       {open && (
         <div class="demodock__panel" role="dialog" aria-label="Bảng điều khiển demo" style={panelStyle}>
           <div
@@ -378,7 +406,7 @@ export function DemoDock() {
               )}
               {ctx.kind === 'all-done' && (
                 <div class="dd__ctxtop">
-                  <b>Bản đồ · 9/9</b>
+                  <b>Bản đồ · {totalSpots}/{totalSpots}</b>
                   <span>Hành trình hoàn tất — diễn lại finale ở tab Finale.</span>
                 </div>
               )}
@@ -581,7 +609,7 @@ export function DemoDock() {
                 ))}
                 <div class="dd__sitehead dd__sitehead--row">
                   <span class="dd__sitename">
-                    <b>Finale 9/9 toàn bộ</b> <i>{finaleSeen('mdv.finale.v1') ? 'đã xem' : ''}</i>
+                    <b>Finale {totalSpots}/{totalSpots} toàn bộ</b> <i>{finaleSeen('mdv.finale.v1') ? 'đã xem' : ''}</i>
                   </span>
                   <button class="dd__mini dd__mini--on" onClick={replayGrandFinale}>
                     Diễn lại

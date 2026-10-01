@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
-import type { Card, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
+import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { asset } from '../lib/asset';
@@ -13,12 +13,17 @@ import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
 import { useOnline } from '../lib/theme';
+import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
+import { HelpMenu } from '../components/Onboarding';
+import { DEST_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import './destination.css';
 
 export function DestinationScreen({ siteId, spotId, query }: { siteId: string; spotId?: string; query?: URLSearchParams }) {
   const [lang] = useLang();
   useProgress(); // re-render khi mở khóa
+  const [bgSrc, setBgSrc] = useState<string | null>(null); // ảnh đang xem -> nền mờ đồng bộ
+  const [helpMenu, setHelpMenu] = useState(false);
   const siteOnly = spotId === undefined ? getSite(siteId) : undefined;
   const found = siteOnly ? undefined : getSpot(siteId, spotId);
   if (siteOnly) return <SiteIntro site={siteOnly} />;
@@ -55,6 +60,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
   return (
     <main class="mdv-screen dest">
+      <SpotBg src={bgSrc} />
       <header class="dest__top">
         <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.back, lang)}>
           <Icon name="back" />
@@ -66,7 +72,22 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         <span class={`mdv-badge ${unlocked ? 'mdv-badge--unlocked' : 'mdv-badge--locked'}`}>
           {unlocked ? `+${spot.xp} XP` : t(UI.locked, lang)}
         </span>
+        <button class="mdv-chip" onClick={() => setHelpMenu(true)} aria-label={t(UI.howto, lang)}>
+          <Icon name="help" size={16} />
+        </button>
       </header>
+      {helpMenu && (
+        <HelpMenu
+          lang={lang}
+          onClose={() => setHelpMenu(false)}
+          onTour={() => {
+            setHelpMenu(false);
+            goScreenTour(DEST_TOUR_STEPS);
+          }}
+          tourTitle={UI.helpMenuTourDest}
+          tourSub={UI.helpMenuTourDestSub}
+        />
+      )}
 
       {/* key spot+sig: remount mỗi QR mới — nếu không, reward/state của điểm trước
           sống sót khi đổi điểm cùng khu (component cha key theo siteId) và che nút xác nhận mới. */}
@@ -99,7 +120,9 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
       <div class="dest__grid">
         {spot.layoutSchema.map((card, i) => (
-          <CardView key={i} card={card} lang={lang} initialAspect={query?.get('a')} />
+          // key theo spotId: đổi điểm cùng khu phải remount card — không thì gallery
+          // giữ idx cũ -> vượt độ dài ảnh của điểm mới = khung trống, nền cũng cũ.
+          <CardView key={`${spot.spotId}:${i}`} card={card} lang={lang} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
         ))}
       </div>
 
@@ -116,6 +139,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
           {site.visit.tickets && (
             <div class="dvisit__row"><Icon name="qr" size={16} /><span>{t(site.visit.tickets, lang)}</span></div>
           )}
+          <p class="dvisit__note">{t(UI.visitNote, lang)}</p>
         </section>
       )}
 
@@ -177,9 +201,15 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
 
   useEffect(() => {
     let live = true;
-    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then((ok) => {
-      if (live) setState(ok ? 'ok' : 'bad');
-    });
+    void verifySignature(site.entityId, spot.spotId, sig, spot.qrId).then(
+      (ok) => {
+        if (live) setState(ok ? 'ok' : 'bad');
+      },
+      // Môi trường lạ làm verify ném lỗi -> báo "mã lạ" thay vì panel chết vô hình.
+      () => {
+        if (live) setState('bad');
+      }
+    );
     return () => {
       live = false;
     };
@@ -235,7 +265,14 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (state === 'checking') return null;
+  if (state === 'checking') {
+    return (
+      <div class="dscan dscan--checking" role="status" aria-live="polite">
+        <span class="dscan__spin" aria-hidden="true" />
+        <span class="dscan__txt">{t(UI.verifyingCode, lang)}</span>
+      </div>
+    );
+  }
   // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
   // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
   if (dismissed) {
@@ -310,6 +347,12 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
 
   // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
   const goAspect = (aspectId: string) => {
+    if (unlocked) {
+      // Đã có dấu từ trước: không toast, không giữ `s` — đóng panel và đi thẳng tới aspect.
+      setDismissed(true);
+      navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
+      return;
+    }
     doUnlock();
     // Giữ `s` trong URL để toast nhận dấu hiện sau khi cuộn tới aspect đã chọn;
     // replace: back không quay lại panel chọn — khách đã vào điểm.
@@ -361,6 +404,15 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
               ))}
             </div>
           </>
+        )}
+        {unlocked ? (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)}
+          </p>
+        ) : (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.scanOkHint, lang)}
+          </p>
         )}
         <button
           class="mdv-btn mdv-btn--primary dscan__cta"
@@ -421,15 +473,11 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang, initialAspect }: { card: Card; lang: Lang; initialAspect?: string | null }) {
+function CardView({ card, lang, initialAspect, onActiveImage }: { card: Card; lang: Lang; initialAspect?: string | null; onActiveImage?: (src: string) => void }) {
   switch (card.type) {
     case 'hero':
-      return (
-        <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={asset(card.image)} alt={t(card.caption, lang)} />
-          {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
-        </figure>
-      );
+    case 'image':
+      return <GalleryFigure card={card} lang={lang} isHero={card.type === 'hero'} onActive={onActiveImage} />;
     case 'aspects':
       return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
@@ -443,43 +491,158 @@ function CardView({ card, lang, initialAspect }: { card: Card; lang: Lang; initi
           <p>{t(card.text, lang)}</p>
         </div>
       );
-    case 'image':
-      return (
-        <figure class={`dcard dcard--hero dcard--${card.size}`}>
-          <img src={asset(card.image)} alt={t(card.caption, lang)} loading="lazy" />
-          {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
-        </figure>
-      );
   }
 }
 
-/** Thẻ video: embed khi có link; chưa có link (hoặc mất mạng) → gạch chú nhỏ, không chiến diện tích màn. */
-function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
+/** Gallery ảnh của một điểm: xếp chồng + crossfade, nút ‹ › và vuốt ngang. */
+function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | ImageCard; lang: Lang; isHero: boolean; onActive?: (src: string) => void }) {
+  const imgs = [card.image, ...(card.images ?? [])];
+  const [idx, setIdx] = useState(0);
+  const [credOn, setCredOn] = useState(false);
+  const credit = IMAGE_CREDITS[imgs[idx]];
+  const touched = useRef(false); // chỉ thẻ phụ (không phải hero) sync nền SAU khi khách tự vuốt
+  const touchX = useRef<number | null>(null);
+  const go = (d: number) => setIdx((i) => (i + d + imgs.length) % imgs.length);
+  const userGo = (d: number) => {
+    touched.current = true;
+    go(d);
+  };
+  useEffect(() => {
+    if (onActive && (isHero || touched.current)) onActive(imgs[idx]);
+  }, [idx]);
+  const multi = imgs.length > 1;
+  return (
+    <figure class={`dcard dcard--hero dcard--${card.size} ${multi ? 'dcard--gal' : ''}`}>
+      <div
+        class="dgal"
+        onTouchStart={multi ? (e) => (touchX.current = e.touches[0].clientX) : undefined}
+        onTouchEnd={
+          multi
+            ? (e) => {
+                const x0 = touchX.current;
+                touchX.current = null;
+                if (x0 === null) return;
+                const dx = e.changedTouches[0].clientX - x0;
+                if (Math.abs(dx) > 42) userGo(dx < 0 ? 1 : -1);
+              }
+            : undefined
+        }
+      >
+        {imgs.map((s, i) => (
+          <img key={s} src={asset(s)} alt={i === idx ? t(card.caption, lang) : ''} class={i === idx ? 'is-on' : ''} />
+        ))}
+        {multi && (
+          <>
+            <button class="dgal__nav dgal__nav--prev" onClick={() => userGo(-1)} aria-label={lang === 'vi' ? 'Ảnh trước' : 'Previous photo'}>
+              <Icon name="back" size={18} />
+            </button>
+            <button class="dgal__nav dgal__nav--next" onClick={() => userGo(1)} aria-label={lang === 'vi' ? 'Ảnh kế' : 'Next photo'}>
+              <Icon name="forward" size={18} />
+            </button>
+            <div class="dgal__dots" aria-hidden="true">
+              {imgs.map((_, i) => (
+                <i key={i} class={i === idx ? 'on' : ''} />
+              ))}
+            </div>
+          </>
+        )}
+        {credit && (
+          <button
+            class="dgal__cred"
+            aria-label={t(UI.photoCreditAria, lang)}
+            aria-pressed={credOn}
+            onClick={() => setCredOn((v) => !v)}
+          >
+            <Icon name="info" size={15} />
+          </button>
+        )}
+      </div>
+      {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
+      {credOn && credit && (
+        <p class="dgal__credline">
+          {credit.author} ·{' '}
+          {credit.licenseUrl ? (
+            <a href={credit.licenseUrl} target="_blank" rel="noreferrer">
+              {credit.license}
+            </a>
+          ) : (
+            credit.license
+          )}
+          {' · '}
+          {credit.sourceUrl ? (
+            <a href={credit.sourceUrl} target="_blank" rel="noreferrer">
+              {t(UI.viewSource, lang)}
+            </a>
+          ) : (
+            credit.source
+          )}
+        </p>
+      )}
+    </figure>
+  );
+}
+
+/** Nền đồng bộ mờ: phủ kín viewport phía sau nội dung, crossfade khi đổi ảnh. */
+function SpotBg({ src }: { src: string | null }) {
+  const [layers, setLayers] = useState<string[]>([]);
+  useEffect(() => {
+    if (src) setLayers((l) => (l[l.length - 1] === src ? l : [...l.slice(-1), src]));
+  }, [src]);
+  if (!layers.length) return null;
+  return (
+    <div class="spotbg" aria-hidden="true">
+      {layers.map((s, i) => (
+        <img key={s} src={asset(s)} alt="" class={i === layers.length - 1 ? 'is-in' : ''} />
+      ))}
+    </div>
+  );
+}
+
+/** Video local (media/*.mp4): cứ render — SW runtime-cache trả bản đã tải khi offline;
+ *  chỉ hiện ghi chú ngoại tuyến khi phát thật sự lỗi. */
+function LocalVideo({ src, poster, label, lang }: { src: string; poster?: string; label: string; lang: Lang }) {
   const online = useOnline();
-  // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
-  if (!card.src) return null;
-  if (!online) {
+  const [err, setErr] = useState(false);
+  if (err && !online) {
     return (
       <p class="dcard__vsoon">
         <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
       </p>
     );
   }
-  // src local (media/*.mp4 trong public/) → phát trực tiếp; https:// → embed iframe.
-  const local = !card.src.startsWith('http');
+  return (
+    <video
+      src={asset(src)}
+      poster={poster ? asset(poster) : undefined}
+      controls
+      playsInline
+      preload="metadata"
+      aria-label={label}
+      onError={() => setErr(true)}
+    />
+  );
+}
+
+/** Thẻ video: embed khi có link; chưa có link (hoặc video mạng ngoài lúc mất mạng) → gạch chú nhỏ. */
+function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
+  const online = useOnline();
+  const src = lang === 'en' && card.srcEn ? card.srcEn : card.src;
+  // Chưa có video: bỏ hẳn khỏi luồng — không hứa "đang ghi hình" với giám khảo.
+  if (!src) return null;
+  const local = !src.startsWith('http');
+  if (!local && !online) {
+    return (
+      <p class="dcard__vsoon">
+        <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
+      </p>
+    );
+  }
   return (
     <div class={`dcard dcard--video dcard--${card.size}`}>
       {local ? (
-        <video
-          src={asset(card.src)}
-          poster={card.poster ? asset(card.poster) : undefined}
-          controls
-          playsInline
-          preload="metadata"
-          aria-label={t(card.title, lang)}
-        />
+        <LocalVideo src={src} poster={card.poster} label={t(card.title, lang)} lang={lang} />
       ) : (
-        <iframe src={card.src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+        <iframe src={src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
     </div>
   );
@@ -493,16 +656,19 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const [sent, setSent] = useState(-1);
   const [rate, setRate] = useState(1);
   const [ambientOn, setAmbientOn] = useState(false);
+  const [fileErr, setFileErr] = useState(false);
+  const [useTts, setUseTts] = useState(false);
+  const fileAudioRef = useRef<HTMLAudioElement | null>(null);
   const sentences = card.script[lang];
 
+  // Chỉ dọn khi rời điểm: stopAmbient() tự no-op khi không có gì đang chạy.
+  // (Không dep ambientOn — cleanup theo dep sẽ stop() narration mỗi lần bật/tắt âm nền.)
   useEffect(
     () => () => {
       playerRef.current?.stop();
-      // Rời điểm là tắt cả âm nền – không để tiếng chạy lửng lơ không nút tắt ở màn khác.
-      if (ambientOn) stopAmbient();
+      stopAmbient();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ambientOn]
+    []
   );
 
   const toggle = () => {
@@ -533,6 +699,72 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   };
 
   const prog = status === 'playing' || status === 'paused' ? ((sent + 1) / sentences.length) * 100 : status === 'done' ? 100 : 0;
+  // Ước lượng thời lượng từ số từ bản đọc (TTS ~170 từ/phút) — nhãn "≈N phút" gần nút Nghe.
+  const totalWords = sentences.join(' ').split(/\s+/).filter(Boolean).length;
+  const mins = Math.max(1, Math.round(totalWords / 170));
+  const durLabel = lang === 'vi' ? `≈ ${mins} phút` : `≈ ${mins} min`;
+  // Bản thu sẵn (giọng đọc thật từ tư liệu chuẩn) — khi có thì phát file thay TTS.
+  const fileSrc = card.src && !useTts ? asset(lang === 'en' && card.srcEn ? card.srcEn : card.src) : null;
+
+  // Watchdog: request treo (mạng chập chờn) không bắn 'error' — readyState vẫn 0 sau 10s → coi như lỗi.
+  useEffect(() => {
+    if (!fileSrc || fileErr) return;
+    const t = setTimeout(() => {
+      const el = fileAudioRef.current;
+      if (el && el.readyState === 0) setFileErr(true);
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [fileSrc, fileErr]);
+
+  if (fileSrc) {
+    return (
+      <div class={`dcard dcard--audio dcard--${card.size}`}>
+        <div class="dcard__audio-ctrl">
+          {!fileErr && (
+            <audio
+              ref={fileAudioRef}
+              class="dcard__player"
+              src={fileSrc}
+              controls
+              preload="metadata"
+              aria-label={t(UI.recordedNarration, lang)}
+              onError={() => setFileErr(true)}
+            />
+          )}
+          {card.ambient && !fileErr && (
+            <button class={`mdv-chip ${ambientOn ? 'is-on' : ''}`} aria-pressed={ambientOn} onClick={toggleAmbient}>
+              <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
+            </button>
+          )}
+        </div>
+        {fileErr ? (
+          <p class="dcard__recnote" role="alert">
+            <Icon name="warn" size={13} /> {t(UI.audioFileError, lang)}
+            <span class="dcard__errbtns">
+              <button class="mdv-chip" onClick={() => { setFileErr(false); fileAudioRef.current?.load(); }}>
+                {t(UI.retry, lang)}
+              </button>
+              <button class="mdv-chip" onClick={() => setUseTts(true)}>
+                {t(UI.useAutoVoice, lang)}
+              </button>
+            </span>
+          </p>
+        ) : (
+          <p class="dcard__recnote">
+            <Icon name="check" size={13} /> {t(UI.recordedNarration, lang)}
+          </p>
+        )}
+        <details class="dcard__scriptwrap">
+          <summary>{t(UI.readScript, lang)}</summary>
+          <ol class="dcard__script">
+            {sentences.map((s, i) => (
+              <li key={i}>{s}</li>
+            ))}
+          </ol>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <div class={`dcard dcard--audio dcard--${card.size}`}>
@@ -557,6 +789,9 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
             <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
           </button>
         )}
+        <span class="dcard__dur">
+          <Icon name="clock" size={12} /> {durLabel}
+        </span>
       </div>
       <div class="dcard__progbar" role="progressbar" aria-label={t(UI.audioProgress, lang)} aria-valuenow={Math.round(prog)} aria-valuemin={0} aria-valuemax={100}>
         <span style={{ width: `${prog}%` }} />
@@ -616,22 +851,25 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
       <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
         {t(cur.body, lang)}
       </p>
-      {cur.video && online && (
-        <div class="dcard__avideo">
-          {cur.video.src.startsWith('http') ? (
-            <iframe src={cur.video.src} title={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
-          ) : (
-            <video
-              src={asset(cur.video.src)}
-              poster={cur.video.poster ? asset(cur.video.poster) : undefined}
-              controls
-              playsInline
-              preload="metadata"
-              aria-label={cur.video.title ? t(cur.video.title, lang) : t(cur.title, lang)}
-            />
-          )}
-        </div>
-      )}
+      {(() => {
+        const vid = lang === 'en' && cur.videoEn ? cur.videoEn : cur.video;
+        if (!vid) return null;
+        return (
+          <div class="dcard__avideo">
+            {vid.src.startsWith('http') ? (
+              online ? (
+                <iframe src={vid.src} title={vid.title ? t(vid.title, lang) : t(cur.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
+              ) : (
+                <p class="dcard__vsoon">
+                  <Icon name="play" size={14} /> {t(UI.videoOffline, lang)}
+                </p>
+              )
+            ) : (
+              <LocalVideo src={vid.src} poster={vid.poster} label={vid.title ? t(vid.title, lang) : t(cur.title, lang)} lang={lang} />
+            )}
+          </div>
+        );
+      })()}
       <div class="dcard__dots" aria-hidden="true">
         {card.aspects.map((a) => (
           <i key={a.id} class={a.id === cur.id ? 'on' : ''} />

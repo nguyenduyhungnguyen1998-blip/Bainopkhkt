@@ -16,7 +16,7 @@
     15.764
   ],
   "journeyOrder": 4,
-  "heroImage": "/img/my-son/hero.svg",
+  "heroImage": "/img/my-son/hero.webp",
   "tint": "#5e3418",
   "summary": {
     "vi": "Quần thể đền tháp Chăm Pa xây từ thế kỷ IV đến XIII, Di sản văn hóa thế giới từ năm 1999.",
@@ -50,7 +50,10 @@
         {
           "type": "hero",
           "size": "lg",
-          "image": "/img/my-son/hero.svg"
+          "image": "/img/my-son/nhom-thap-b.webp",
+          "images": [
+            "/img/my-son/hero.webp"
+          ]
         },
         {
           "type": "audio",

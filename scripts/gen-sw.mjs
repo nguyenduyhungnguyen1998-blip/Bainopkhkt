@@ -69,9 +69,14 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET' || !req.url.startsWith('http')) return;
   const url = new URL(req.url);
 
-  // Điều hướng trang: network-first, rớt mạng → shell đã precache (hash router tự xử lý).
+  // Điều hướng trang: network-first, rớt mạng → trang tĩnh đã precache (qr-sheet…) rồi mới tới shell.
+  // Không check cache trước thì tem QR dù đã cache vẫn bị nuốt thành index.html (văng về map).
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).catch(() => caches.match(OFFLINE_URL)));
+    e.respondWith(
+      fetch(req).catch(() =>
+        caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match(OFFLINE_URL))
+      )
+    );
     return;
   }
 

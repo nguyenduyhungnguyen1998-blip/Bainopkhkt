@@ -656,6 +656,9 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const [sent, setSent] = useState(-1);
   const [rate, setRate] = useState(1);
   const [ambientOn, setAmbientOn] = useState(false);
+  const [fileErr, setFileErr] = useState(false);
+  const [useTts, setUseTts] = useState(false);
+  const fileAudioRef = useRef<HTMLAudioElement | null>(null);
   const sentences = card.script[lang];
 
   // Chỉ dọn khi rời điểm: stopAmbient() tự no-op khi không có gì đang chạy.
@@ -701,22 +704,56 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const mins = Math.max(1, Math.round(totalWords / 170));
   const durLabel = lang === 'vi' ? `≈ ${mins} phút` : `≈ ${mins} min`;
   // Bản thu sẵn (giọng đọc thật từ tư liệu chuẩn) — khi có thì phát file thay TTS.
-  const fileSrc = card.src ? asset(lang === 'en' && card.srcEn ? card.srcEn : card.src) : null;
+  const fileSrc = card.src && !useTts ? asset(lang === 'en' && card.srcEn ? card.srcEn : card.src) : null;
+
+  // Watchdog: request treo (mạng chập chờn) không bắn 'error' — readyState vẫn 0 sau 10s → coi như lỗi.
+  useEffect(() => {
+    if (!fileSrc || fileErr) return;
+    const t = setTimeout(() => {
+      const el = fileAudioRef.current;
+      if (el && el.readyState === 0) setFileErr(true);
+    }, 10000);
+    return () => clearTimeout(t);
+  }, [fileSrc, fileErr]);
 
   if (fileSrc) {
     return (
       <div class={`dcard dcard--audio dcard--${card.size}`}>
         <div class="dcard__audio-ctrl">
-          <audio class="dcard__player" src={fileSrc} controls preload="metadata" aria-label={t(UI.recordedNarration, lang)} />
-          {card.ambient && (
+          {!fileErr && (
+            <audio
+              ref={fileAudioRef}
+              class="dcard__player"
+              src={fileSrc}
+              controls
+              preload="metadata"
+              aria-label={t(UI.recordedNarration, lang)}
+              onError={() => setFileErr(true)}
+            />
+          )}
+          {card.ambient && !fileErr && (
             <button class={`mdv-chip ${ambientOn ? 'is-on' : ''}`} aria-pressed={ambientOn} onClick={toggleAmbient}>
               <Icon name="leaf" size={14} /> {ambientOn ? t(UI.ambientOff, lang) : t(UI.ambient, lang)}
             </button>
           )}
         </div>
-        <p class="dcard__recnote">
-          <Icon name="check" size={13} /> {t(UI.recordedNarration, lang)}
-        </p>
+        {fileErr ? (
+          <p class="dcard__recnote" role="alert">
+            <Icon name="warn" size={13} /> {t(UI.audioFileError, lang)}
+            <span class="dcard__errbtns">
+              <button class="mdv-chip" onClick={() => { setFileErr(false); fileAudioRef.current?.load(); }}>
+                {t(UI.retry, lang)}
+              </button>
+              <button class="mdv-chip" onClick={() => setUseTts(true)}>
+                {t(UI.useAutoVoice, lang)}
+              </button>
+            </span>
+          </p>
+        ) : (
+          <p class="dcard__recnote">
+            <Icon name="check" size={13} /> {t(UI.recordedNarration, lang)}
+          </p>
+        )}
         <details class="dcard__scriptwrap">
           <summary>{t(UI.readScript, lang)}</summary>
           <ol class="dcard__script">

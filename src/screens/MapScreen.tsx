@@ -8,7 +8,7 @@ import { SITES } from '../data/content';
 import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProgress, type UnlockResult } from '../lib/progress';
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
-import { Icon } from '../components/Icon';
+import { Icon, FlagVN } from '../components/Icon';
 import { HelpMenu, WelcomeModal } from '../components/Onboarding';
 import { HINT_REQ_KEY, TOUR_REQ_KEY, WELCOME_KEY } from '../lib/tour';
 import { asset } from '../lib/asset';
@@ -444,7 +444,9 @@ export function MapScreen() {
     <main class="mscreen">
       <header class="mscreen__top">
         <div class="mscreen__title">
-          <span class="mdv-eyebrow">Mở Dấu Việt</span>
+          <span class="mdv-eyebrow mscreen__brand">
+            <FlagVN size={15} /> {t(UI.appName, lang)}
+          </span>
           <h1>{lang === 'vi' ? 'Hành trình di sản' : 'Heritage journey'}</h1>
         </div>
         <div class="mscreen__xp" aria-label={`${progress.xp} ${t(UI.xp, lang)}`}>

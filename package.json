@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Mở Dấu Việt – nền tảng du lịch thông minh định danh văn hóa Việt (PWA + QR)",
+  "description": "Du lịch Việt Nam – nền tảng du lịch thông minh định danh văn hóa Việt (PWA + QR)",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",

@@ -84,10 +84,10 @@ const clampPos = (p: Pos): Pos => ({
   y: Math.min(Math.max(6, p.y), Math.max(6, window.innerHeight - FAB - 6)),
 });
 
-/** Vị trí mặc định (góc phải, ngay trên dock). */
+/** Vị trí mặc định (góc phải, ngay trên counter/legend của bản đồ). */
 const defaultPos = (): Pos => ({
   x: Math.max(6, window.innerWidth - 12 - FAB),
-  y: Math.max(6, window.innerHeight - 90 - FAB),
+  y: Math.max(6, window.innerHeight - 112 - FAB),
 });
 
 export function DemoDock() {

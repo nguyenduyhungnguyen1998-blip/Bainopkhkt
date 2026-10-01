@@ -118,10 +118,12 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-left: 6px;
+  flex-shrink: 0;
 }
-.mscreen__legend .lg:first-child {
-  margin-left: 0;
+.mscreen__lgitem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .lg--done {
   background: var(--color-accent-tertiary);
@@ -144,6 +146,15 @@
   font-weight: 700;
   color: var(--color-text-muted);
   pointer-events: none;
+}
+/* ≤430px: legend ngang (≈230px) + counter đè nhau — xếp dọc legend thành cột hẹp. */
+@media (max-width: 430px) {
+  .mscreen__legend {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 6px 9px;
+  }
 }
 
 /* Bottom sheet: kéo 40% <-> 90%, vuốt xuống để đóng */

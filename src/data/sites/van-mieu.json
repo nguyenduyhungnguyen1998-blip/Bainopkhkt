@@ -426,6 +426,64 @@
             "vi": "Năm lớp sân dọc trục Bắc–Nam từ cổng Văn Miếu tới nhà Thái Học, mỗi sân một công trình trung tâm.",
             "en": "Five courtyards follow the north–south axis from the gate to Thai Hoc hall, each with a focal building."
           }
+        },
+        {
+          "q": {
+            "vi": "Trước khi ra làm quan, Chu Văn An đã mở trường nào thu nhận học trò?",
+            "en": "Before entering government service, which school did Chu Văn An open for students?"
+          },
+          "options": [
+            {
+              "vi": "Trường Huỳnh Cung",
+              "en": "Huỳnh Cung School"
+            },
+            {
+              "vi": "Trường Quốc Tử Giám",
+              "en": "The Imperial Academy"
+            },
+            {
+              "vi": "Trường Thái Học",
+              "en": "Thái Học School"
+            },
+            {
+              "vi": "Trường Văn Miếu",
+              "en": "The Temple of Literature School"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Chu Văn An mở trường Huỳnh Cung; nhiều học trò của ông sau này giữ vị trí quan trọng trong triều đình nhà Trần.",
+            "en": "Chu Văn An founded Huỳnh Cung School; many of his students later held important positions in the Trần court."
+          }
+        },
+        {
+          "q": {
+            "vi": "Chu Văn An dâng tấu sớ nào đề nghị xử lý bảy quyền thần?",
+            "en": "Which petition did Chu Văn An submit calling for seven powerful officials to be punished?"
+          },
+          "options": [
+            {
+              "vi": "Thất trảm sớ",
+              "en": "The Seven Executions Petition"
+            },
+            {
+              "vi": "Bình Ngô sách",
+              "en": "Bình Ngô sách"
+            },
+            {
+              "vi": "Đại thành tâm pháp",
+              "en": "Đại thành tâm pháp"
+            },
+            {
+              "vi": "Cư trần lạc đạo phú",
+              "en": "Cư trần lạc đạo phú"
+            }
+          ],
+          "answer": 0,
+          "explain": {
+            "vi": "Khi Thất trảm sớ không được chấp thuận, ông từ quan về núi Phượng Hoàng ở Chí Linh tiếp tục dạy học.",
+            "en": "When the petition was rejected, he resigned and returned to Phượng Hoàng Mountain in Chí Linh to keep teaching."
+          }
         }
       ]
     },

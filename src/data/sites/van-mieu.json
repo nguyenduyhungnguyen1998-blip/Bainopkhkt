@@ -229,31 +229,52 @@
               "body": {
                 "vi": "Phía trước Văn Miếu là Hồ Văn rộng hơn 12.000 m²; giữa hồ nổi lên gò Kim Châu – xưa là nơi nho sĩ kinh thành bình thơ đàm đạo, nay có tòa Phương Đình hai tầng tám mái được phục dựng năm 2022 cùng cầu đá và những cây si cổ thụ. Hồ Văn được trả lại cho di tích năm 1940 – sự kiện ghi trên bia 'Hoàn Văn hồ bi'. Phía Tây, Vườn Giám được trùng tu 1996–2004 với Nhà Bát Giác mặt bằng bát giác, mái ngói nhiều lớp góc đao cong, hòa mình giữa cây xanh và mặt nước – vừa là điểm dừng chân vừa là nơi tổ chức hoạt động văn hóa, giáo dục. Ngày nay Hồ Văn còn là nơi diễn ra Hội chữ Xuân, hội sách, rối nước và các trò chơi dân gian.",
                 "en": "In front of the temple lies Hồ Văn lake, over 12,000 m²; on its Kim Châu islet – where capital scholars once composed poetry – stands the Phương Đình pavilion with two tiers and eight roofs, restored in 2022 amid stone bridges and ancient banyans. The lake was returned to the monument in 1940, an event recorded on the 'Hoàn Văn hồ bi' stele. To the west, Giám garden (restored 1996–2004) holds the octagonal pavilion with layered curved roofs amid greenery and water – both a resting place and a venue for cultural activities. Today the lake still hosts spring calligraphy fairs, book festivals, water puppetry and folk games."
+              },
+              "video": {
+                "src": "media/vm-tien-an.mp4",
+                "poster": "/media/vm-tien-an-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
+                  "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-tien-an-en.mp4",
+                "poster": "/media/vm-tien-an-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
+                  "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
+                }
+              }
+            },
+            {
+              "id": "khu-vuc",
+              "title": {
+                "vi": "Khu vực",
+                "en": "Precinct"
+              },
+              "body": {
+                "vi": "Khu Nhập Đạo là phần sân ngoài của di tích – nơi du khách bắt đầu hành trình: từ cổng chính đi qua bốn trụ gạch lớn của khu Tiền Án, theo con đường lát gạch xưa giữa vườn cây cổ thụ để tới cổng Văn Miếu Môn.",
+                "en": "The Nhap Dao precinct is the temple’s outer grounds, where the visit begins: from the main gate, past the four great brick pillars of the Tien An forecourt, along the old paved path under ancient trees to the Van Mieu Mon gate."
+              },
+              "video": {
+                "src": "media/vm-nhap-dao.mp4",
+                "poster": "/media/vm-nhap-dao-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khu Nhập Đạo",
+                  "en": "Narrated clip: Nhap Dao gate area"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-nhap-dao-en.mp4",
+                "poster": "/media/vm-nhap-dao-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khu Nhập Đạo",
+                  "en": "Narrated clip: Nhap Dao gate area"
+                }
               }
             }
           ]
-        },
-        {
-          "type": "video",
-          "size": "lg",
-          "src": "media/vm-nhap-dao.mp4",
-          "srcEn": "media/vm-nhap-dao-en.mp4",
-          "poster": "/media/vm-nhap-dao-poster.jpg",
-          "title": {
-            "vi": "Clip thuyết minh Khu Nhập Đạo",
-            "en": "Narrated clip: Nhap Dao gate area"
-          }
-        },
-        {
-          "type": "video",
-          "size": "lg",
-          "src": "media/vm-tien-an.mp4",
-          "srcEn": "media/vm-tien-an-en.mp4",
-          "poster": "/media/vm-tien-an-poster.jpg",
-          "title": {
-            "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
-            "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
-          }
         },
         {
           "type": "fact",
@@ -558,6 +579,22 @@
               "body": {
                 "vi": "Qua cổng Đại Trung là khu Thành Đạt với ba lối vào: lối chính dẫn tới Khuê Văn Các, hai lối bên đến cổng Bí Văn và Súc Văn – mang ý nghĩa vẻ đẹp của văn chương. Gác được dựng năm 1805 dưới Tổng trấn Bắc Thành Nguyễn Văn Thành, kiến trúc cân đối thanh thoát: đế vuông bốn trụ gạch, tầng trên bằng gỗ sơn đỏ với bốn cửa sổ tròn tỏa tia, mái hai tầng lợp ngói ống – giản dị mà tao nhã.",
                 "en": "Beyond the Đại Trung gate lies the Thành Đạt quarter with three entrances: the central path leads to Khuê Văn Các while the side paths reach the Bí Văn and Súc Văn gates – emblems of literary beauty. The pavilion was built in 1805 under Nguyễn Văn Thành, Governor of Bắc Thành: a square base of four brick pillars, a red-lacquered timber upper storey with four round radiating windows, and a two-tier tube-tile roof – simple yet elegant, balanced and graceful."
+              },
+              "video": {
+                "src": "media/vm-thanh-dat.mp4",
+                "poster": "/media/vm-thanh-dat-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khuê Văn Các",
+                  "en": "Narrated clip: Khue Van Pavilion"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-thanh-dat-en.mp4",
+                "poster": "/media/vm-thanh-dat-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Khuê Văn Các",
+                  "en": "Narrated clip: Khue Van Pavilion"
+                }
               }
             },
             {
@@ -572,17 +609,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "title": {
-            "vi": "Clip thuyết minh Khuê Văn Các",
-            "en": "Narrated clip: Khue Van Pavilion"
-          },
-          "src": "media/vm-thanh-dat.mp4",
-          "poster": "/media/vm-thanh-dat-poster.jpg",
-          "srcEn": "media/vm-thanh-dat-en.mp4"
         },
         {
           "type": "fact",
@@ -820,6 +846,22 @@
               "body": {
                 "vi": "Mỗi bia đặt trên lưng một con rùa đá – biểu tượng của sự trường tồn. Hoa văn trán bia thay đổi theo từng thời kỳ, là tư liệu quý về điêu khắc Việt qua ba thế kỷ. Giữa khu vườn là Thiên Quang Tỉnh – giếng cổ hình vuông 30×30 m, mặt nước quanh năm xanh trong phẳng lặng; tám dãy nhà che bia được xây năm 1994, kiến trúc hài hòa cùng cảnh quan cổ kính của khu di tích.",
                 "en": "Each stele rests on a stone tortoise, a symbol of longevity. Their carved motifs change over time, documenting three centuries of Vietnamese sculpture. At the centre of the courtyard is the Thiên Quang Tỉnh – a square 30×30 m ancient well whose water stays clear and still year-round; eight roofed halls sheltering the steles were built in 1994 in harmony with the historic landscape."
+              },
+              "video": {
+                "src": "media/vm-vuon-bia.mp4",
+                "poster": "/media/vm-vuon-bia-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Vườn bia",
+                  "en": "Narrated clip: Garden of Steles"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-vuon-bia-en.mp4",
+                "poster": "/media/vm-vuon-bia-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Vườn bia",
+                  "en": "Narrated clip: Garden of Steles"
+                }
               }
             },
             {
@@ -834,17 +876,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "title": {
-            "vi": "Clip thuyết minh Vườn bia",
-            "en": "Narrated clip: Garden of Steles"
-          },
-          "src": "media/vm-vuon-bia.mp4",
-          "poster": "/media/vm-vuon-bia-poster.jpg",
-          "srcEn": "media/vm-vuon-bia-en.mp4"
         },
         {
           "type": "fact",
@@ -1070,6 +1101,22 @@
               "body": {
                 "vi": "Trung tâm khu thờ tự là sân Đại Bái, hai bên là các dãy nhà chạy song song. Phía trước là Bái Đường chín gian – nơi từng diễn ra nghi lễ tế Khổng Tử – với hệ cột gỗ lim, mái ngói mũi hài và họa tiết truyền thống. Phía sau, một tiểu đình nối với Điện Đại Thành chín gian: cột sơn son thếp vàng, mái ngói mũi hài, trên nóc là đôi rồng chầu nhật nguyệt. Trong điện thờ Khổng Tử – tượng chính giữa hướng về phương Nam – cùng Tứ Phối và Thập Triết.",
                 "en": "The worship quarter centres on the Đại Bái courtyard, flanked by parallel rows of buildings. In front stands the nine-bay Bái Đường – where ceremonies honouring Confucius were held – with ironwood columns and a 'mũi hài' tiled roof. A small pavilion links it to the nine-bay Điện Đại Thành: gilded lacquered columns, mũi hài tiles, and twin dragons bowing to the sun and moon on the roof. Inside are worshipped Confucius – the central statue facing south – together with the Four Paragons and Ten Philosophers."
+              },
+              "video": {
+                "src": "media/vm-dai-thanh.mp4",
+                "poster": "/media/vm-dai-thanh-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Điện Đại Thành",
+                  "en": "Narrated clip: Hall of Great Success"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-dai-thanh-en.mp4",
+                "poster": "/media/vm-dai-thanh-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Điện Đại Thành",
+                  "en": "Narrated clip: Hall of Great Success"
+                }
               }
             },
             {
@@ -1113,17 +1160,6 @@
             "vi": "…và Tử Tư (492–431 TCN), Mạnh Tử (371–289 TCN).",
             "en": "…along with Zisi (492–431 BCE) and Mencius (371–289 BCE)."
           }
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "title": {
-            "vi": "Clip thuyết minh Điện Đại Thành",
-            "en": "Narrated clip: Hall of Great Success"
-          },
-          "src": "media/vm-dai-thanh.mp4",
-          "poster": "/media/vm-dai-thanh-poster.jpg",
-          "srcEn": "media/vm-dai-thanh-en.mp4"
         }
       ],
       "sources": [
@@ -1344,6 +1380,22 @@
               "body": {
                 "vi": "Nhà Thái Học được xây năm 2000 trên nền Quốc Tử Giám xưa, mang dáng dấp kiến trúc truyền thống gồm Tiền Đường, Hậu Đường, Tả vu, Hữu vu cùng nhà Chuông và nhà Trống. Tiền Đường là không gian diễn ra các hoạt động văn hóa, khoa học và nghệ thuật; Hậu Đường hai tầng – tầng dưới giới thiệu lịch sử Văn Miếu – Quốc Tử Giám và tôn vinh thầy Chu Văn An, tầng trên thờ ba vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.",
                 "en": "The Thái Học house was built in 2000 on the foundations of the old Imperial Academy, in traditional style with Tiền Đường and Hậu Đường halls, left and right wings, plus a bell house and drum house. Tiền Đường hosts cultural, scientific and artistic events; the two-storey Hậu Đường presents the site's history and honours teacher Chu Văn An below, while the upper floor worships the three kings who founded the school: Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông."
+              },
+              "video": {
+                "src": "media/vm-thai-hoc.mp4",
+                "poster": "/media/vm-thai-hoc-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Nhà Thái Học",
+                  "en": "Narrated clip: Thai Hoc House"
+                }
+              },
+              "videoEn": {
+                "src": "media/vm-thai-hoc-en.mp4",
+                "poster": "/media/vm-thai-hoc-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Nhà Thái Học",
+                  "en": "Narrated clip: Thai Hoc House"
+                }
               }
             },
             {
@@ -1378,17 +1430,6 @@
             "vi": "Tượng thầy Chu Văn An ở tầng dưới nhà Thái Học – đúc năm 2003, nặng khoảng 3 tấn.",
             "en": "The statue of teacher Chu Van An on the ground floor – cast in 2003, weighing about 3 tonnes."
           }
-        },
-        {
-          "type": "video",
-          "size": "md",
-          "title": {
-            "vi": "Clip thuyết minh Nhà Thái Học",
-            "en": "Narrated clip: Thai Hoc House"
-          },
-          "src": "media/vm-thai-hoc.mp4",
-          "poster": "/media/vm-thai-hoc-poster.jpg",
-          "srcEn": "media/vm-thai-hoc-en.mp4"
         }
       ],
       "sources": [
@@ -1620,6 +1661,14 @@
               "body": {
                 "vi": "Nằm ở phía Tây Văn Miếu – Quốc Tử Giám, Nhà Bát Giác là công trình mang phong cách kiến trúc truyền thống, hài hòa với cây xanh và mặt nước. Công trình có mặt bằng hình bát giác, mái ngói nhiều lớp với những góc đao cong, kết hợp cùng hệ thống cột gỗ tạo nên vẻ thanh thoát, cổ kính.",
                 "en": "Set on the west side of the complex, the Octagonal Pavilion is a traditional design that blends with the greenery and water. It has an octagonal floor plan, a multi-layer tiled roof with curved ridge corners, and a timber column system that gives it a graceful, ancient feel."
+              },
+              "video": {
+                "src": "media/vm-vuon-giam.mp4",
+                "poster": "/media/vm-vuon-giam-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Vườn Giám",
+                  "en": "Narrated clip: Giam Garden"
+                }
               }
             },
             {
@@ -1634,16 +1683,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "video",
-          "size": "lg",
-          "src": "media/vm-vuon-giam.mp4",
-          "poster": "/media/vm-vuon-giam-poster.jpg",
-          "title": {
-            "vi": "Clip thuyết minh Vườn Giám",
-            "en": "Narrated clip: Giam Garden"
-          }
         },
         {
           "type": "fact",

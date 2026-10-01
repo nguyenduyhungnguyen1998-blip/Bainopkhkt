@@ -115,6 +115,9 @@ export function useMapGestures(opts: GestureOptions) {
 
     const onDown = (e: PointerEvent) => {
       cancelAnimationFrame(anim.current);
+      // Chạm tay = hủy animation đang bay: phải resolve promise chờ — nếu để treo,
+      // callback hạ cánh (vd dive "Khám phá") sẽ bắn ra muộn khi có animation mới.
+      animDone.current();
       svg.setPointerCapture(e.pointerId);
       pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
       const { mid, dist } = midAndDist();

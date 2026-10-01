@@ -16,7 +16,7 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 - Reset progress: `import(...).then(m=>m.resetProgress())` — see module-URL gotcha below.
 
 ## Module gotchas (important)
-- **Progress lives in IndexedDB `mdv-progress`, NOT localStorage.** `localStorage.clear()` does not reset progress.
+- **Progress lives in IndexedDB `mdv` (store `progress`), NOT localStorage.** `localStorage.clear()` does not reset progress.
 - **Vite `?t=` versioning splits module instances.** After HMR, the app imports `src/lib/progress.ts?t=<ts>` while a bare `import('/src/lib/progress.ts')` creates a SECOND, empty module record — `getProgress()` then reads a fresh EMPTY state even though the app unlocked spots. Always resolve the app's real URL:
   `performance.getEntriesByType('resource').map(r=>r.name).filter(n=>n.includes('src/lib/progress.ts')).filter(n=>n.includes('?t=')).pop()` then `import(that)`. Same for `src/data/content.ts` (`m.getSpot(site,spot).spot` — returns `{site,spot}`, not the spot itself).
 - On a **prod build** there are no `/src/*.ts` modules — read progress via IDB or UI only.
@@ -37,13 +37,18 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 - `npm run build -- --base=/Bainopkhkt/` (base REQUIRED for SW/precache paths) → `ln -sfn dist /tmp/serve/Bainopkhkt` → `python3 -m http.server 8080 -d /tmp/serve`. SW: `getRegistration().active` + `controller` before going offline.
 - `Network.emulateNetworkConditions{offline:true}` works fine WITH an active SW — `caches.match` runs inside the worker, not the network. qr-sheet.html serves (precached, 10 inline SVG QRs), `?q=` URLs get index.html via OFFLINE_URL → full scan→verify→stamp works offline (WebCrypto needs no network).
 - Block a resource class with `Network.setBlockedURLs` (e.g. `*m4a*` → exercises the audio-error → TTS-fallback path). Unblock with `urls:[]` after.
+- `PRECACHE` may overlap `OFFLINE_URL` — install must dedupe before `addAll`: verify `new Set(` in `scripts/gen-sw.mjs` AND in `dist/sw.js`.
+- Prod errorlog: window.onerror/unhandledrejection record into `mdv.errors.v1` localStorage (200-entry ring) even on prod builds — read it via eval to inspect errors without DevTools attached during a field demo.
+- `?q=`/`?d=` navigation: a Location nav may not reply within its timeout — the nav still proceeds; drive post-nav evals with a retry-on-timeout loop (5s).
+- Manual QR entry without a camera: open the map filters strip, type the 6-hex code in `.msearch__code` → ScanConfirm panel (same gate as a real tag — set `mdv.lang` first).
+- `.msearch__filters` row: `.mscreen__searchbtn` can be clipped at 390px (observed in a build) — verify before asserting the search button is gone.
 
 ## TTS / voices
 - Box has **0 TTS voices** → real "Nghe" lands in `failed` fallback. For durable `playing`: `speechSynthesis.speak=u=>{window.__utt=u;setTimeout(()=>!u.__dead&&u.onstart&&u.onstart(),30)}; cancel=()=>{if(window.__utt)window.__utt.__dead=true}; pause=resume=()=>{}`.
 - Playing state: `.dcard__playbtn` text "Tạm dừng" + aria-pressed, `.dcard__script[data-reading]`, progressbar valuenow>0.
 
 ## Demo dock / admin
-- Enable: visit `#/admin` (mount calls `enableDemoDock` → `mdv.admin` LS flag). FAB `.demodock__fab` (tap toggles; keyboard via detail===0 click). Panel `.demodock__panel`; ctx `.dd__ctx` + `.dd__fold` (▸/▾, `--fold` class). ConfirmSheet `.confirm__card[role=alertdialog]` — Esc/Hủy/confirm; NOT a browser dialog. Achievements under "XP" tab (`●`/`○` + "Thu hồi"/"Đạt luôn").
+- Enable: visit `#/admin` (mount calls `enableDemoDock` → `mdv.admin` LS flag). FAB `.demodock__fab` (tap toggles; keyboard via detail===0 click). FAB taps run through `onPointerDown`→`startDrag`→`setPointerCapture(pointerId)` — synthetic PointerEvents with fake pointerIds throw and the tap never registers; use real `Input.dispatchTouchEvent`/`dispatchMouseEvent`, or `el.click()` (detail===0 path). Panel `.demodock__panel`; ctx `.dd__ctx` + `.dd__fold` (▸/▾, `--fold` class). ConfirmSheet `.confirm__card[role=alertdialog]` — Esc/Hủy/confirm; NOT a browser dialog. Achievements under "XP" tab (`●`/`○` + "Thu hồi"/"Đạt luôn").
 - `relockAll` refunds each spot's raw `spot.xp` (NOT badge bonuses) — "Gỡ hết" on N stamped spots → xp drops by sum of raw xp; quizDone + badges kept.
 - **Known bug observed 2025-10**: `defaultPos` (innerHeight-156) overlaps the map counter (~32×25px) at 560 AND 844 — verify it got fixed before asserting FAB clears the counter.
 
@@ -68,5 +73,6 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 - Hidden `<input type=file>` (passport import): `DOM.getDocument` → `DOM.querySelector` → `DOM.setFileInputFiles` fires the real change handler.
 - Downloads (passport export): `Browser.setDownloadBehavior` on the BROWSER websocket with `downloadPath`.
 - lang change needs a REAL `Page.reload` (module-level cache). Same for `mdv.theme`. Same-URL `Page.navigate` does NOT reload — always `Page.reload` or navigate elsewhere first.
-- SVG `tabIndex` on `<g>` is not keyboard-focusable: dispatch `new KeyboardEvent('keydown',{key:'Enter',bubbles:true})` on `g[role=button]` to verify keydown wiring.
+- SVG `tabindex={0}` on `<g>` DOES make it keyboard-focusable — `g[role=button][tabindex="0"]` joins Tab order; drive real Enter/Space with `Input.dispatchKeyEvent` keyDown/keyUp (KeyboardEvent only verifies the handler wiring, not focusability).
 - Errorlog introspection via `await import(<resolved ?t= url>)` — see module-URL gotcha above; a bare `/src/*.ts` import reads an empty twin module.
+- Evals that `const`-declare a name twice die with `already been declared` — wrap in `(()=>{...})()`/`(async()=>{...})()`.

@@ -34,6 +34,22 @@ describe('thẻ hộ chiếu html', () => {
   it('still accepts a raw json payload', () => {
     expect(previewPassportJson(payload)?.spots).toBe(3);
   });
+  it('drops stamp keys for spots that no longer exist', () => {
+    const p = previewPassportJson(
+      JSON.stringify({
+        kind: 'passport',
+        progress: {
+          schemaVersion: 2,
+          unlocked: { 'van-mieu/van-mieu-mon': 1, 'old-site/gone-spot': 1, 'van-mieu': 1 },
+          quizDone: { 'old-site/gone-spot': 4, 'van-mieu/khue-van-cac': 3 },
+          xp: 50,
+          badges: [],
+        },
+      })
+    );
+    expect(p?.spots).toBe(1);
+    expect(p?.progress.quizDone).toEqual({ 'van-mieu/khue-van-cac': 3 });
+  });
   it('rejects garbage', () => {
     expect(previewPassportJson('<html><body>no backup</body></html>')).toBeNull();
     expect(previewPassportJson('{"a":1}')).toBeNull();

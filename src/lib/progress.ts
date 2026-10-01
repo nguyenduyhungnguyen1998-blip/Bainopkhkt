@@ -28,16 +28,25 @@ const LS_KEY = 'mdv.progress.v1';
 const IDB_KEY = 'progress';
 const EMPTY: Progress = { schemaVersion: 2, unlocked: {}, quizDone: {}, xp: 0, badges: [] };
 
+/** Khóa điểm hợp lệ hiện hữu — dữ liệu sao lưu/nhập có khóa lạ (điểm đổi tên, bản app mới hơn) bị loại ra khỏi số đếm. */
+const KNOWN_SPOTS = new Set(SITES.flatMap((s) => s.spots.map((sp) => `${s.entityId}/${sp.spotId}`)));
+
 /** Chấp nhận bản v1 (localStorage cũ, thiếu quizDone) lẫn v2. Trả null nếu không hợp lệ. */
 function migrate(raw: unknown): Progress | null {
   if (!raw || typeof raw !== 'object') return null;
   const p = raw as { schemaVersion?: number } & Omit<Partial<Progress>, 'schemaVersion'>;
   if (p.schemaVersion !== 1 && p.schemaVersion !== 2) return null;
   if (!p.unlocked || typeof p.unlocked !== 'object') return null;
+  // Chỉ giữ khóa điểm tồn tại thật — khóa lạ làm phình số dấu và có thể bắn nhầm finale/danh hiệu.
+  const unlocked: Record<string, number> = {};
+  for (const [k, v] of Object.entries(p.unlocked)) if (KNOWN_SPOTS.has(k) && typeof v === 'number') unlocked[k] = v;
+  const quizDone: Record<string, number> = {};
+  if (p.quizDone && typeof p.quizDone === 'object')
+    for (const [k, v] of Object.entries(p.quizDone)) if (KNOWN_SPOTS.has(k) && typeof v === 'number') quizDone[k] = v;
   return {
     schemaVersion: 2,
-    unlocked: p.unlocked,
-    quizDone: p.quizDone && typeof p.quizDone === 'object' ? p.quizDone : {},
+    unlocked,
+    quizDone,
     xp: typeof p.xp === 'number' ? p.xp : 0,
     badges: Array.isArray(p.badges) ? p.badges : [],
   };

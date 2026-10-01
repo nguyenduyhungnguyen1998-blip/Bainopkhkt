@@ -347,6 +347,12 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
 
   // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
   const goAspect = (aspectId: string) => {
+    if (unlocked) {
+      // Đã có dấu từ trước: không toast, không giữ `s` — đóng panel và đi thẳng tới aspect.
+      setDismissed(true);
+      navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
+      return;
+    }
     doUnlock();
     // Giữ `s` trong URL để toast nhận dấu hiện sau khi cuộn tới aspect đã chọn;
     // replace: back không quay lại panel chọn — khách đã vào điểm.
@@ -652,14 +658,14 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const [ambientOn, setAmbientOn] = useState(false);
   const sentences = card.script[lang];
 
+  // Chỉ dọn khi rời điểm: stopAmbient() tự no-op khi không có gì đang chạy.
+  // (Không dep ambientOn — cleanup theo dep sẽ stop() narration mỗi lần bật/tắt âm nền.)
   useEffect(
     () => () => {
       playerRef.current?.stop();
-      // Rời điểm là tắt cả âm nền – không để tiếng chạy lửng lơ không nút tắt ở màn khác.
-      if (ambientOn) stopAmbient();
+      stopAmbient();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ambientOn]
+    []
   );
 
   const toggle = () => {

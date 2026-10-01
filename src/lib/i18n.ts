@@ -194,7 +194,7 @@ export const UI = {
   updateReady: { vi: 'Có bản cập nhật mới', en: 'New version available' },
   updateNow: { vi: 'Cập nhật', en: 'Update' },
   quizProgress: { vi: 'Tiến độ câu hỏi', en: 'Question progress' },
-  quizPraisePerfect: { vi: 'Tràng nguyên! Đỗ đạt toàn bộ!', en: 'Full marks, scholar!' },
+  quizPraisePerfect: { vi: 'Trạng nguyên! Đỗ đạt toàn bộ!', en: 'Full marks, scholar!' },
   quizPraiseGood: { vi: 'Khá lắm, sĩ tử!', en: 'Well done, scholar!' },
   quizPraiseLow: { vi: 'Cố lên – sĩ tử rèn thêm nhé!', en: 'Keep practicing, scholar!' },
   quizLockedHint: { vi: 'Chơi trước được – điểm chưa mở', en: 'Preview – spot not unlocked' },

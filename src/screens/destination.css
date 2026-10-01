@@ -878,7 +878,7 @@ a.dest__crumb--link:active {
 
 /* Thẻ âm thanh bản thu sẵn (audio chuẩn từ tư liệu) */
 .dcard__player{width:100%;max-width:520px;height:44px;border-radius:12px;outline:none}
-.dcard__player::-webkit-media-controls-panel{background:var(--color-surface-2,#fff)}
+.dcard__player::-webkit-media-controls-panel{background:var(--color-surface-solid,#fff)}
 .dcard__recnote{display:flex;align-items:center;gap:6px;margin:2px 0 0;font-size:var(--text-xs);color:var(--color-text-faint)}
 .dcard__errbtns{display:inline-flex;gap:8px;margin-left:6px}
 .dcard__recnote[role="alert"]{color:var(--color-danger,#c0392b);flex-wrap:wrap}

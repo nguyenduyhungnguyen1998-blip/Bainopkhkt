@@ -348,8 +348,8 @@ export function VietnamMap({
         </pattern>
         {/* Vignette: láng giềng/nội dung tan vào biển ở rìa khung (không còn cạnh thẳng cắt) */}
         <radialGradient id="vmap-vignette" cx="50%" cy="50%" r="72%">
-          <stop offset="56%" stop-color="var(--color-sea)" stop-opacity="0" />
-          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="0.8" />
+          <stop offset="54%" stop-color="var(--color-sea)" stop-opacity="0" />
+          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="1" />
         </radialGradient>
       </defs>
 

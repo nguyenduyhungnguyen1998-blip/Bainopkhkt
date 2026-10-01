@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://modauviet.vn/schema/site.schema.json",
-  "title": "Mở Dấu Việt – Site",
+  "title": "Du lịch Việt Nam – Site",
   "type": "object",
   "additionalProperties": false,
   "required": [

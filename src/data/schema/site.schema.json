@@ -246,6 +246,15 @@
                 "en": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
               }
             },
+            "scriptComplete": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["vi", "en"],
+              "properties": {
+                "vi": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+                "en": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+              }
+            },
             "ambient": { "enum": ["wind-water", "temple-bell", "garden"] },
             "src": { "type": "string", "format": "uri-reference" },
             "srcEn": { "type": "string", "format": "uri-reference" }

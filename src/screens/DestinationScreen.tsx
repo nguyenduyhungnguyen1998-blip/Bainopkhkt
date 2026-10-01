@@ -122,7 +122,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         {spot.layoutSchema.map((card, i) => (
           // key theo spotId: đổi điểm cùng khu phải remount card — không thì gallery
           // giữ idx cũ -> vượt độ dài ảnh của điểm mới = khung trống, nền cũng cũ.
-          <CardView key={`${spot.spotId}:${i}`} card={card} lang={lang} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
+          <CardView key={`${spot.spotId}:${i}`} card={card} lang={lang} site={site} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
         ))}
       </div>
 
@@ -480,7 +480,7 @@ function SiteIntro({ site }: { site: Site }) {
   );
 }
 
-function CardView({ card, lang, initialAspect, onActiveImage }: { card: Card; lang: Lang; initialAspect?: string | null; onActiveImage?: (src: string) => void }) {
+function CardView({ card, lang, site, initialAspect, onActiveImage }: { card: Card; lang: Lang; site: Site; initialAspect?: string | null; onActiveImage?: (src: string) => void }) {
   switch (card.type) {
     case 'hero':
     case 'image':
@@ -489,8 +489,11 @@ function CardView({ card, lang, initialAspect, onActiveImage }: { card: Card; la
       return <AspectsCardView card={card} lang={lang} initial={initialAspect} />;
     case 'video':
       return <VideoCardView card={card} lang={lang} />;
-    case 'audio':
-      return <AudioCardView card={card} lang={lang} />;
+    case 'audio': {
+      // Câu chúc mừng chỉ đọc khi khu thật sự hoàn thành — khách ghé lẻ không nghe "đã hoàn thành".
+      const done = site.spots.every((sp) => isSpotUnlocked(site.entityId, sp.spotId));
+      return <AudioCardView card={card} lang={lang} extra={done ? card.scriptComplete?.[lang] : undefined} />;
+    }
     case 'fact':
       return (
         <div class={`dcard dcard--fact dcard--${card.size}`}>
@@ -657,7 +660,7 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
 
 
 /** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */
-function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
+function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; extra?: string[] }) {
   const playerRef = useRef<SpeechPlayer | null>(null);
   const [status, setStatus] = useState<SpeechStatus>('idle');
   const [sent, setSent] = useState(-1);
@@ -666,7 +669,7 @@ function AudioCardView({ card, lang }: { card: AudioCard; lang: Lang }) {
   const [fileErr, setFileErr] = useState(false);
   const [useTts, setUseTts] = useState(false);
   const fileAudioRef = useRef<HTMLAudioElement | null>(null);
-  const sentences = card.script[lang];
+  const sentences = extra?.length ? [...card.script[lang], ...extra] : card.script[lang];
 
   // Chỉ dọn khi rời điểm: stopAmbient() tự no-op khi không có gì đang chạy.
   // (Không dep ambientOn — cleanup theo dep sẽ stop() narration mỗi lần bật/tắt âm nền.)

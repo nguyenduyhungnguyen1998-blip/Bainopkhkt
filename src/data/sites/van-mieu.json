@@ -1346,12 +1346,18 @@
           "script": {
             "vi": [
               "Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.",
-              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường.",
-              "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."
+              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường."
             ],
             "en": [
               "The final stop: Thai Hoc House, once the Imperial Academy itself.",
-              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings.",
+              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings."
+            ]
+          },
+          "scriptComplete": {
+            "vi": [
+              "Chúc mừng, bạn đã hoàn thành hành trình sĩ tử tại Văn Miếu."
+            ],
+            "en": [
               "Congratulations – you have completed the scholar's journey."
             ]
           }

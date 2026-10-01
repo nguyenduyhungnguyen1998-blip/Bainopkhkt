@@ -150,6 +150,7 @@ export const UI = {
   backupMerge: { vi: 'Gộp với hiện tại', en: 'Merge with current' },
   backupReplace: { vi: 'Thay thế tiến độ', en: 'Replace progress' },
   cancel: { vi: 'Hủy', en: 'Cancel' },
+  confirm: { vi: 'Đồng ý', en: 'Confirm' },
   sharePassport: { vi: 'Chia sẻ hành trình', en: 'Share journey' },
   shareCopied: { vi: 'Đã chép nội dung chia sẻ', en: 'Share text copied' },
   quizExplain: { vi: 'Vì sao?', en: 'Why?' },

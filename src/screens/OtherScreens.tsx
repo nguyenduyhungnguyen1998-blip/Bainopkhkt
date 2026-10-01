@@ -13,6 +13,7 @@ import { Icon } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
 import { PASSPORT_TOUR_STEPS, QUIZ_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import { navigate, routeHref } from '../lib/router';
+import { ConfirmSheet, useConfirm } from '../components/ConfirmSheet';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
 
@@ -583,6 +584,7 @@ export function SettingsScreen() {
   const [theme, setTheme] = useTheme();
   const [fontPct, setFontPct] = useFontScale();
   const [flatPct, setFlatPct] = useAmbientFlat();
+  const { ask, setAsk } = useConfirm();
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -652,9 +654,14 @@ export function SettingsScreen() {
             <span class="setrow__lbl">{lang === 'vi' ? 'Đặt lại' : 'Reset'}</span>
             <button
               class="mdv-btn mdv-btn--ghost"
-              onClick={() => {
-                if (confirm(lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?')) resetProgress();
-              }}
+              onClick={() =>
+                setAsk({
+                  title: lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?',
+                  ok: lang === 'vi' ? 'Đặt lại' : 'Reset',
+                  danger: true,
+                  act: resetProgress,
+                })
+              }
             >
               {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
             </button>
@@ -678,6 +685,7 @@ export function SettingsScreen() {
         </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
       </div>
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </main>
   );
 }
@@ -985,6 +993,8 @@ export function SourcesScreen() {
  */
 export function AdminScreen() {
   const p = useProgress();
+  const [lang] = useLang();
+  const { ask, setAsk } = useConfirm();
   const [, forceTick] = useState(0); // re-render sau thao tác cục bộ (finale flags)
   // Mở trang admin = có ý định demo -> bật luôn nút điều khiển nổi (DemoDock).
   useEffect(() => enableDemoDock(), []);
@@ -1092,14 +1102,20 @@ export function AdminScreen() {
           </a>
           <button
             class="mdv-btn mdv-btn--ghost"
-            onClick={() => {
-              if (confirm('Xóa toàn bộ tiến độ hành trình?')) resetProgress();
-            }}
+            onClick={() =>
+              setAsk({
+                title: 'Xóa toàn bộ tiến độ hành trình?',
+                ok: 'Xóa hết',
+                danger: true,
+                act: resetProgress,
+              })
+            }
           >
             Reset hành trình
           </button>
         </div>
       </section>
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </main>
   );
 }

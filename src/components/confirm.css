@@ -1,0 +1,27 @@
+/* Hộp xác nhận trong app — overlay tái dùng .finale, card gọn hơn cho câu hỏi ngắn */
+.confirm {
+  z-index: 130;
+}
+.confirm__card {
+  gap: var(--space-4);
+  text-align: start;
+  align-items: stretch;
+}
+.confirm__title {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+.confirm__body {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.confirm__btns {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+}
+.confirm__ok--danger {
+  background: var(--color-danger);
+  color: #fff;
+}

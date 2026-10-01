@@ -305,3 +305,11 @@
     transition: none;
   }
 }
+
+/* Dock nằm ở root còn modal quét/xác-nhận nằm trong .mdv-screen (z-index:1 tạo
+   stacking context riêng) — z-index trong màn không thắng được dock, nên ẩn hẳn
+   dock khi modal mở: vừa hết đè CTA, vừa đúng UX (dock demo vô nghĩa giữa modal). */
+body:has(.dpick) .demodock,
+body:has(.confirm) .demodock {
+  display: none;
+}

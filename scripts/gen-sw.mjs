@@ -6,34 +6,16 @@
  * Chạy: node scripts/gen-sw.mjs [--base=/ten/] (base được vite build chuyển tiếp).
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
-const dist = new URL('../dist/', import.meta.url).pathname;
-const baseArg = process.argv.find((a) => a.startsWith('--base=')) ?? '';
-// Base: ưu tiên argv, còn không suy ra từ đường dẫn asset trong index.html (khớp --base của vite).
-let base = baseArg ? baseArg.slice('--base='.length).replace(/\/$/, '') : '';
-if (!baseArg) {
-  const html = readFileSync(join(dist, 'index.html'), 'utf8');
-  const m = html.match(/src="(\/[^"]+)\/assets\//) ?? html.match(/src="assets\//);
-  base = m && m[1] !== undefined ? m[1].replace(/\/$/, '') : '';
-}
-
-const files = [];
-const walk = (dir) => {
-  for (const f of readdirSync(dir)) {
-    const p = join(dir, f);
-    if (statSync(p).isDirectory()) walk(p);
-    else if (f !== 'sw.js') files.push(relative(dist, p));
-  }
-};
-walk(dist);
-
-const version = createHash('sha256').update(files.sort().join('|')).digest('hex').slice(0, 12);
-// Không precache media nặng (video thuyết minh): tải theo nhu cầu, runtime cache giữ lại sau lần phát đầu.
-const precache = files.sort().filter((f) => !f.startsWith('media/')).map((f) => `${base}/${f}`);
-
-const sw = `// Mở Dấu Việt service worker – sinh tự động bởi scripts/gen-sw.mjs, không sửa tay.
+/**
+ * Thân service worker — tách ra để test cấu trúc (journey-e2e.test.ts) mà không
+ * cần build dist. Mọi nhánh fetch quan trọng được test assert trực tiếp vào đây.
+ */
+export function buildSw({ version, precache, base }) {
+  return `// Mở Dấu Việt service worker – sinh tự động bởi scripts/gen-sw.mjs, không sửa tay.
 const VERSION = '${version}';
 const PRE = 'mdv-pre-' + VERSION;
 const RUNTIME = 'mdv-rt-' + VERSION;
@@ -126,6 +108,35 @@ self.addEventListener('fetch', (e) => {
   );
 });
 `;
+}
 
-writeFileSync(join(dist, 'sw.js'), sw);
-console.log(`sw.js: ${precache.length + 1} precache entries, version ${version}`);
+// Chỉ chạy phần sinh file khi gọi trực tiếp `node scripts/gen-sw.mjs` —
+// import (vitest) thì không đụng vào dist.
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const dist = new URL('../dist/', import.meta.url).pathname;
+  const baseArg = process.argv.find((a) => a.startsWith('--base=')) ?? '';
+  // Base: ưu tiên argv, còn không suy ra từ đường dẫn asset trong index.html (khớp --base của vite).
+  let base = baseArg ? baseArg.slice('--base='.length).replace(/\/$/, '') : '';
+  if (!baseArg) {
+    const html = readFileSync(join(dist, 'index.html'), 'utf8');
+    const m = html.match(/src="(\/[^"]+)\/assets\//) ?? html.match(/src="assets\//);
+    base = m && m[1] !== undefined ? m[1].replace(/\/$/, '') : '';
+  }
+
+  const files = [];
+  const walk = (dir) => {
+    for (const f of readdirSync(dir)) {
+      const p = join(dir, f);
+      if (statSync(p).isDirectory()) walk(p);
+      else if (f !== 'sw.js') files.push(relative(dist, p));
+    }
+  };
+  walk(dist);
+
+  const version = createHash('sha256').update(files.sort().join('|')).digest('hex').slice(0, 12);
+  // Không precache media nặng (video thuyết minh): tải theo nhu cầu, runtime cache giữ lại sau lần phát đầu.
+  const precache = files.sort().filter((f) => !f.startsWith('media/')).map((f) => `${base}/${f}`);
+
+  writeFileSync(join(dist, 'sw.js'), buildSw({ version, precache, base }));
+  console.log(`sw.js: ${precache.length + 1} precache entries, version ${version}`);
+}

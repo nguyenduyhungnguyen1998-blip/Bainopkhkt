@@ -103,10 +103,16 @@ for (const f of files) {
           warn(tag, `audio.script vi có ${card.script.vi.length} câu, en có ${card.script.en.length} câu`);
         // Bản thu sẵn (audio chuẩn) — kiểm tồn tại như video local
         for (const sv of [card.src, card.srcEn]) if (sv && !sv.startsWith('https://')) videos.add(sv);
+        // Ngữ nghĩa: file thu sẵn đọc kịch bản đầy đủ — script ngắn bất thường
+        // thường nghĩa là transcript đang trỏ nhầm bản tóm tắt (bug từng có).
+        if ((card.src || card.srcEn) && (card.script.vi.length < 8 || card.script.en.length < 8))
+          warn(tag, `audio có file thu (${card.src || card.srcEn}) nhưng script chỉ ${card.script.vi.length}/${card.script.en.length} câu — kiểm transcript khớp file`);
       }
       if (card.type === 'aspects') {
         const ids = card.aspects.map((a) => a.id);
         if (new Set(ids).size !== ids.length) err(tag, 'aspects.id trùng');
+        const titles = card.aspects.map((a) => a.title.vi);
+        if (new Set(titles).size !== titles.length) err(tag, 'aspect.title trùng trong cùng điểm — tab nhầm chủ đề');
         for (const a of card.aspects) {
           // video gắn riêng vào một tab aspect — cũng kiểm tồn tại/dung lượng
           for (const vref of [a.video, a.videoEn]) {
@@ -114,6 +120,17 @@ for (const f of files) {
             hasVideoSrc = true;
             if (vref.poster) assets.add(vref.poster);
             if (!vref.src.startsWith('https://')) videos.add(vref.src);
+            // Ngữ nghĩa: tiêu đề video nên ăn theo chủ đề tab chứa nó.
+            // (Lỗi từng có: tab "Lịch sử" phát video "Các danh nhân".)
+            if (vref.title) {
+              const tabTokens = a.title.vi
+                .toLowerCase()
+                .split(/[\s–—·,.:;()]+/)
+                .filter((w) => w.length >= 3);
+              const vt = vref.title.vi.toLowerCase();
+              if (tabTokens.length && !tabTokens.some((w) => vt.includes(w)))
+                warn(tag, `video "${vref.title.vi}" lệch chủ đề với tab "${a.title.vi}" — kiểm nhầm tab`);
+            }
           }
         }
       }

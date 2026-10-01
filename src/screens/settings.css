@@ -1,5 +1,13 @@
 /* Cài đặt nhóm theo nhu cầu + các màn phụ (Trợ giúp / Về / Nguồn). */
 
+/* Màn rộng: 3 thẻ xếp 2 cột — tránh cột đơn hẹp để lại khoảng trống lớn (thưa). */
+@media (min-width: 960px) {
+  .setgrid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
 /* Hàng nhãn–điều khiển trong thẻ cài đặt */
 .setrow {
   display: flex;

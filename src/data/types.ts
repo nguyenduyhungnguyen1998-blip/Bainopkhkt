@@ -126,6 +126,16 @@ export interface SiteMap {
   decor?: SiteMapDecor[];
 }
 
+export interface ExploreEntry {
+  id: string;
+  title: Localized;
+  body: Localized;
+  /** Điểm QR tương ứng để nhảy tới — mục chỉ-tham-khảo (vd Hồ Văn) không có. */
+  spotId?: string;
+  /** Tab aspect trong điểm đó muốn mở sẵn (route `?a=`). */
+  aspect?: string;
+}
+
 export interface Site {
   schemaVersion: 1;
   entityId: string;
@@ -149,6 +159,9 @@ export interface Site {
     tickets?: Localized;
   };
   summary: Localized;
+  /** Mục lục nội dung cấp khu (F): tách "Khu vực" (địa điểm) khỏi "Danh nhân" (con người).
+      Mỗi mục là một khối Đọc/Nghe cùng một nội dung; spotId+aspect nhảy tới điểm QR tương ứng. */
+  explore?: { khuVuc: ExploreEntry[]; danhNhan: ExploreEntry[] };
   gamificationConfig: {
     badge: { id: string; name: Localized; icon: string };
     completionBonusXp: number;

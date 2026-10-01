@@ -82,14 +82,28 @@ self.addEventListener('fetch', (e) => {
 
   // Asset cùng origin trong precache: cache-first (đổi VERSION khi build mới → cache mới).
   if (url.origin === location.origin) {
+    const mediaLike = /\.(mp4|m4a|mp3|webm|wav)(\?|$)/i.test(url.pathname);
     e.respondWith(
       caches.match(req, { ignoreSearch: url.pathname === OFFLINE_URL }).then(
         (hit) =>
           hit ||
           fetch(req).then((res) => {
-            if (res.ok) {
+            if (res.status === 200) {
               const copy = res.clone();
-              caches.open(RUNTIME).then((c) => c.put(req, copy));
+              caches.open(RUNTIME).then((c) => c.put(req, copy).catch(() => {}));
+            } else if (res.status === 206 && mediaLike) {
+              // <audio>/<video> gửi Range → 206 không cache.put được (spec cấm).
+              // Clip nhỏ (<15MB): kéo bản đầy đủ nền để offline xem lại được.
+              const total = Number((res.headers.get('Content-Range') || '').split('/')[1]) || 0;
+              if (total > 0 && total <= 15 * 1024 * 1024) {
+                e.waitUntil(
+                  fetch(new Request(url.href))
+                    .then((full) => {
+                      if (full.status === 200) return caches.open(RUNTIME).then((c) => c.put(new Request(url.href), full));
+                    })
+                    .catch(() => {})
+                );
+              }
             }
             return res;
           })
@@ -102,9 +116,9 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(req)
       .then((res) => {
-        if (res.ok || res.type === 'opaque') {
+        if (res.status === 200 || res.type === 'opaque') {
           const copy = res.clone();
-          caches.open(RUNTIME).then((c) => c.put(req, copy));
+          caches.open(RUNTIME).then((c) => c.put(req, copy).catch(() => {}));
         }
         return res;
       })

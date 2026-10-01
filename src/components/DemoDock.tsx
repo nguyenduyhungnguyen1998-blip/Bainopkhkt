@@ -23,11 +23,13 @@ import {
   relockAll,
   relockSpot,
   resetProgress,
+  revokeAchievement,
   revokeBadge,
   siteUnlockedCount,
   unlockSpot,
   useProgress,
 } from '../lib/progress';
+import { ConfirmSheet, useConfirm } from './ConfirmSheet';
 import { routeHref, useRoute } from '../lib/router';
 import { Icon } from './Icon';
 import './demodock.css';
@@ -82,10 +84,10 @@ const clampPos = (p: Pos): Pos => ({
   y: Math.min(Math.max(6, p.y), Math.max(6, window.innerHeight - FAB - 6)),
 });
 
-/** Vị trí mặc định (góc phải, ngay trên dock). */
+/** Vị trí mặc định (góc phải, ngay trên counter/legend của bản đồ). */
 const defaultPos = (): Pos => ({
   x: Math.max(6, window.innerWidth - 12 - FAB),
-  y: Math.max(6, window.innerHeight - 90 - FAB),
+  y: Math.max(6, window.innerHeight - 160 - FAB),
 });
 
 export function DemoDock() {
@@ -98,6 +100,8 @@ export function DemoDock() {
   const [theme, setTheme] = useTheme();
   const route = useRoute();
   const p = useProgress();
+  const { ask, setAsk } = useConfirm();
+  const [ctxFold, setCtxFold] = useState(false);
   const drag = useRef<{ sx: number; sy: number; ox: number; oy: number; moved: boolean } | null>(null);
 
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
@@ -328,7 +332,16 @@ export function DemoDock() {
           </div>
 
           {ctx && (
-            <div class="dd__ctx">
+            <div class={`dd__ctx ${ctxFold ? 'dd__ctx--fold' : ''}`}>
+              <button
+                class="dd__fold"
+                aria-expanded={!ctxFold}
+                aria-label="Ngữ cảnh màn hình"
+                title={ctxFold ? 'Mở ngữ cảnh' : 'Gập ngữ cảnh'}
+                onClick={() => setCtxFold((v) => !v)}
+              >
+                {ctxFold ? '▸' : '▾'}
+              </button>
               {ctx.kind === 'spot' && (
                 <>
                   <div class="dd__ctxtop">
@@ -450,9 +463,15 @@ export function DemoDock() {
                   </button>
                   <button
                     class="dd__btn"
-                    onClick={() => {
-                      if (confirm('Gỡ dấu mọi điểm? (giữ XP/huy hiệu/quiz)')) relockAll();
-                    }}
+                    onClick={() =>
+                      setAsk({
+                        title: 'Gỡ dấu mọi điểm?',
+                        body: 'XP của từng dấu bị trừ lại; giữ huy hiệu và điểm quiz.',
+                        ok: 'Gỡ hết',
+                        danger: true,
+                        act: relockAll,
+                      })
+                    }
                   >
                     Gỡ hết dấu
                   </button>
@@ -503,9 +522,15 @@ export function DemoDock() {
                   </button>
                   <button
                     class="dd__btn"
-                    onClick={() => {
-                      if (confirm('Xóa mọi điểm quiz? (giữ dấu + XP)')) clearQuizResults();
-                    }}
+                    onClick={() =>
+                      setAsk({
+                        title: 'Xóa mọi điểm quiz?',
+                        body: 'Giữ dấu và XP đã nhận.',
+                        ok: 'Xóa quiz',
+                        danger: true,
+                        act: clearQuizResults,
+                      })
+                    }
                   >
                     Xóa quiz
                   </button>
@@ -582,9 +607,13 @@ export function DemoDock() {
                       {a.unlocked ? '●' : '○'} {t(a.name, lang)}
                     </span>
                     <span class="dd__achneed">{t(a.need, lang)}</span>
-                    {!a.unlocked && (
+                    {!a.unlocked ? (
                       <button class="dd__mini dd__mini--on" onClick={() => earnAchievement(a.id)}>
                         Đạt luôn
+                      </button>
+                    ) : (
+                      <button class="dd__mini" title="Gỡ trạng thái tạo ra danh hiệu — diễn lại khoảnh khắc phong" onClick={() => revokeAchievement(a.id)}>
+                        Thu hồi
                       </button>
                     )}
                   </div>
@@ -669,9 +698,15 @@ export function DemoDock() {
                 <div class="dd__row">
                   <button
                     class="dd__btn dd__btn--warn"
-                    onClick={() => {
-                      if (confirm('Xóa TOÀN BỘ tiến độ (dấu + quiz + XP + huy hiệu)?')) resetProgress();
-                    }}
+                    onClick={() =>
+                      setAsk({
+                        title: 'Xóa TOÀN BỘ tiến độ?',
+                        body: 'Dấu + quiz + XP + huy hiệu sẽ về 0 — không hoàn lại được.',
+                        ok: 'Xóa hết',
+                        danger: true,
+                        act: resetProgress,
+                      })
+                    }
                   >
                     Reset hành trình
                   </button>
@@ -685,12 +720,17 @@ export function DemoDock() {
       <button
         class={`demodock__fab ${drag.current?.moved ? 'demodock__fab--drag' : ''}`}
         aria-expanded={open}
-        aria-label="Bảng điều khiển demo (chạm: mở, giữ & kéo: di chuyển)"
+        aria-label="Bảng điều khiển demo (chạm: mở, giữ & kéo: di chuyển; Enter/Space: mở)"
         title="Bảng điều khiển demo · giữ & kéo để di chuyển"
         onPointerDown={(e) => startDrag(e, () => setOpen((v) => !v))}
+        onClick={(e) => {
+          // detail===0 = click từ bàn phím (Enter/Space) — pointer tap đã qua startDrag.
+          if (e.detail === 0) setOpen((v) => !v);
+        }}
       >
         <Icon name="spark" size={18} />
       </button>
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </div>
   );
 }

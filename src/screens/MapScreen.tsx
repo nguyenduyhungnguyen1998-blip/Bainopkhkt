@@ -513,9 +513,9 @@ export function MapScreen() {
           />
         )}
         <div class="mscreen__legend" aria-hidden="true">
-          <span class="lg lg--done" /> {t(UI.unlocked, lang)}
-          <span class="lg lg--next" /> {t(UI.next, lang)}
-          <span class="lg lg--locked" /> {t(UI.locked, lang)}
+          <span class="mscreen__lgitem"><span class="lg lg--done" /> {t(UI.unlocked, lang)}</span>
+          <span class="mscreen__lgitem"><span class="lg lg--next" /> {t(UI.next, lang)}</span>
+          <span class="mscreen__lgitem"><span class="lg lg--locked" /> {t(UI.locked, lang)}</span>
         </div>
         <div class="mscreen__counter">
           {levelSite ? `${siteUnlockedCount(levelSite)}/${levelSite.spots.length}` : `${unlockedSpots}/${totalSpots}`} {t(UI.spots, lang)}

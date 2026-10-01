@@ -1,5 +1,5 @@
 /** Hộ chiếu, Thử tài, Cài đặt – P3: quiz engine + xuất/nhập hộ chiếu. */
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
@@ -13,6 +13,7 @@ import { Icon } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
 import { PASSPORT_TOUR_STEPS, QUIZ_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import { navigate, routeHref } from '../lib/router';
+import { ConfirmSheet, useConfirm } from '../components/ConfirmSheet';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
 
@@ -380,12 +381,28 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
   const [done, setDone] = useState(false);
   const [gained, setGained] = useState<number | null>(null);
   const best = quizBest(site.entityId, spot.spotId);
+  // Đáp án luôn cùng vị trí -> khách học thuộc thứ tự chứ không học nội dung.
+  // Xáo trộn thứ tự HIỂN THỊ mỗi lượt chơi; đối chiếu qua orders[idx][displayIdx].
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+  const orders = useMemo(
+    () =>
+      quiz.map((qq) => {
+        const ord = qq.options.map((_, i) => i);
+        for (let i = ord.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [ord[i], ord[j]] = [ord[j], ord[i]];
+        }
+        return ord;
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [quiz, shuffleSeed]
+  );
 
   const pick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    if (i === quiz[idx].answer) setCorrect((c) => c + 1);
-    if (navigator.vibrate) navigator.vibrate(i === quiz[idx].answer ? 20 : [60, 40, 60]);
+    if (orders[idx][i] === quiz[idx].answer) setCorrect((c) => c + 1);
+    if (navigator.vibrate) navigator.vibrate(orders[idx][i] === quiz[idx].answer ? 20 : [60, 40, 60]);
   };
   const locked = !isSpotUnlocked(site.entityId, spot.spotId);
   const nextQ = () => {
@@ -427,7 +444,7 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
             <p class="mdv-muted">{best !== undefined && `${t(UI.bestScore, lang)}: ${best}/${quiz.length}`}</p>
           )}
           <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            <button class="mdv-btn mdv-btn--ghost" onClick={() => (setIdx(0), setPicked(null), setCorrect(0), setDone(false), setGained(null))}>
+            <button class="mdv-btn mdv-btn--ghost" onClick={() => (setIdx(0), setPicked(null), setCorrect(0), setDone(false), setGained(null), setShuffleSeed((s) => s + 1))}>
               {t(UI.quizAgain, lang)}
             </button>
             <button class="mdv-btn mdv-btn--primary" onClick={onExit}>
@@ -473,17 +490,20 @@ function QuizRun({ site, spot, lang, onExit }: { site: Site; spot: Spot; lang: L
         </div>
         <p class="quiz__q">{t(q.q, lang)}</p>
         <div class="quiz__opts">
-          {q.options.map((o, i) => {
-            const cls = picked === null ? '' : i === q.answer ? 'is-correct' : i === picked ? 'is-wrong' : 'is-dim';
+          {orders[idx].map((optIdx, dispIdx) => {
+            const o = q.options[optIdx];
+            const cls = picked === null ? '' : optIdx === q.answer ? 'is-correct' : dispIdx === picked ? 'is-wrong' : 'is-dim';
             return (
-              <button key={i} class={`quiz__opt ${cls}`} onClick={() => pick(i)} disabled={picked !== null}>
+              <button key={optIdx} class={`quiz__opt ${cls}`} onClick={() => pick(dispIdx)} disabled={picked !== null}>
                 {t(o, lang)}
               </button>
             );
           })}
         </div>
         {picked !== null && (
-          <div class={`quiz__mark ${picked === q.answer ? 'ok' : 'bad'}`}>{t(picked === q.answer ? UI.correctMark : UI.wrongMark, lang)}</div>
+          <div class={`quiz__mark ${orders[idx][picked] === q.answer ? 'ok' : 'bad'}`}>
+            {t(orders[idx][picked] === q.answer ? UI.correctMark : UI.wrongMark, lang)}
+          </div>
         )}
         {picked !== null && q.explain && (
           <p class="quiz__explain">
@@ -583,6 +603,7 @@ export function SettingsScreen() {
   const [theme, setTheme] = useTheme();
   const [fontPct, setFontPct] = useFontScale();
   const [flatPct, setFlatPct] = useAmbientFlat();
+  const { ask, setAsk } = useConfirm();
   return (
     <main class="mdv-screen">
       <header class="mdv-screen__header">
@@ -591,7 +612,7 @@ export function SettingsScreen() {
           <h1>{t(UI.settings, lang)}</h1>
         </div>
       </header>
-      <div style="display:grid;gap:var(--space-3)">
+      <div class="setgrid" style="display:grid;gap:var(--space-3)">
         <section class="mdv-card">
           <h2 style="font-size:var(--text-md);margin:0 0 12px">{t(UI.groupDisplay, lang)}</h2>
           <div class="setrow">
@@ -652,9 +673,14 @@ export function SettingsScreen() {
             <span class="setrow__lbl">{lang === 'vi' ? 'Đặt lại' : 'Reset'}</span>
             <button
               class="mdv-btn mdv-btn--ghost"
-              onClick={() => {
-                if (confirm(lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?')) resetProgress();
-              }}
+              onClick={() =>
+                setAsk({
+                  title: lang === 'vi' ? 'Xóa toàn bộ tiến độ hành trình?' : 'Reset all journey progress?',
+                  ok: lang === 'vi' ? 'Đặt lại' : 'Reset',
+                  danger: true,
+                  act: resetProgress,
+                })
+              }
             >
               {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
             </button>
@@ -678,6 +704,7 @@ export function SettingsScreen() {
         </section>
         <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
       </div>
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </main>
   );
 }
@@ -985,6 +1012,8 @@ export function SourcesScreen() {
  */
 export function AdminScreen() {
   const p = useProgress();
+  const [lang] = useLang();
+  const { ask, setAsk } = useConfirm();
   const [, forceTick] = useState(0); // re-render sau thao tác cục bộ (finale flags)
   // Mở trang admin = có ý định demo -> bật luôn nút điều khiển nổi (DemoDock).
   useEffect(() => enableDemoDock(), []);
@@ -1092,14 +1121,20 @@ export function AdminScreen() {
           </a>
           <button
             class="mdv-btn mdv-btn--ghost"
-            onClick={() => {
-              if (confirm('Xóa toàn bộ tiến độ hành trình?')) resetProgress();
-            }}
+            onClick={() =>
+              setAsk({
+                title: 'Xóa toàn bộ tiến độ hành trình?',
+                ok: 'Xóa hết',
+                danger: true,
+                act: resetProgress,
+              })
+            }
           >
             Reset hành trình
           </button>
         </div>
       </section>
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </main>
   );
 }

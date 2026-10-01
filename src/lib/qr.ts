@@ -109,3 +109,27 @@ export async function verifySignature(siteId: string, spotId: string, sig: strin
   if ((await signSpot(siteId, spotId, qrId)) === s) return true;
   return qrId != null && (await signSpot(siteId, spotId)) === s;
 }
+
+type QrSpotIndex = { entityId: string; spotId: string; qrId?: string };
+
+/**
+ * URL tem QR không-fragment (camera/scanner có thể cắt phần sau '#') → hash route đích.
+ * Hai dạng tem in: `?q=<nn>.<sig>` (qrId mdvqNN, tem mới) và `?d=<site>/<spot>&s=<sig>` (tem cũ).
+ * Trả về đoạn `#/d/...` để location.replace, hoặc null nếu URL không phải tem QR.
+ */
+export function resolveQrRedirect(search: string, spots: readonly QrSpotIndex[]): string | null {
+  const q = new URLSearchParams(search);
+  const compact = q.get('q')?.match(/^(\d+)\.([0-9a-f]{16})$/i);
+  if (compact) {
+    const qrId = `mdvq${compact[1].padStart(2, '0')}`;
+    const found = spots.find((sp) => sp.qrId === qrId);
+    if (found) return `#/d/${found.entityId}/${found.spotId}?s=${compact[2].toLowerCase()}`;
+    return null;
+  }
+  const dParam = q.get('d');
+  if (dParam && /^[\w-]+\/[\w-]+$/.test(dParam)) {
+    const sParam = q.get('s');
+    return `#/d/${dParam}${sParam ? `?s=${encodeURIComponent(sParam)}` : ''}`;
+  }
+  return null;
+}

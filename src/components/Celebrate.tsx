@@ -93,17 +93,35 @@ export function Celebrate() {
   const badgeTimer = useRef(0);
   const finaleCardRef = useRef<HTMLDivElement>(null);
   const siteCardRef = useRef<HTMLDivElement>(null);
+  // Banner danh hiệu: hàng đợi xếp lần lượt + chống trùng cùng id trong 4s (huy hiệu khu
+  // vừa nhận qua mdv:unlock.newBadge cũng đi qua đây, event mdv:achievement sau sẽ bị lọc).
+  const bannerQueue = useRef<{ id: string; name: { vi: string; en: string } }[]>([]);
+  const bannerSeen = useRef(new Map<string, number>());
 
   useEffect(() => {
+    const pump = () => {
+      if (badgeTimer.current) return;
+      const it = bannerQueue.current.shift();
+      if (!it) return;
+      setBadge({ name: t(it.name), seq: Date.now() });
+      badgeTimer.current = window.setTimeout(() => {
+        setBadge(null);
+        badgeTimer.current = 0;
+        pump();
+      }, 3600);
+    };
+    const showBanner = (id: string, name: { vi: string; en: string }) => {
+      const now = Date.now();
+      if ((bannerSeen.current.get(id) ?? 0) + 4000 > now) return;
+      bannerSeen.current.set(id, now);
+      bannerQueue.current.push({ id, name });
+      pump();
+    };
     const onUnlock = (e: Event) => {
       const d = (e as CustomEvent<UnlockResult & { siteId?: string; spotId?: string }>).detail;
       if (d.gainedXp <= 0) return;
       if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setBurst(Date.now());
-      if (d.newBadge) {
-        setBadge({ name: t(d.newBadge.name), seq: Date.now() });
-        clearTimeout(badgeTimer.current);
-        badgeTimer.current = window.setTimeout(() => setBadge(null), 3600);
-      }
+      if (d.newBadge) showBanner(d.newBadge.id, d.newBadge.name);
       if (Object.keys(getProgress().unlocked).length >= TOTAL_SPOTS && !finaleSeen()) {
         markFinaleSeen();
         setFinale(true);
@@ -114,8 +132,18 @@ export function Celebrate() {
         if (s) setSiteFin(s);
       }
     };
+    // Danh hiệu hành trình (quiz/XP/dấu) đạt qua mọi đường — confetti + banner tên danh hiệu.
+    const onAchievement = (e: Event) => {
+      const d = (e as CustomEvent<{ id: string; name: { vi: string; en: string } }>).detail;
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setBurst(Date.now());
+      showBanner(d.id, d.name);
+    };
     window.addEventListener('mdv:unlock', onUnlock);
-    return () => window.removeEventListener('mdv:unlock', onUnlock);
+    window.addEventListener('mdv:achievement', onAchievement);
+    return () => {
+      window.removeEventListener('mdv:unlock', onUnlock);
+      window.removeEventListener('mdv:achievement', onAchievement);
+    };
   }, []);
 
   // Confetti tự gỡ sau khi mảnh cuối rơi xong.

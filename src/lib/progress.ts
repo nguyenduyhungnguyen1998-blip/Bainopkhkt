@@ -134,17 +134,31 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
     gained += site.gamificationConfig.completionBonusXp;
     newBadge = site.gamificationConfig.badge;
   }
+  const before = state;
   commit({ ...state, unlocked, xp: state.xp + gained, badges });
   const result: UnlockResult = { alreadyUnlocked: false, gainedXp: gained, newBadge, siteCompleted: completed };
   // Chuỗi ăn mừng (sóng lan, vẽ đường, toast) lắng nghe sự kiện này — phát ra dù mở từ QR, HUD hay demo.
   window.dispatchEvent(new CustomEvent<UnlockResult & { siteId: string; spotId: string }>('mdv:unlock', { detail: { ...result, siteId, spotId } }));
+  announceNewAchievements(before);
   return result;
+}
+
+/** Danh hiệu là hàm của trạng thái — mọi đường mutation đều phải bắn sự kiện khi một danh hiệu lật khóa→mở. */
+function announceNewAchievements(before: Progress): void {
+  const had = new Set(computeAchievements(before).filter((a) => a.unlocked).map((a) => a.id));
+  for (const a of computeAchievements()) {
+    if (a.unlocked && !had.has(a.id)) {
+      window.dispatchEvent(new CustomEvent('mdv:achievement', { detail: { id: a.id, name: a.name, icon: a.icon } }));
+    }
+  }
 }
 
 /** Công cụ demo (#/admin): cộng XP trực tiếp để dựng kịch bản trình diễn. */
 export function grantXp(amount: number): void {
   if (!Number.isFinite(amount) || amount === 0) return;
+  const before = state;
   commit({ ...state, xp: Math.max(0, state.xp + amount) });
+  announceNewAchievements(before);
 }
 
 /**
@@ -182,6 +196,21 @@ export function revokeBadge(badgeId: string, refundXp = 0): void {
   commit({ ...state, badges: state.badges.filter((b) => b !== badgeId), xp: Math.max(0, state.xp - refundXp) });
 }
 
+/**
+ * Công cụ demo: thu hồi một danh hiệu — gỡ trạng thái tạo ra nó để diễn lại khoảnh khắc phong.
+ * Danh hiệu hành trình không lưu riêng: quiz-driven (Sĩ tử/Trạng nguyên/Học giả) → xóa điểm quiz;
+ * còn lại (dấu/khu) → gỡ hết dấu. Huy hiệu khu → revokeBadge.
+ */
+export function revokeAchievement(id: string): void {
+  const siteBadge = SITES.find((s) => s.gamificationConfig.badge.id === id);
+  if (siteBadge) {
+    revokeBadge(id, siteBadge.gamificationConfig.completionBonusXp);
+    return;
+  }
+  if (id === 'si-tu' || id === 'trang-nguyen' || id === 'hoc-gia') clearQuizResults();
+  else relockAll();
+}
+
 export const QUIZ_XP_PER_CORRECT = 5;
 
 /**
@@ -193,7 +222,9 @@ export function recordQuizResult(siteId: string, spotId: string, correct: number
   const prev = state.quizDone[key] ?? 0;
   const gained = Math.max(0, correct - Math.min(prev, total)) * QUIZ_XP_PER_CORRECT;
   const quizDone = correct > prev ? { ...state.quizDone, [key]: correct } : state.quizDone;
+  const before = state;
   commit({ ...state, quizDone, xp: state.xp + gained });
+  announceNewAchievements(before);
   return gained;
 }
 
@@ -457,7 +488,8 @@ export function computeAchievements(p: Progress = state): Achievement[] {
       vi: `Đủ ${s.spots.length} dấu tại ${s.name.vi}`,
       en: `All ${s.spots.length} stamps at ${s.name.en}`,
     },
-    unlocked: p.badges.includes(s.gamificationConfig.badge.id) || siteUnlockedCount(s, p) === s.spots.length,
+    // Chỉ tính huy hiệu đang "giữ" trong badges — đủ điểm nhưng bị tước (revokeBadge) thì hiện lại khóa.
+    unlocked: p.badges.includes(s.gamificationConfig.badge.id),
   }));
   return [...journey, ...siteBadges];
 }

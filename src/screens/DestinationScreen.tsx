@@ -4,7 +4,7 @@
  */
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { getSpot, getSite } from '../data/content';
-import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard } from '../data/types';
+import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard, ExploreEntry } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { asset } from '../lib/asset';
@@ -475,8 +475,83 @@ function SiteIntro({ site }: { site: Site }) {
         <button class="mdv-btn mdv-btn--primary dintro__cta" onClick={() => first && navigate(`d/${site.entityId}/${first.spotId}`)}>
           {t(UI.startExploring, lang)}
         </button>
+
+        {site.explore && <ExploreDirectory site={site} lang={lang} />}
       </div>
     </main>
+  );
+}
+
+/**
+ * Mục lục nội dung cấp khu (F): "Khu vực" (địa điểm, 8 mục gồm Hồ Văn tham khảo) tách
+ * khỏi "Danh nhân" (con người). Mỗi mục là một khối Đọc (body luôn hiển thị) + Nghe
+ * (TTS đọc chính body đó — cùng nội dung, hai chế độ tiêu thụ, không nhân đôi bản) +
+ * link tới điểm QR tương ứng nếu có tem.
+ */
+function ExploreDirectory({ site, lang }: { site: Site; lang: Lang }) {
+  const ex = site.explore!;
+  const playerRef = useRef<SpeechPlayer | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  useEffect(() => () => playerRef.current?.stop(), []);
+
+  const listen = (id: string, text: string) => {
+    if (!speechSupported()) return;
+    if (!playerRef.current) playerRef.current = new SpeechPlayer();
+    const p = playerRef.current;
+    if (playingId === id) {
+      p.stop();
+      return;
+    }
+    p.play([text], lang, {
+      onStatus: (s) => {
+        if (s !== 'playing' && s !== 'paused') setPlayingId(null);
+      },
+    });
+    setPlayingId(id);
+  };
+
+  const renderGroup = (title: string, list: ExploreEntry[]) => (
+    <section class="xplr" aria-label={title}>
+      <h2 class="xplr__h">{title}</h2>
+      <div class="xplr__list">
+        {list.map((e) => (
+          <article key={e.id} class="xplr__item">
+            <h3 class="xplr__t">{t(e.title, lang)}</h3>
+            <p class="xplr__b">{t(e.body, lang)}</p>
+            <div class="xplr__acts">
+              {speechSupported() && (
+                <button
+                  type="button"
+                  class="mdv-chip"
+                  aria-pressed={playingId === e.id}
+                  onClick={() => listen(e.id, t(e.body, lang))}
+                >
+                  <Icon name={playingId === e.id ? 'pause' : 'play'} size={14} />
+                  {playingId === e.id ? t(UI.pause, lang) : t(UI.play, lang)}
+                </button>
+              )}
+              {e.spotId ? (
+                <a
+                  class="xplr__go"
+                  href={`${routeHref.destination(site.entityId, e.spotId)}${e.aspect ? `?a=${e.aspect}` : ''}`}
+                >
+                  {t(UI.exploreGoSpot, lang)} <Icon name="forward" size={13} />
+                </a>
+              ) : (
+                <span class="xplr__ref">{t(UI.exploreRefOnly, lang)}</span>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+
+  return (
+    <>
+      {renderGroup(t(UI.exploreKhuVuc, lang), ex.khuVuc)}
+      {renderGroup(t(UI.exploreDanhNhan, lang), ex.danhNhan)}
+    </>
   );
 }
 

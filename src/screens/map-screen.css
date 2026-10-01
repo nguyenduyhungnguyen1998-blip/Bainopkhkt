@@ -22,6 +22,14 @@
   line-height: 1.15;
   margin: 2px 0 0;
 }
+.mscreen__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.mscreen__brand svg {
+  flex: none;
+}
 .mscreen__xp {
   display: inline-flex;
   align-items: center;

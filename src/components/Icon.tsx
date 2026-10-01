@@ -62,3 +62,16 @@ export function Icon({ name, size = 24, class: cls }: { name: string; size?: num
     </svg>
   );
 }
+
+/** Cờ Việt Nam (đỏ + sao vàng) — icon fill riêng, không theo bộ icon stroke. */
+export function FlagVN({ size = 18, class: cls }: { size?: number; class?: string }) {
+  return (
+    <svg class={cls} width={size} height={size * (20 / 30)} viewBox="0 0 30 20" role="img" aria-label="Cờ Việt Nam">
+      <rect width="30" height="20" rx="2" fill="#DA251D" />
+      <path
+        d="M15 4.5l1.35 3.64 3.88.16-3.04 2.41 1.04 3.74L15 12.3l-3.23 2.15 1.04-3.74-3.04-2.41 3.88-.16z"
+        fill="#FFCD00"
+      />
+    </svg>
+  );
+}

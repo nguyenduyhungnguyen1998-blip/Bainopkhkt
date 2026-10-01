@@ -9,7 +9,7 @@ import { asset } from '../lib/asset';
 import './passport.css';
 import { useAmbientFlat, useFontScale, useTheme, FLAT_PCT_MAX, FONT_PCT_MAX, FONT_PCT_MIN } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
-import { Icon } from '../components/Icon';
+import { Icon, FlagVN } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
 import { PASSPORT_TOUR_STEPS, QUIZ_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import { navigate, routeHref } from '../lib/router';
@@ -182,12 +182,12 @@ function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; tot
   const [copied, setCopied] = useState(false);
   const text =
     lang === 'vi'
-      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Mở Dấu Việt`
-      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in Mo Dau Viet`;
+      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Du lịch Việt Nam`
+      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in Travel in Vietnam`;
   const share = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Mở Dấu Việt', text });
+        await navigator.share({ title: lang === 'vi' ? 'Du lịch Việt Nam' : 'Travel in Vietnam', text });
         return;
       }
     } catch {
@@ -702,7 +702,9 @@ export function SettingsScreen() {
             <Icon name="forward" size={14} />
           </a>
         </section>
-        <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
+        <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
+          {t(UI.appName, lang)} v{__APP_VERSION__}
+        </p>
       </div>
       <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
     </main>
@@ -818,7 +820,9 @@ export function AboutScreen() {
       <header class="mdv-screen__header">
         <div>
           <span class="mdv-eyebrow">{t(UI.about, lang)}</span>
-          <h1>Mở Dấu Việt</h1>
+          <h1 style="display:flex;align-items:center;gap:10px">
+            <FlagVN size={26} /> {t(UI.appName, lang)}
+          </h1>
         </div>
         <a class="mdv-btn mdv-btn--icon" href={routeHref.settings} aria-label={t(UI.back, lang)}>
           <Icon name="back" />
@@ -867,10 +871,13 @@ export function AboutScreen() {
           <Icon name="share" size={16} /> github.com/nguyenduyhungnguyen1998-blip/Bainopkhkt
         </a>
         <p class="mdv-muted" style="font-size:var(--text-xs);margin:8px 0 0">
-          {vi ? 'Cập nhật tháng 9/2026 · ' : 'Updated September 2026 · '}Mở Dấu Việt v{__APP_VERSION__}
+          {vi ? 'Cập nhật tháng 9/2026 · ' : 'Updated September 2026 · '}
+          {t(UI.appName, lang)} v{__APP_VERSION__}
         </p>
       </section>
-      <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">Mở Dấu Việt v{__APP_VERSION__}</p>
+      <p class="mdv-muted" style="font-size:var(--text-xs);text-align:center">
+        {t(UI.appName, lang)} v{__APP_VERSION__}
+      </p>
     </main>
   );
 }

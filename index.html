@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#07111F" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)" />
-    <meta name="description" content="Mở Dấu Việt – hành trình di sản qua mã QR, không cần cài ứng dụng." />
+    <meta name="description" content="Du lịch Việt Nam – Travel in Vietnam: hành trình di sản qua mã QR, không cần cài ứng dụng." />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" type="image/png" href="img/icon-192.png" />
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="Mở Dấu Việt" />
+    <meta name="apple-mobile-web-app-title" content="Du lịch Việt Nam" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>Mở Dấu Việt</title>
+    <title>Du lịch Việt Nam — Travel in Vietnam</title>
     <style>
       /* Splash boot: hiện ngay từ first paint, Preact render sẽ thay thế. */
       #splash {
@@ -33,6 +33,10 @@
       #splash .brand {
         text-align: center;
         letter-spacing: 0.04em;
+      }
+      #splash .brand .flag {
+        display: block;
+        margin: 0 auto 12px;
       }
       #splash .brand h1 {
         font-size: 26px;
@@ -158,8 +162,14 @@
     <div id="app">
       <div id="splash" aria-hidden="true">
         <div class="brand">
-          <div class="dot"></div>
-          <h1>Mở Dấu Việt</h1>
+          <svg class="flag" viewBox="0 0 30 20" width="30" height="20" aria-hidden="true">
+            <rect width="30" height="20" rx="2" fill="#DA251D" />
+            <path
+              d="M15 4.5l1.35 3.64 3.88.16-3.04 2.41 1.04 3.74L15 12.3l-3.23 2.15 1.04-3.74-3.04-2.41 3.88-.16z"
+              fill="#FFCD00"
+            />
+          </svg>
+          <h1>Du lịch Việt Nam</h1>
           <p>Hành trình di sản qua mã QR</p>
           <div class="track">
             <span class="fill"></span>

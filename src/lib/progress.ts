@@ -311,7 +311,7 @@ export function exportPassportCardHtml(): string {
   const payload = exportPassportJson().replace(/</g, '\\u003c');
   return `<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hộ chiếu Mở Dấu Việt</title><style>
+<title>Hộ chiếu Du lịch Việt Nam</title><style>
 *{box-sizing:border-box;margin:0}body{font-family:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;background:#f4f1ea;color:#2a2019;padding:24px;display:flex;justify-content:center}
 .card{max-width:520px;width:100%;background:#fffdf8;border-radius:22px;padding:30px 26px;box-shadow:0 12px 40px rgb(60 40 10 / .14);border:1.5px solid #e5d9bf}
 .brand{text-align:center;letter-spacing:.24em;font-size:12px;font-weight:700;color:#b23a2e}
@@ -337,7 +337,7 @@ ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
 .foot b{color:#b23a2e}
 @media print{body{padding:0}.card{box-shadow:none}}
 </style></head><body><div class="card">
-<div class="brand">MỞ DẤU VIỆT</div>
+<div class="brand">DU LỊCH VIỆT NAM</div>
 <h1>Hộ chiếu hành trình</h1>
 <p class="sub">Heritage Journey Passport — ${dateVi}</p>
 <div class="stats">
@@ -346,7 +346,7 @@ ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
   <div class="xp"><b>${state.xp}</b><div class="lbl">XP</div></div>
 </div>
 <ul>${siteRows}</ul>
-<p class="foot">Để chuyển tiến độ sang thiết bị khác: mở app <b>Mở Dấu Việt</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
+<p class="foot">Để chuyển tiến độ sang thiết bị khác: mở app <b>Du lịch Việt Nam</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
 </div>
 <script type="application/json" id="mdv-backup">${payload}</script>
 </body></html>`;

@@ -49,6 +49,7 @@ export function t(text: Localized | undefined, lang: Lang = current): string {
 
 /** Chuỗi giao diện (UI strings) – tách khỏi nội dung di sản. */
 export const UI = {
+  appName: { vi: 'Du lịch Việt Nam', en: 'Travel in Vietnam' },
   map: { vi: 'Bản đồ', en: 'Map' },
   passport: { vi: 'Hộ chiếu', en: 'Passport' },
   quiz: { vi: 'Thử tài', en: 'Quiz' },
@@ -179,8 +180,8 @@ export const UI = {
   badgeEarned: { vi: 'Huy hiệu mới', en: 'New badge' },
   finaleTitle: { vi: 'Hoàn thành hành trình!', en: 'Journey complete!' },
   finaleBody: {
-    vi: 'Bạn đã mở khóa toàn bộ điểm di sản – hành trình Mở Dấu Việt khép lại trọn vẹn.',
-    en: 'You unlocked every heritage spot – the Mo Dau Viet journey is complete.',
+    vi: 'Bạn đã mở khóa toàn bộ điểm di sản – hành trình Du lịch Việt Nam khép lại trọn vẹn.',
+    en: 'You unlocked every heritage spot – the Travel in Vietnam journey is complete.',
   },
   finalePassport: { vi: 'Xem hộ chiếu đầy đủ', en: 'View full passport' },
   errTitle: { vi: 'Có lỗi nhỏ rồi', en: 'Something went wrong' },
@@ -226,7 +227,7 @@ export const UI = {
     en: 'Journey is stored on this device — use Backup to move phones.',
   },
   help: { vi: 'Trợ giúp', en: 'Help' },
-  about: { vi: 'Về Mở Dấu Việt', en: 'About Mở Dấu Việt' },
+  about: { vi: 'Về Du lịch Việt Nam', en: 'About Travel in Vietnam' },
   sourcesTitle: { vi: 'Nguồn tư liệu & hình ảnh', en: 'Media & content sources' },
   scanOkHint: {
     vi: 'Chọn điều muốn khám phá — mỗi lựa chọn đều nhận dấu luôn',
@@ -238,7 +239,7 @@ export const UI = {
   viewSource: { vi: 'Xem nguồn gốc', en: 'View source' },
   crossChecking: { vi: 'đang đối chiếu', en: 'cross-checking' },
   photoCreditAria: { vi: 'Nguồn ảnh', en: 'Photo credit' },
-  welcomeTitle: { vi: 'Chào mừng đến với Mở Dấu Việt', en: 'Welcome to Mở Dấu Việt' },
+  welcomeTitle: { vi: 'Chào mừng đến với Du lịch Việt Nam', en: 'Welcome to Travel in Vietnam' },
   welcomeAsk: { vi: 'Bạn đã biết cách sử dụng chưa?', en: 'Do you already know your way around?' },
   welcomeYes: { vi: 'Đã biết — vào khám phá ngay', en: 'I do — take me in' },
   welcomeNo: { vi: 'Chưa — xem hướng dẫn', en: 'Not yet — show me around' },

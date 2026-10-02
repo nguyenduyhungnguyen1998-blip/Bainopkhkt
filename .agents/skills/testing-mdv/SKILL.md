@@ -87,3 +87,13 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 
 ## lang toggle in-page
 - `localStorage.mdv.lang`='vi'|'en' — but SPA hash navs don't re-read it; only a full reload applies the change. EN mode swaps clip variants (videoEn → `*-en.mp4`, label "Narrated clip: … · English narration", link "Visit spot: …"). My regex `/Clip|thuyết minh/` misses EN text — check both languages' patterns.
+
+## Storage layout (post progress.ts rewrite, ~head 7e09258)
+- Progress is DUAL-STORED: localStorage `mdv.progress.v1` (authoritative, JSON {unlocked,xp,...}) AND IndexedDB `mdv` `kv` store (same object). Clearing ONE alone is NOT enough — the merge re-hydrates from the other and stamps persist.
+- To reset progress for a clean QR-stamp test: `localStorage.removeItem("mdv.progress.v1")` PLUS clear IDB `mdv`'s `kv` store (`tx([...names],'readwrite').objectStore(n).clear()`), then navigate fresh.
+- XP per stamp is now +30.
+
+## Media stall — distinguish env wedge from app bug
+- Symptom seen: a long-lived CDP page (many reloads/emulation flips/manual media els) can wedge its media pipeline — ALL `<audio>/<video>` stall rs=0 forever while `fetch()` through the SW still works and curl is fine. The app renders its graceful error UI ("Không tải được bản thu" + Thử lại + TTS chip + transcript).
+- Diagnose before reporting a bug: (1) test a fresh `<audio>` element — stalls too = pipeline-level; (2) check CacheStorage entry status for the file; (3) open a NEW page target (/json/new) — if media loads there instantly it's session wedge, not app.
+- The card error UI + Thử lại retry working IS correct degradation behavior.

@@ -987,3 +987,13 @@ a.dest__crumb--link:active {
 
 /* Bản thu theo tab aspect (VD: kiến trúc toàn quần thể EN-only). */
 .dcard__aaudio figcaption{display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* Ảnh của mục explore (trang chi tiết ?e=) — contain như ảnh aspect */
+.xplrd__media .xplrd__img {
+  width: 100%;
+  max-height: 340px;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-md, 12px);
+  background: var(--color-bg-alt, transparent);
+}

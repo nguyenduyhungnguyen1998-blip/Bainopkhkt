@@ -85,9 +85,11 @@
       "properties": {
         "id": { "$ref": "#/definitions/slug" },
         "title": { "$ref": "#/definitions/localized" },
+        "lead": { "$ref": "#/definitions/localized" },
         "body": { "$ref": "#/definitions/localized" },
         "spotId": { "$ref": "#/definitions/slug" },
-        "aspect": { "$ref": "#/definitions/slug" }
+        "aspect": { "$ref": "#/definitions/slug" },
+        "clipAspect": { "$ref": "#/definitions/slug" }
       }
     },
     "localized": {
@@ -208,7 +210,23 @@
             "type": { "const": "hero" },
             "size": { "$ref": "#/definitions/size" },
             "image": { "$ref": "#/definitions/assetPath" },
-            "images": { "type": "array", "items": { "$ref": "#/definitions/assetPath" } },
+            "images": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "$ref": "#/definitions/assetPath" },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["src"],
+                    "properties": {
+                      "src": { "$ref": "#/definitions/assetPath" },
+                      "caption": { "$ref": "#/definitions/localized" }
+                    }
+                  }
+                ]
+              }
+            },
             "caption": { "$ref": "#/definitions/localized" }
           }
         },
@@ -222,7 +240,7 @@
             "aspects": {
               "type": "array",
               "minItems": 1,
-              "maxItems": 5,
+              "maxItems": 8,
               "items": {
                 "type": "object",
                 "additionalProperties": false,
@@ -278,7 +296,8 @@
             },
             "ambient": { "enum": ["wind-water", "temple-bell", "garden"] },
             "src": { "type": "string", "format": "uri-reference" },
-            "srcEn": { "type": "string", "format": "uri-reference" }
+            "srcEn": { "type": "string", "format": "uri-reference" },
+            "label": { "$ref": "#/definitions/localized" }
           }
         },
         {
@@ -300,7 +319,23 @@
             "type": { "const": "image" },
             "size": { "$ref": "#/definitions/size" },
             "image": { "$ref": "#/definitions/assetPath" },
-            "images": { "type": "array", "items": { "$ref": "#/definitions/assetPath" } },
+            "images": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  { "$ref": "#/definitions/assetPath" },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["src"],
+                    "properties": {
+                      "src": { "$ref": "#/definitions/assetPath" },
+                      "caption": { "$ref": "#/definitions/localized" }
+                    }
+                  }
+                ]
+              }
+            },
             "caption": { "$ref": "#/definitions/localized" }
           }
         }

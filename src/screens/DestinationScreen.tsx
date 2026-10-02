@@ -444,6 +444,28 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
  */
 type ExploreBranch = 'khuVuc' | 'danhNhan';
 
+/** Clip của mục đang xem (?e=): nhúng đúng video của tab aspect tương ứng,
+ *  nhãn dưới player = tiêu đề clip + thời lượng + ngôn ngữ thuyết minh. */
+function EntryMedia({ site, entry, lang }: { site: Site; entry: ExploreEntry; lang: Lang }) {
+  const [dur, setDur] = useState<number | null>(null);
+  const sp = site.spots.find((s) => s.spotId === entry.spotId);
+  const aspect = sp?.layoutSchema.flatMap((c) => (c.type === 'aspects' ? c.aspects : [])).find((x) => x.id === entry.aspect);
+  if (!aspect) return null;
+  const enClip = lang === 'en' && !!aspect.videoEn;
+  const vid = enClip ? aspect.videoEn : aspect.video;
+  if (!vid) return null;
+  const mmss = `${Math.floor((dur ?? 0) / 60)}:${String(Math.floor((dur ?? 0) % 60)).padStart(2, '0')}`;
+  return (
+    <figure class="xplrd__media">
+      <LocalVideo src={vid.src} poster={vid.poster} label={vid.title ? t(vid.title, lang) : t(aspect.title, lang)} lang={lang} onDur={setDur} />
+      <figcaption class="xplrd__mnote">
+        <Icon name="play" size={12} /> {vid.title ? t(vid.title, lang) : t(aspect.title, lang)}
+        {dur ? ` · ${mmss}` : ''} · {enClip ? t(UI.clipEn, lang) : t(UI.clipVi, lang)}
+      </figcaption>
+    </figure>
+  );
+}
+
 const branchKey = (siteId: string) => `mdv.xplr.${siteId}`;
 function savedBranch(siteId: string): ExploreBranch | null {
   try {
@@ -572,6 +594,7 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
               </span>
             )}
           </div>
+          <EntryMedia site={site} entry={entry} lang={lang} />
         </article>
       ) : (
         <>
@@ -589,12 +612,16 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
                   <button type="button" class={`xplr__branch ${branch === 'khuVuc' ? 'xplr__branch--on' : ''}`} onClick={() => pickBranch('khuVuc')}>
                     <Icon name="locate" size={18} />
                     <b>{t(UI.exploreKhuVuc, lang)}</b>
-                    <small>{ex.khuVuc.length}</small>
+                    <small>
+                      {ex.khuVuc.length} {t(UI.khuVucUnit, lang)}
+                    </small>
                   </button>
                   <button type="button" class={`xplr__branch ${branch === 'danhNhan' ? 'xplr__branch--on' : ''}`} onClick={() => pickBranch('danhNhan')}>
                     <Icon name="spark" size={18} />
                     <b>{t(UI.exploreDanhNhan, lang)}</b>
-                    <small>{ex.danhNhan.length}</small>
+                    <small>
+                      {ex.danhNhan.length} {t(UI.danhNhanUnit, lang)}
+                    </small>
                   </button>
                 </div>
                 {branch && (
@@ -602,8 +629,10 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
                     <div class="xplr__list">
                       {(branch === 'danhNhan' ? ex.danhNhan : ex.khuVuc).map((e) => (
                         <a key={e.id} class="xplr__row" href={`#/d/${site.entityId}?e=${e.id}`} onClick={() => (savedScroll.current = window.scrollY)}>
-                          <span class="xplr__rt">{t(e.title, lang)}</span>
-                          <span class="xplr__rl">{leadOf(t(e.body, lang))}</span>
+                          <span class="xplr__txt">
+                            <span class="xplr__rt">{t(e.title, lang)}</span>
+                            <span class="xplr__rl">{e.lead ? t(e.lead, lang) : leadOf(t(e.body, lang))}</span>
+                          </span>
                           {e.spotId ? (
                             isSpotUnlocked(site.entityId, e.spotId) ? (
                               <span class="xplr__done">
@@ -658,9 +687,14 @@ function CardView({ card, lang, site, initialAspect, onActiveImage }: { card: Ca
   }
 }
 
-/** Gallery ảnh của một điểm: xếp chồng + crossfade, nút ‹ › và vuốt ngang. */
+/** Gallery ảnh của một điểm: xếp chồng + crossfade, nút ‹ › và vuốt ngang.
+ *  Mỗi ảnh phụ có thể mang caption riêng ({src, caption}) — thiếu thì dùng caption chung. */
 function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | ImageCard; lang: Lang; isHero: boolean; onActive?: (src: string) => void }) {
-  const imgs = [card.image, ...(card.images ?? [])];
+  const items = [
+    { src: card.image, cap: card.caption },
+    ...(card.images ?? []).map((i) => (typeof i === 'string' ? { src: i, cap: card.caption } : { src: i.src, cap: i.caption ?? card.caption })),
+  ];
+  const imgs = items.map((x) => x.src);
   const [idx, setIdx] = useState(0);
   const [credOn, setCredOn] = useState(false);
   const credit = IMAGE_CREDITS[imgs[idx]];
@@ -693,7 +727,7 @@ function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | Imag
         }
       >
         {imgs.map((s, i) => (
-          <img key={s} src={asset(s)} alt={i === idx ? t(card.caption, lang) : ''} class={i === idx ? 'is-on' : ''} />
+          <img key={s} src={asset(s)} alt={i === idx ? t(items[i].cap, lang) : ''} class={i === idx ? 'is-on' : ''} />
         ))}
         {multi && (
           <>
@@ -721,7 +755,7 @@ function GalleryFigure({ card, lang, isHero, onActive }: { card: HeroCard | Imag
           </button>
         )}
       </div>
-      {card.caption && <figcaption>{t(card.caption, lang)}</figcaption>}
+      {items[idx].cap && <figcaption>{t(items[idx].cap, lang)}</figcaption>}
       {credOn && credit && (
         <p class="dgal__credline">
           {credit.author} ·{' '}
@@ -764,7 +798,7 @@ function SpotBg({ src }: { src: string | null }) {
 
 /** Video local (media/*.mp4): cứ render — SW runtime-cache trả bản đã tải khi offline;
  *  chỉ hiện ghi chú ngoại tuyến khi phát thật sự lỗi. */
-function LocalVideo({ src, poster, label, lang }: { src: string; poster?: string; label: string; lang: Lang }) {
+function LocalVideo({ src, poster, label, lang, onDur }: { src: string; poster?: string; label: string; lang: Lang; onDur?: (sec: number) => void }) {
   const online = useOnline();
   const [err, setErr] = useState(false);
   if (err && !online) {
@@ -782,6 +816,7 @@ function LocalVideo({ src, poster, label, lang }: { src: string; poster?: string
       playsInline
       preload="metadata"
       aria-label={label}
+      onLoadedMetadata={(e) => onDur?.(e.currentTarget.duration)}
       onError={() => setErr(true)}
     />
   );
@@ -898,7 +933,7 @@ function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; ext
               src={fileSrc}
               controls
               preload="metadata"
-              aria-label={t(UI.recordedNarration, lang)}
+              aria-label={card.label ? t(card.label, lang) : t(UI.recordedNarration, lang)}
               onError={() => setFileErr(true)}
             />
           )}
@@ -922,7 +957,7 @@ function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; ext
           </p>
         ) : (
           <p class="dcard__recnote">
-            <Icon name="check" size={13} /> {t(UI.recordedNarration, lang)}
+            <Icon name="check" size={13} /> {card.label ? t(card.label, lang) : t(UI.recordedNarration, lang)}
           </p>
         )}
         <details class="dcard__scriptwrap">
@@ -982,8 +1017,6 @@ function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; ext
   );
 }
 
-const SWIPE_PX = 40;
-
 function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lang; initial?: string | null }) {
   // Tab mở đầu theo lựa chọn từ panel quét QR (?a=<aspectId>); fallback tab đầu.
   // Phải sync theo param — navigate ?a= đổi query không remount component,
@@ -996,20 +1029,6 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
   }, [initial]);
   const cur = card.aspects.find((a) => a.id === active) ?? card.aspects[0];
   const online = useOnline();
-  const idx = card.aspects.indexOf(cur);
-  const startX = useRef<number | null>(null);
-  // Vuốt ngang trên thân thẻ đổi tab (P2: "tab vuốt ngang")
-  const onPointerDown = (e: PointerEvent) => {
-    startX.current = e.clientX;
-  };
-  const onPointerUp = (e: PointerEvent) => {
-    if (startX.current === null) return;
-    const dx = e.clientX - startX.current;
-    startX.current = null;
-    if (Math.abs(dx) < SWIPE_PX) return;
-    const next = dx < 0 ? Math.min(idx + 1, card.aspects.length - 1) : Math.max(idx - 1, 0);
-    setActive(card.aspects[next].id);
-  };
   return (
     <div class={`dcard dcard--aspects dcard--${card.size}`}>
       <div class="dcard__tabs" role="group" aria-label={t(UI.aspects, lang)}>
@@ -1019,7 +1038,7 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
           </button>
         ))}
       </div>
-      <p key={cur.id} class="dcard__body" onPointerDown={onPointerDown} onPointerUp={onPointerUp} style="touch-action:pan-y">
+      <p key={cur.id} class="dcard__body">
         {t(cur.body, lang)}
       </p>
       {(() => {

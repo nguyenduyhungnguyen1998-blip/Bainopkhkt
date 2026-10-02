@@ -7,6 +7,7 @@ import { getSpot, getSite } from '../data/content';
 import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, VideoCard, ExploreEntry } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
+import { siteEmoji } from '../lib/siteEmoji';
 import { asset } from '../lib/asset';
 import { getProgress, isSpotUnlocked, progressPersistFailed, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
@@ -66,7 +67,7 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
           <Icon name="back" />
         </a>
         <a class="dest__crumb dest__crumb--link" href={routeHref.destination(site.entityId)} title={t(UI.backToSite, lang)}>
-          <span class="mdv-eyebrow">{t(site.name, lang)}</span>
+          <span class="mdv-eyebrow">{siteEmoji(site)} {t(site.name, lang)}</span>
           <h1>{t(spot.name, lang)}</h1>
         </a>
         <span class={`mdv-badge ${unlocked ? 'mdv-badge--unlocked' : 'mdv-badge--locked'}`}>
@@ -643,7 +644,7 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
           </figure>
           <div class="dintro__body">
             <span class="mdv-eyebrow">{t(site.province, lang)}</span>
-            <h1>{t(site.name, lang)}</h1>
+            <h1>{siteEmoji(site)} {t(site.name, lang)}</h1>
             <p class="mdv-muted">{t(site.summary, lang)}</p>
 
             {ex ? (

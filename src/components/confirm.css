@@ -25,3 +25,58 @@
   background: var(--color-danger);
   color: #fff;
 }
+
+/* Sheet chọn app quét (camera/Zalo/Lens) — dòng lựa chọn lớn, emoji + gợi ý. */
+.scanch__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
+}
+.scanch__opt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: 1px solid var(--mdv-line, rgba(140, 110, 60, 0.3));
+  border-radius: 14px;
+  background: var(--mdv-card, rgba(255, 253, 248, 0.6));
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.scanch__opt:hover,
+.scanch__opt:focus-visible {
+  border-color: var(--mdv-accent, #b23a2e);
+}
+.scanch__emoji {
+  font-size: 22px;
+  flex: none;
+}
+.scanch__txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.scanch__txt b {
+  font-size: var(--text-md, 15px);
+}
+.scanch__txt small {
+  color: var(--mdv-muted, #8a7f6f);
+  font-size: var(--text-sm, 12.5px);
+  line-height: 1.35;
+}
+.scanch__last {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--mdv-accent, #b23a2e);
+  margin-left: 6px;
+  font-size: var(--text-sm, 12.5px);
+}
+.scanch__desktop {
+  background: rgba(200, 148, 26, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+}

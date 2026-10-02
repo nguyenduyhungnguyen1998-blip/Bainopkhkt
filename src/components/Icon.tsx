@@ -1,4 +1,6 @@
 /** Bộ icon nội tuyến (stroke 1.75, 24px) – không tải font icon để giữ offline-first và bundle nhỏ. */
+import { asset } from '../lib/asset';
+
 const PATHS: Record<string, string> = {
   map: 'M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3Zm0 0v15m6-12v15',
   passport: 'M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm6 4a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7ZM8 17h8',
@@ -74,4 +76,9 @@ export function FlagVN({ size = 18, class: cls }: { size?: number; class?: strin
       />
     </svg>
   );
+}
+
+/** Biểu tượng chính của app: bản đồ VN đỏ trong vòng tròn + chấm vàng (logo KHKT chính thức). */
+export function BrandMark({ size = 20, class: cls }: { size?: number; class?: string }) {
+  return <img class={cls} width={size} height={size} src={asset('img/brand/emblem-256.webp')} alt="Du lịch Việt Nam" />;
 }

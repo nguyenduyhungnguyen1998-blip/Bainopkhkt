@@ -172,7 +172,36 @@ export const UI = {
   cancel: { vi: 'Hủy', en: 'Cancel' },
   confirm: { vi: 'Đồng ý', en: 'Confirm' },
   sharePassport: { vi: 'Chia sẻ hành trình', en: 'Share journey' },
-  shareCopied: { vi: 'Đã chép nội dung chia sẻ', en: 'Share text copied' },
+  shareCopied: { vi: 'Đã chép link chia sẻ', en: 'Share link copied' },
+  shareScreenTitle: { vi: 'Hộ chiếu được chia sẻ', en: 'Shared passport' },
+  shareScreenIntro: {
+    vi: 'Người thân đã gửi bạn link hành trình — thẻ hộ chiếu của họ ở bên dưới. Bạn có thể nhập tiến độ này vào máy mình.',
+    en: 'A friend shared their journey link — their passport card is below. You can import this progress onto your device.',
+  },
+  shareImport: { vi: 'Nhập hành trình này', en: 'Import this journey' },
+  shareImportAsk: {
+    vi: 'Hợp nhất hành trình được chia sẻ vào hộ chiếu trên máy bạn? (Dữ liệu hiện có được giữ, điểm mới sẽ được cộng vào.)',
+    en: 'Merge the shared journey into the passport on this device? (Your existing data is kept; new spots are added.)',
+  },
+  shareImported: { vi: 'Đã nhập ✓', en: 'Imported ✓' },
+  shareInvalid: {
+    vi: 'Link hành trình không hợp lệ hoặc đã hỏng. Hãy xin người chia sẻ một link mới.',
+    en: 'This journey link is invalid or damaged. Ask your friend for a fresh link.',
+  },
+  scanChooseTitle: { vi: 'Quét mã QR bằng gì?', en: 'How will you scan the QR?' },
+  scanChooseSub: {
+    vi: 'Chọn ứng dụng quét trên máy bạn — mã ở mỗi điểm di sản sẽ mở lại đúng app này.',
+    en: 'Pick the scanning app on your device — each heritage QR opens right back here.',
+  },
+  scanLastUsed: { vi: 'lần trước', en: 'last used' },
+  scanHint: {
+    vi: 'Mẹo: quét mã QR dán tại mỗi điểm tham quan là xong — không cần tải thêm gì.',
+    en: 'Tip: scan the QR plaque at each spot and you are done — nothing to install.',
+  },
+  scanDesktopHint: {
+    vi: 'Máy tính không quét được trực tiếp — cầm điện thoại quét mã ở điểm tham quan, link sẽ tự mở app.',
+    en: 'A desktop cannot scan — point your phone at the QR plaque and the link opens this app.',
+  },
   quizExplain: { vi: 'Vì sao?', en: 'Why?' },
   quizTrial: { vi: 'Chơi thử – điểm chưa ghé thăm nên không nhận XP', en: 'Practice run – no XP until you visit the spot' },
   // P2/P4 – audio & TTS

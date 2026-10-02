@@ -3,16 +3,17 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp } from '../lib/progress';
+import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp, sharePassportPayload, decodePassportPayload } from '../lib/progress';
 import type { Achievement, Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
 import { useAmbientFlat, useFontScale, useTheme, FLAT_PCT_MAX, FONT_PCT_MAX, FONT_PCT_MIN } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
-import { Icon, FlagVN } from '../components/Icon';
+import { Icon, BrandMark } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
 import { PASSPORT_TOUR_STEPS, QUIZ_TOUR_STEPS, goScreenTour } from '../lib/tour';
 import { navigate, routeHref } from '../lib/router';
+import { siteEmoji } from '../lib/siteEmoji';
 import { ConfirmSheet, useConfirm } from '../components/ConfirmSheet';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
@@ -23,6 +24,7 @@ export function PassportScreen() {
   const [helpMenu, setHelpMenu] = useState(false);
   const [badgesOpen, setBadgesOpen] = useState(false);
   const [openAch, setOpenAch] = useState<Achievement | null>(null);
+  const [scanAsk, setScanAsk] = useState(false);
   const achPopRef = useRef<HTMLDivElement>(null);
   // Popover danh hiệu: focus khi mở + Esc/tap nền để đóng.
   useEffect(() => {
@@ -118,9 +120,24 @@ export function PassportScreen() {
       </p>
 
       {doneSpots === 0 && (
-        <a class="mdv-btn mdv-btn--primary ppass__cta" href={routeHref.map}>
+        <button class="mdv-btn mdv-btn--primary ppass__cta" onClick={() => setScanAsk(true)}>
           {t(UI.startScanning, lang)}
-        </a>
+        </button>
+      )}
+      {scanAsk && (
+        <ScanChooserSheet
+          lang={lang}
+          onClose={() => setScanAsk(false)}
+          onPick={(id) => {
+            try {
+              localStorage.setItem(SCAN_APP_KEY, id);
+            } catch {
+              /* bộ nhớ riêng tư */
+            }
+            setScanAsk(false);
+            navigate('map');
+          }}
+        />
       )}
 
       <ShareJourney lang={lang} done={doneSpots} total={totalSpots} xp={p.xp} />
@@ -155,7 +172,7 @@ export function PassportScreen() {
             <a key={s.entityId} class="mdv-card" href={routeHref.destination(s.entityId)} style="display:flex;gap:12px;align-items:center;color:inherit">
               <img src={asset(s.heroImage)} alt="" width="56" height="56" style="border-radius:12px;object-fit:cover" />
               <div style="flex:1;min-width:0">
-                <b>{t(s.name, lang)}</b>
+                <b>{siteEmoji(s)} {t(s.name, lang)}</b>
                 <div class="mdv-muted" style="font-size:var(--text-sm)">
                   {n}/{s.spots.length} {t(UI.spots, lang)}
                 </div>
@@ -210,9 +227,11 @@ export function PassportScreen() {
   );
 }
 
-/** Chia sẻ hành trình: Web Share API nếu có, không thì chép nội dung vào clipboard. */
+/** Chia sẻ hành trình bằng LINK: Web Share API nếu có, không thì chép văn bản + link
+ *  vào clipboard. Link #/pp/<payload> mở thẻ hộ chiếu chỉ-đọc của người chia sẻ. */
 function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; total: number; xp: number }) {
   const [copied, setCopied] = useState(false);
+  const url = `${location.origin}${location.pathname}#/pp/${sharePassportPayload()}`;
   const text =
     lang === 'vi'
       ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Du lịch Việt Nam`
@@ -220,14 +239,14 @@ function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; tot
   const share = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: lang === 'vi' ? 'Du lịch Việt Nam' : 'Travel in Vietnam', text });
+        await navigator.share({ title: lang === 'vi' ? 'Du lịch Việt Nam' : 'Travel in Vietnam', text, url });
         return;
       }
     } catch {
       /* user hủy share sheet hoặc API lỗi -> fallback copy */
     }
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${text}\n${url}`);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
     } catch {
@@ -238,6 +257,155 @@ function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; tot
     <button class="mdv-btn mdv-btn--ghost ppass__share" onClick={() => void share()}>
       <Icon name="share" size={18} /> {copied ? t(UI.shareCopied, lang) : t(UI.sharePassport, lang)}
     </button>
+  );
+}
+
+/** Sheet hỏi "quét bằng gì?" trước lần quét đầu tiên — danh sách lựa chọn
+ *  nhận diện theo máy (Zalo/Lens trên mobile, ẩn Lens trên iOS khi không rõ).
+ *  Lựa chọn được nhớ ở mdv.scanApp; lần sau mở sheet đánh dấu "lần trước". */
+const SCAN_APP_KEY = 'mdv.scanApp';
+type ScanAppId = 'camera' | 'zalo' | 'lens' | 'other';
+
+function ScanChooserSheet({ lang, onPick, onClose }: { lang: Lang; onPick: (id: ScanAppId) => void; onClose: () => void }) {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const isAndroid = /android/i.test(ua);
+  const isIos = /iphone|ipad|ipod/i.test(ua);
+  const isMobile = isAndroid || isIos;
+  const lastUsed = (() => {
+    try {
+      return localStorage.getItem(SCAN_APP_KEY) as ScanAppId | null;
+    } catch {
+      return null;
+    }
+  })();
+  const opts: { id: ScanAppId; emoji: string; name: { vi: string; en: string }; sub: { vi: string; en: string } }[] = [
+    {
+      id: 'camera',
+      emoji: '📷',
+      name: { vi: 'Máy ảnh', en: 'Camera app' },
+      sub: isIos
+        ? { vi: 'Quét trực tiếp trong ứng dụng Camera của iPhone', en: 'Scan straight from the iPhone Camera app' }
+        : { vi: 'Chế độ quét QR của camera / trình quét tích hợp trên máy', en: "Your camera's QR mode or the built-in scanner" },
+    },
+    ...(isMobile
+      ? [
+          {
+            id: 'zalo' as const,
+            emoji: '💬',
+            name: { vi: 'Zalo', en: 'Zalo' },
+            sub: { vi: 'Nút quét QR ở góc phải trên trong Zalo', en: 'The QR button at the top-right in Zalo' },
+          },
+        ]
+      : []),
+    {
+      id: 'lens',
+      emoji: '🔍',
+      name: { vi: 'Google Lens', en: 'Google Lens' },
+      sub: isIos
+        ? { vi: 'Trong ứng dụng Google (nếu máy đã cài)', en: 'Inside the Google app (if installed)' }
+        : { vi: 'Lens trong Google Photos / thanh tìm kiếm Google', en: 'Lens in Google Photos or the Google search bar' },
+    },
+    {
+      id: 'other',
+      emoji: '⋯',
+      name: { vi: 'Ứng dụng quét QR khác', en: 'Another QR app' },
+      sub: { vi: 'Bất kỳ app quét QR nào trên máy bạn', en: 'Any QR reader already on your device' },
+    },
+  ];
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+  return (
+    <div class="finale confirm" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div class="finale__card confirm__card scanch" role="dialog" aria-modal="true" aria-label={t(UI.scanChooseTitle, lang)}>
+        <h2 class="confirm__title">{t(UI.scanChooseTitle, lang)}</h2>
+        <p class="confirm__body">{t(UI.scanChooseSub, lang)}</p>
+        <div class="scanch__list">
+          {opts.map((o) => (
+            <button key={o.id} type="button" class="scanch__opt" onClick={() => onPick(o.id)}>
+              <span class="scanch__emoji" aria-hidden="true">
+                {o.emoji}
+              </span>
+              <span class="scanch__txt">
+                <b>
+                  {t(o.name, lang)}
+                  {lastUsed === o.id && <em class="scanch__last">· {t(UI.scanLastUsed, lang)}</em>}
+                </b>
+                <small>{t(o.sub, lang)}</small>
+              </span>
+            </button>
+          ))}
+        </div>
+        {!isMobile && <p class="confirm__body scanch__desktop">{t(UI.scanDesktopHint, lang)}</p>}
+        <p class="confirm__body">{t(UI.scanHint, lang)}</p>
+        <div class="confirm__btns">
+          <button class="mdv-btn mdv-btn--ghost" onClick={onClose}>
+            {t(UI.cancel, lang)}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Trang chỉ-đọc khi người nhận bấm link #/pp/<payload>: thấy đúng thẻ hộ chiếu
+ *  của người chia sẻ + có thể nhập tiến độ đó vào máy mình. */
+export function PassportShareScreen({ payload }: { payload: string }) {
+  const lang = useLang()[0];
+  const decoded = useMemo(() => decodePassportPayload(payload), [payload]);
+  const [imported, setImported] = useState(false);
+  const { ask, setAsk } = useConfirm();
+  const srcDoc = useMemo(() => (decoded ? exportPassportCardHtml(decoded.progress, decoded.json) : ''), [decoded]);
+  const doImport = () =>
+    decoded &&
+    setAsk({
+      title: t(UI.shareImport, lang),
+      body: t(UI.shareImportAsk, lang),
+      ok: t(UI.shareImport, lang),
+      act: () => {
+        applyPassportImport(decoded.progress, 'merge');
+        setImported(true);
+        navigate('passport');
+      },
+    });
+  return (
+    <main class="mdv-screen pshare">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow" style="display:inline-flex;align-items:center;gap:6px">
+            <BrandMark size={16} /> {t(UI.appName, lang)}
+          </span>
+          <h1>{t(UI.shareScreenTitle, lang)}</h1>
+        </div>
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.map, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      {decoded ? (
+        <>
+          <p class="mdv-muted">{t(UI.shareScreenIntro, lang)}</p>
+          <iframe class="pshare__card" title={t(UI.shareScreenTitle, lang)} srcDoc={srcDoc} sandbox="" />
+          <div class="pshare__actions">
+            <button class="mdv-btn mdv-btn--primary" onClick={doImport} disabled={imported}>
+              <Icon name="check" /> {imported ? t(UI.shareImported, lang) : t(UI.shareImport, lang)}
+            </button>
+            <a class="mdv-btn" href={routeHref.map}>
+              {t(UI.map, lang)}
+            </a>
+          </div>
+        </>
+      ) : (
+        <>
+          <p class="mdv-muted">{t(UI.shareInvalid, lang)}</p>
+          <a class="mdv-btn mdv-btn--primary" href={routeHref.map}>
+            {t(UI.map, lang)}
+          </a>
+        </>
+      )}
+      <ConfirmSheet ask={ask} lang={lang} onClose={() => setAsk(null)} />
+    </main>
   );
 }
 
@@ -718,10 +886,9 @@ export function SettingsScreen() {
               {lang === 'vi' ? 'Đặt lại tiến độ' : 'Reset progress'}
             </button>
           </div>
-          <div class="setrow" style="margin-top:14px">
-            <span class="setrow__lbl">{lang === 'vi' ? 'Dữ liệu tải sẵn' : 'Downloaded data'}</span>
+          <div class="setrow setrow--split" style="margin-top:14px">
             <button
-              class="mdv-btn mdv-btn--ghost"
+              class="mdv-btn mdv-btn--ghost mdv-btn--sm"
               onClick={() =>
                 setAsk({
                   title:
@@ -745,6 +912,45 @@ export function SettingsScreen() {
               }
             >
               {lang === 'vi' ? 'Xóa bộ nhớ đệm' : 'Clear cache'}
+            </button>
+            <button
+              class="mdv-btn mdv-btn--ghost mdv-btn--sm mdv-btn--danger"
+              onClick={() =>
+                setAsk({
+                  title:
+                    lang === 'vi'
+                      ? 'Xóa TOÀN BỘ dữ liệu? Tiến độ, cài đặt và bộ nhớ đệm sẽ về như lần đầu mở app — không khôi phục được.'
+                      : 'Delete ALL data? Progress, settings and cache return to first-launch state — cannot be undone.',
+                  ok: lang === 'vi' ? 'Xóa toàn bộ' : 'Delete everything',
+                  danger: true,
+                  act: () => {
+                    void (async () => {
+                      try {
+                        for (const k of Object.keys(localStorage)) {
+                          if (k.startsWith('mdv.')) localStorage.removeItem(k);
+                        }
+                        await Promise.all(
+                          ['mdv'].map(
+                            (db) =>
+                              new Promise<void>((res) => {
+                                const rq = indexedDB.deleteDatabase(db);
+                                rq.onsuccess = rq.onerror = rq.onblocked = () => res();
+                              })
+                          )
+                        );
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map((k) => caches.delete(k)));
+                        const regs = await navigator.serviceWorker?.getRegistrations();
+                        await Promise.all((regs ?? []).map((r) => r.unregister()));
+                      } finally {
+                        location.reload();
+                      }
+                    })();
+                  },
+                })
+              }
+            >
+              {lang === 'vi' ? 'Xóa toàn bộ dữ liệu' : 'Delete all data'}
             </button>
           </div>
         </section>
@@ -883,7 +1089,7 @@ export function AboutScreen() {
         <div>
           <span class="mdv-eyebrow">{t(UI.about, lang)}</span>
           <h1 style="display:flex;align-items:center;gap:10px">
-            <FlagVN size={26} /> {t(UI.appName, lang)}
+            <BrandMark size={30} /> {t(UI.appName, lang)}
           </h1>
         </div>
         <a class="mdv-btn mdv-btn--icon" href={routeHref.settings} aria-label={t(UI.back, lang)}>

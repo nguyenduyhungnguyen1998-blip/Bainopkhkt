@@ -15,9 +15,13 @@ async function hmacHex(payload: string): Promise<string> {
   // (LINE, Zalo, Messenger) hoặc máy cũ không có → rơi về bản JS thuần,
   // kết quả bit-perfect nên chữ ký trên tem in vẫn khớp.
   if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const key = await crypto.subtle.importKey('raw', enc.encode(QR_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-    const mac = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
-    return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    try {
+      const key = await crypto.subtle.importKey('raw', enc.encode(QR_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const mac = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
+      return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    } catch {
+      // Một số webview Android có subtle nhưng importKey/sign reject — rơi về bản JS thuần.
+    }
   }
   return hmacSha256Hex(enc.encode(QR_SECRET), enc.encode(payload));
 }

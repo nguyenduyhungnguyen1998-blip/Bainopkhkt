@@ -450,16 +450,20 @@ function EntryMedia({ site, entry, lang }: { site: Site; entry: ExploreEntry; la
   const [dur, setDur] = useState<number | null>(null);
   const sp = site.spots.find((s) => s.spotId === entry.spotId);
   const aspect = sp?.layoutSchema.flatMap((c) => (c.type === 'aspects' ? c.aspects : [])).find((x) => x.id === (entry.clipAspect ?? entry.aspect));
-  if (!aspect) return null;
-  const enClip = lang === 'en' && !!aspect.videoEn;
-  const vid = enClip ? aspect.videoEn : aspect.video;
+  const vcard = sp?.layoutSchema.find((c): c is VideoCard => c.type === 'video');
+  const enClip = lang === 'en' && (!!aspect?.videoEn || !!vcard?.srcEn);
+  const cardSrc = vcard ? (lang === 'en' && vcard.srcEn ? vcard.srcEn : vcard.src) : undefined;
+  const vid =
+    (enClip ? aspect?.videoEn : aspect?.video) ??
+    (vcard && cardSrc ? { src: cardSrc, poster: vcard.poster, title: vcard.title } : undefined);
   if (!vid) return null;
+  const vtitle = vid.title ? t(vid.title, lang) : aspect ? t(aspect.title, lang) : '';
   const mmss = `${Math.floor((dur ?? 0) / 60)}:${String(Math.floor((dur ?? 0) % 60)).padStart(2, '0')}`;
   return (
     <figure class="xplrd__media">
-      <LocalVideo src={vid.src} poster={vid.poster} label={vid.title ? t(vid.title, lang) : t(aspect.title, lang)} lang={lang} onDur={setDur} />
+      <LocalVideo src={vid.src} poster={vid.poster} label={vtitle} lang={lang} onDur={setDur} />
       <figcaption class="xplrd__mnote">
-        <Icon name="play" size={12} /> {vid.title ? t(vid.title, lang) : t(aspect.title, lang)}
+        <Icon name="play" size={12} /> {vtitle}
         {dur ? ` · ${mmss}` : ''} · {enClip ? t(UI.clipEn, lang) : t(UI.clipVi, lang)}
       </figcaption>
     </figure>
@@ -1038,9 +1042,13 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
           </button>
         ))}
       </div>
-      <p key={cur.id} class="dcard__body">
-        {t(cur.body, lang)}
-      </p>
+      {t(cur.body, lang)
+        .split(/\n\s*\n/)
+        .map((para, i) => (
+          <p key={`${cur.id}-${i}`} class="dcard__body">
+            {para}
+          </p>
+        ))}
       {(() => {
         const vid = lang === 'en' && cur.videoEn ? cur.videoEn : cur.video;
         if (!vid) return null;

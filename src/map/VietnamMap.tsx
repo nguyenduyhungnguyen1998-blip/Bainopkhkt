@@ -336,10 +336,7 @@ export function VietnamMap({
       aria-label={lang === 'vi' ? 'Bản đồ hành trình di sản Việt Nam' : 'Vietnam heritage journey map'}
     >
       <defs>
-        <radialGradient id="vmap-sea" cx="60%" cy="45%" r="80%">
-          <stop offset="0" stop-color="var(--color-sea)" stop-opacity="0.35" />
-          <stop offset="1" stop-color="var(--color-sea)" />
-        </radialGradient>
+
         <pattern id="vmap-waves" width="36" height="18" patternUnits="userSpaceOnUse">
           <path d="M0 9c6-6 12-6 18 0s12 6 18 0" fill="none" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" />
         </pattern>
@@ -348,12 +345,12 @@ export function VietnamMap({
         </pattern>
         {/* Vignette: láng giềng/nội dung tan vào biển ở rìa khung (không còn cạnh thẳng cắt) */}
         <radialGradient id="vmap-vignette" cx="50%" cy="50%" r="72%">
-          <stop offset="54%" stop-color="var(--color-sea)" stop-opacity="0" />
-          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="1" />
+          <stop offset="62%" stop-color="var(--color-sea)" stop-opacity="0" />
+          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="0.72" />
         </radialGradient>
       </defs>
 
-      <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-sea)" />
+      <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="var(--color-sea)" />
       <rect class="vmap__waves" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-waves)" />
 
       <g ref={gRef} class="vmap__world">

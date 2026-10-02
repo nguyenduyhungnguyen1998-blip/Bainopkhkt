@@ -1766,6 +1766,14 @@
                   "vi": "Clip thuyết minh Vườn Giám",
                   "en": "Narrated clip: Giam Garden"
                 }
+              },
+              "videoEn": {
+                "src": "media/vm-vuon-giam-en.mp4",
+                "poster": "/media/vm-vuon-giam-poster.jpg",
+                "title": {
+                  "vi": "Clip thuyết minh Vườn Giám",
+                  "en": "Narrated clip: Giam Garden"
+                }
               }
             },
             {

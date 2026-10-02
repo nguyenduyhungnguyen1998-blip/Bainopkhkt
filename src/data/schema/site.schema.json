@@ -276,7 +276,16 @@
                     "items": { "$ref": "#/definitions/galleryItem" }
                   },
                   "video": { "$ref": "#/definitions/videoRef" },
-                  "videoEn": { "$ref": "#/definitions/videoRef" }
+                  "videoEn": { "$ref": "#/definitions/videoRef" },
+                  "audio": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "src": { "type": "string", "format": "uri-reference" },
+                      "srcEn": { "type": "string", "format": "uri-reference" },
+                      "label": { "$ref": "#/definitions/localized" }
+                    }
+                  }
                 }
               }
             }

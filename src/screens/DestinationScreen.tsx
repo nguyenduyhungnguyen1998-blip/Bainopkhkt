@@ -1098,6 +1098,20 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
         );
       })}
       {(() => {
+        const aSrc = lang === 'en' ? (cur.audio?.srcEn ?? cur.audio?.src) : cur.audio?.src;
+        if (!aSrc) return null;
+        return (
+          <figure class="dcard__aimg dcard__aaudio">
+            <audio class="xplrd__audio" controls preload="metadata" src={asset(aSrc)} />
+            {cur.audio?.label && (
+              <figcaption>
+                <Icon name="headphones" size={12} /> {t(cur.audio.label, lang)}
+              </figcaption>
+            )}
+          </figure>
+        );
+      })()}
+      {(() => {
         const vid = lang === 'en' && cur.videoEn ? cur.videoEn : cur.video;
         if (!vid) return null;
         return (

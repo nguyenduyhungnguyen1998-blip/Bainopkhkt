@@ -35,6 +35,8 @@ export interface AspectsCard {
     images?: GalleryItem[];
     video?: { src: string; poster?: string; title?: Localized };
     videoEn?: { src: string; poster?: string; title?: Localized };
+    /** Bản thu gắn chủ thể của tab (có thể chỉ có một ngôn ngữ — srcEn chỉ hiện khi lang='en'). */
+    audio?: { src?: string; srcEn?: string; label?: Localized };
   }[];
 }
 

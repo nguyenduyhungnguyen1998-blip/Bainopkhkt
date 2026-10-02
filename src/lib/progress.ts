@@ -64,15 +64,116 @@ function loadLocal(): Progress {
 let state: Progress = loadLocal();
 const listeners = new Set<() => void>();
 
-function commit(next: Progress) {
-  state = next;
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(next));
-  } catch {
-    /* bộ nhớ riêng tư */
+/** true khi cả localStorage lẫn IndexedDB đều không ghi được — UI đọc để cảnh báo mất tiến độ. */
+let persistFailed = false;
+export function progressPersistFailed(): boolean {
+  return persistFailed;
+}
+
+/** Hàng đợi hiệu ứng mở dấu trên bản đồ (ripple) — dấu nhận ở màn khác vẫn được bắn lại khi vào map. */
+const pendingMapUnlocks: string[] = [];
+export function takePendingMapUnlocks(): string[] {
+  return pendingMapUnlocks.splice(0, pendingMapUnlocks.length);
+}
+
+/** Hợp hai trạng thái: unlocked là union (xoá chỉ bằng mutate), quiz lấy max, badge union. */
+function mergeProgress(a: Progress, b: Progress): Progress {
+  const unlocked = { ...a.unlocked };
+  for (const [k, v] of Object.entries(b.unlocked)) if (!(k in unlocked)) unlocked[k] = v;
+  const quizDone = { ...a.quizDone };
+  for (const [k, v] of Object.entries(b.quizDone)) quizDone[k] = Math.max(quizDone[k] ?? 0, v);
+  const badges = [...new Set([...a.badges, ...b.badges])];
+  const merged: Progress = { schemaVersion: 2, unlocked, quizDone, xp: Math.max(a.xp, b.xp), badges };
+  // XP không được thấp hơn mức tối thiểu suy ra từ dấu+quiz đã hợp — cộng của cả hai tab đều còn nguyên.
+  merged.xp = Math.max(merged.xp, floorXp(merged));
+  return merged;
+}
+
+/** Sàn XP suy ra từ dấu + câu quiz đúng (grantXp demo chỉ tăng nên max() vẫn giữ được). */
+function floorXp(p: Progress): number {
+  let xp = 0;
+  for (const site of SITES) {
+    let all = true;
+    for (const sp of site.spots) {
+      const key = `${site.entityId}/${sp.spotId}`;
+      if (key in p.unlocked) xp += sp.xp; else all = false;
+      const q = p.quizDone[key];
+      if (q && sp.quiz) xp += Math.min(q, sp.quiz.length) * QUIZ_XP_PER_CORRECT;
+    }
+    if (all) xp += site.gamificationConfig.completionBonusXp;
   }
-  void idbSet(IDB_KEY, next);
+  return xp;
+}
+
+/** Bản persist hiện tại hợp với state trong tab (lấy về mọi dấu tab khác vừa ghi). */
+function mergeBase(): Progress {
+  return mergeProgress(loadLocal(), state);
+}
+
+function persist(p: Progress) {
+  let lsOk = true;
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(p));
+  } catch {
+    lsOk = false;
+  }
+  // localStorage fail (private mode) không sao nếu IDB còn ghi được; chỉ báo lỗi khi cả hai cùng chết.
+  void idbSet(IDB_KEY, p).then(
+    () => {},
+    () => {
+      if (!lsOk) {
+        persistFailed = true;
+        window.dispatchEvent(new CustomEvent('mdv:savefail'));
+      }
+    }
+  );
+}
+
+let channel: BroadcastChannel | null = null;
+try {
+  channel = new BroadcastChannel('mdv.progress');
+} catch {
+  /* không có BroadcastChannel */
+}
+
+function applyState(next: Progress, broadcast: boolean) {
+  state = next;
+  persist(next);
+  if (broadcast) channel?.postMessage(next);
   listeners.forEach((l) => l());
+}
+
+/**
+ * Đọc-hợp → biến đổi → ghi nguyên tử: mọi mutation đi qua đây, dựng trên bản đã merge
+ * persist+state nên hai tab mở dấu hai điểm khác nhau không xoá nhau (Q01).
+ */
+function mutate(fn: (base: Progress) => Progress): Progress {
+  const base = mergeBase();
+  const next = fn(base);
+  applyState(next, true);
+  return next;
+}
+
+// Nhận commit của tab khác: storage event (localStorage đổi) + BroadcastChannel (state thật).
+function applyExternal(incoming?: Progress) {
+  const base = incoming ? mergeProgress(incoming, state) : mergeBase();
+  state = base;
+  listeners.forEach((l) => l());
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === LS_KEY || e.key === null) applyExternal();
+  });
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') applyExternal();
+    });
+  }
+  channel?.addEventListener('message', (e) => {
+    const incoming = migrate(e.data);
+    if (incoming) applyExternal(incoming);
+  });
 }
 
 /**
@@ -126,29 +227,40 @@ export function unlockSpot(siteId: string, spotId: string): UnlockResult {
   const spot = site?.spots.find((s) => s.spotId === spotId);
   if (!site || !spot) return { alreadyUnlocked: false, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
   const key = `${siteId}/${spotId}`;
-  if (key in state.unlocked) return { alreadyUnlocked: true, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
 
-  const unlocked = { ...state.unlocked, [key]: Date.now() };
-  let gained = spot.xp;
-  const badges = [...state.badges];
-  const completed = site.spots.every((s) => `${siteId}/${s.spotId}` in unlocked);
-  let newBadge: UnlockResult['newBadge'];
-  if (completed && !badges.includes(site.gamificationConfig.badge.id)) {
-    badges.push(site.gamificationConfig.badge.id);
-    gained += site.gamificationConfig.completionBonusXp;
-    newBadge = site.gamificationConfig.badge;
-  }
-  const before = state;
-  commit({ ...state, unlocked, xp: state.xp + gained, badges });
-  const result: UnlockResult = {
-    alreadyUnlocked: false,
-    gainedXp: gained,
-    spotXp: spot.xp,
-    bonusXp: completed ? site.gamificationConfig.completionBonusXp : 0,
-    newBadge,
-    siteCompleted: completed,
-  };
+  let before = state;
+  let result: UnlockResult = { alreadyUnlocked: false, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
+  let granted = false;
+  mutate((base) => {
+    before = base;
+    if (key in base.unlocked) {
+      result = { alreadyUnlocked: true, gainedXp: 0, spotXp: 0, bonusXp: 0, siteCompleted: false };
+      return base;
+    }
+    const unlocked = { ...base.unlocked, [key]: Date.now() };
+    let gained = spot.xp;
+    const badges = [...base.badges];
+    const completed = site.spots.every((s) => `${siteId}/${s.spotId}` in unlocked);
+    let newBadge: UnlockResult['newBadge'];
+    if (completed && !badges.includes(site.gamificationConfig.badge.id)) {
+      badges.push(site.gamificationConfig.badge.id);
+      gained += site.gamificationConfig.completionBonusXp;
+      newBadge = site.gamificationConfig.badge;
+    }
+    result = {
+      alreadyUnlocked: false,
+      gainedXp: gained,
+      spotXp: spot.xp,
+      bonusXp: completed ? site.gamificationConfig.completionBonusXp : 0,
+      newBadge,
+      siteCompleted: completed,
+    };
+    granted = true;
+    return { ...base, unlocked, xp: base.xp + gained, badges };
+  });
+  if (!granted) return result;
   // Chuỗi ăn mừng (sóng lan, vẽ đường, toast) lắng nghe sự kiện này — phát ra dù mở từ QR, HUD hay demo.
+  pendingMapUnlocks.push(siteId);
   window.dispatchEvent(new CustomEvent<UnlockResult & { siteId: string; spotId: string }>('mdv:unlock', { detail: { ...result, siteId, spotId } }));
   announceNewAchievements(before);
   return result;
@@ -167,8 +279,11 @@ function announceNewAchievements(before: Progress): void {
 /** Công cụ demo (#/admin): cộng XP trực tiếp để dựng kịch bản trình diễn. */
 export function grantXp(amount: number): void {
   if (!Number.isFinite(amount) || amount === 0) return;
-  const before = state;
-  commit({ ...state, xp: Math.max(0, state.xp + amount) });
+  let before = state;
+  mutate((base) => {
+    before = base;
+    return { ...base, xp: Math.max(0, base.xp + amount) };
+  });
   announceNewAchievements(before);
 }
 
@@ -179,32 +294,38 @@ export function grantXp(amount: number): void {
  */
 export function relockSpot(siteId: string, spotId: string): void {
   const key = `${siteId}/${spotId}`;
-  if (!(key in state.unlocked)) return;
   const spot = SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId);
-  const unlocked = { ...state.unlocked };
-  delete unlocked[key];
-  commit({ ...state, unlocked, xp: Math.max(0, state.xp - (spot?.xp ?? 0)) });
+  mutate((base) => {
+    if (!(key in base.unlocked)) return base;
+    const unlocked = { ...base.unlocked };
+    delete unlocked[key];
+    return { ...base, unlocked, xp: Math.max(0, base.xp - (spot?.xp ?? 0)) };
+  });
 }
 
 /** Công cụ demo: gỡ dấu mọi điểm + hoàn XP của các điểm đó (huy hiệu/quiz giữ nguyên). */
 export function relockAll(): void {
-  let refund = 0;
-  for (const key of Object.keys(state.unlocked)) {
-    const [siteId, spotId] = key.split('/');
-    refund += SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId)?.xp ?? 0;
-  }
-  commit({ ...state, unlocked: {}, xp: Math.max(0, state.xp - refund) });
+  mutate((base) => {
+    let refund = 0;
+    for (const key of Object.keys(base.unlocked)) {
+      const [siteId, spotId] = key.split('/');
+      refund += SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId)?.xp ?? 0;
+    }
+    return { ...base, unlocked: {}, xp: Math.max(0, base.xp - refund) };
+  });
 }
 
 /** Công cụ demo: xóa mọi điểm quiz (giữ dấu + XP) — để giám khảo chơi lại và thấy XP thưởng thật. */
 export function clearQuizResults(): void {
-  commit({ ...state, quizDone: {} });
+  mutate((base) => ({ ...base, quizDone: {} }));
 }
 
 /** Công cụ demo: tước huy hiệu khu + hoàn XP thưởng hoàn thành — diễn lại khoảnh khắc nhận huy hiệu. */
 export function revokeBadge(badgeId: string, refundXp = 0): void {
-  if (!state.badges.includes(badgeId)) return;
-  commit({ ...state, badges: state.badges.filter((b) => b !== badgeId), xp: Math.max(0, state.xp - refundXp) });
+  mutate((base) => {
+    if (!base.badges.includes(badgeId)) return base;
+    return { ...base, badges: base.badges.filter((b) => b !== badgeId), xp: Math.max(0, base.xp - refundXp) };
+  });
 }
 
 /**
@@ -223,74 +344,69 @@ export function revokeAchievement(id: string): void {
   const totalCorrect = (qd: Record<string, number>) =>
     quizSpots.reduce((n, { key, total }) => n + Math.min(qd[key] ?? 0, total), 0);
 
-  switch (id) {
-    case 'khoi-hanh':
-      // Danh hiệu "dấu đầu tiên" — muốn khóa lại thì bắt buộc về 0 dấu.
-      commit({ ...state, unlocked: {} });
-      return;
-    case 'lu-khach': {
-      // Cần <3 dấu: gỡ các dấu mở gần nhất, giữ lại 2 dấu đầu tiên.
-      const keep = Object.entries(state.unlocked)
-        .sort((a, b) => a[1] - b[1])
-        .slice(0, 2)
-        .map(([k]) => k);
-      commit({ ...state, unlocked: Object.fromEntries(keep.map((k) => [k, state.unlocked[k]])) });
-      return;
-    }
-    case 'tham-hiem': {
-      // Cần ≤2 khu có dấu: gỡ dấu của các khu ghé gần nhất, giữ 2 khu đầu tiên.
-      const firstVisit = new Map<string, number>();
-      for (const [k, ts] of Object.entries(state.unlocked)) {
-        const s = k.split('/')[0];
-        firstVisit.set(s, Math.min(firstVisit.get(s) ?? ts, ts));
+  mutate((base) => {
+    switch (id) {
+      case 'khoi-hanh':
+        // Danh hiệu "dấu đầu tiên" — muốn khóa lại thì bắt buộc về 0 dấu.
+        return { ...base, unlocked: {} };
+      case 'lu-khach': {
+        // Cần <3 dấu: gỡ các dấu mở gần nhất, giữ lại 2 dấu đầu tiên.
+        const keep = Object.entries(base.unlocked)
+          .sort((a, b) => a[1] - b[1])
+          .slice(0, 2)
+          .map(([k]) => k);
+        return { ...base, unlocked: Object.fromEntries(keep.map((k) => [k, base.unlocked[k]])) };
       }
-      const keepSites = new Set(
-        [...firstVisit.entries()].sort((a, b) => a[1] - b[1]).slice(0, 2).map(([s]) => s)
-      );
-      commit({
-        ...state,
-        unlocked: Object.fromEntries(Object.entries(state.unlocked).filter(([k]) => keepSites.has(k.split('/')[0]))),
-      });
-      return;
-    }
-    case 'si-tu': {
-      // Cần <3 bộ quiz đã trả lời: xóa kết quả mới nhất, giữ 2 bộ đầu.
-      const keys = Object.keys(state.quizDone).filter((k) => state.quizDone[k] > 0);
-      const drop = new Set(keys.slice(2));
-      commit({ ...state, quizDone: Object.fromEntries(Object.entries(state.quizDone).filter(([k]) => !drop.has(k))) });
-      return;
-    }
-    case 'trang-nguyen': {
-      // Phá "đúng hết một bộ": hạ một bộ đang điểm tuyệt đối xuống thiếu 1 câu.
-      const perfect = quizSpots.find(({ key, total }) => (state.quizDone[key] ?? 0) >= total);
-      if (!perfect) return;
-      commit({ ...state, quizDone: { ...state.quizDone, [perfect.key]: perfect.total - 1 } });
-      return;
-    }
-    case 'hoc-gia': {
-      // Cần tổng đúng <10: gỡ kết quả từng bộ cho tới khi dưới ngưỡng.
-      const quizDone = { ...state.quizDone };
-      for (const k of Object.keys(quizDone)) {
-        if (totalCorrect(quizDone) < 10) break;
-        delete quizDone[k];
+      case 'tham-hiem': {
+        // Cần ≤2 khu có dấu: gỡ dấu của các khu ghé gần nhất, giữ 2 khu đầu tiên.
+        const firstVisit = new Map<string, number>();
+        for (const [k, ts] of Object.entries(base.unlocked)) {
+          const s = k.split('/')[0];
+          firstVisit.set(s, Math.min(firstVisit.get(s) ?? ts, ts));
+        }
+        const keepSites = new Set(
+          [...firstVisit.entries()].sort((a, b) => a[1] - b[1]).slice(0, 2).map(([s]) => s)
+        );
+        return {
+          ...base,
+          unlocked: Object.fromEntries(Object.entries(base.unlocked).filter(([k]) => keepSites.has(k.split('/')[0]))),
+        };
       }
-      commit({ ...state, quizDone });
-      return;
+      case 'si-tu': {
+        // Cần <3 bộ quiz đã trả lời: xóa kết quả mới nhất, giữ 2 bộ đầu.
+        const keys = Object.keys(base.quizDone).filter((k) => base.quizDone[k] > 0);
+        const drop = new Set(keys.slice(2));
+        return { ...base, quizDone: Object.fromEntries(Object.entries(base.quizDone).filter(([k]) => !drop.has(k))) };
+      }
+      case 'trang-nguyen': {
+        // Phá "đúng hết một bộ": hạ một bộ đang điểm tuyệt đối xuống thiếu 1 câu.
+        const perfect = quizSpots.find(({ key, total }) => (base.quizDone[key] ?? 0) >= total);
+        if (!perfect) return base;
+        return { ...base, quizDone: { ...base.quizDone, [perfect.key]: perfect.total - 1 } };
+      }
+      case 'hoc-gia': {
+        // Cần tổng đúng <10: gỡ kết quả từng bộ cho tới khi dưới ngưỡng.
+        const quizDone = { ...base.quizDone };
+        for (const k of Object.keys(quizDone)) {
+          if (totalCorrect(quizDone) < 10) break;
+          delete quizDone[k];
+        }
+        return { ...base, quizDone };
+      }
+      case 'dai-su-di-san': {
+        // Phá "đủ 5 khu": bỏ dấu mới nhất của một khu đã xong + tước luôn huy hiệu khu đó.
+        const s = SITES.find((x) => siteUnlockedCount(x) === x.spots.length);
+        if (!s) return base;
+        const keys = s.spots.map((sp) => `${s.entityId}/${sp.spotId}`).filter((k) => k in base.unlocked);
+        const last = keys.sort((a, b) => base.unlocked[b] - base.unlocked[a])[0];
+        const unlocked = { ...base.unlocked };
+        delete unlocked[last];
+        return { ...base, unlocked, badges: base.badges.filter((b) => b !== s.gamificationConfig.badge.id) };
+      }
+      default:
+        return base;
     }
-    case 'dai-su-di-san': {
-      // Phá "đủ 5 khu": bỏ dấu mới nhất của một khu đã xong + tước luôn huy hiệu khu đó.
-      const s = SITES.find((x) => siteUnlockedCount(x) === x.spots.length);
-      if (!s) return;
-      const keys = s.spots.map((sp) => `${s.entityId}/${sp.spotId}`).filter((k) => k in state.unlocked);
-      const last = keys.sort((a, b) => state.unlocked[b] - state.unlocked[a])[0];
-      const unlocked = { ...state.unlocked };
-      delete unlocked[last];
-      commit({ ...state, unlocked, badges: state.badges.filter((b) => b !== s.gamificationConfig.badge.id) });
-      return;
-    }
-    default:
-      return;
-  }
+  });
 }
 
 export const QUIZ_XP_PER_CORRECT = 5;
@@ -301,11 +417,15 @@ export const QUIZ_XP_PER_CORRECT = 5;
  */
 export function recordQuizResult(siteId: string, spotId: string, correct: number, total: number): number {
   const key = `${siteId}/${spotId}`;
-  const prev = state.quizDone[key] ?? 0;
-  const gained = Math.max(0, correct - Math.min(prev, total)) * QUIZ_XP_PER_CORRECT;
-  const quizDone = correct > prev ? { ...state.quizDone, [key]: correct } : state.quizDone;
-  const before = state;
-  commit({ ...state, quizDone, xp: state.xp + gained });
+  let before = state;
+  let gained = 0;
+  mutate((base) => {
+    before = base;
+    const prev = base.quizDone[key] ?? 0;
+    gained = Math.max(0, correct - Math.min(prev, total)) * QUIZ_XP_PER_CORRECT;
+    const quizDone = correct > prev ? { ...base.quizDone, [key]: correct } : base.quizDone;
+    return { ...base, quizDone, xp: base.xp + gained };
+  });
   announceNewAchievements(before);
   return gained;
 }
@@ -324,7 +444,7 @@ export function resetProgress() {
   } catch {
     /* bộ nhớ riêng tư */
   }
-  commit({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] });
+  mutate(() => ({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] }));
 }
 
 export function siteUnlockedCount(site: Site, p: Progress = state): number {
@@ -451,7 +571,7 @@ export function importPassportJson(json: string): boolean {
     if (raw?.kind !== 'passport') return false;
     const p = migrate(raw.progress);
     if (!p) return false;
-    commit(p);
+    mutate(() => p);
     return true;
   } catch {
     return false;
@@ -479,13 +599,10 @@ export function previewPassportJson(json: string): { progress: Progress; spots: 
  */
 export function applyPassportImport(p: Progress, mode: 'merge' | 'replace'): void {
   if (mode === 'replace') {
-    commit(p);
+    mutate(() => p);
     return;
   }
-  const unlocked = { ...p.unlocked, ...state.unlocked };
-  const quizDone: Record<string, number> = { ...p.quizDone };
-  for (const [k, v] of Object.entries(state.quizDone)) quizDone[k] = Math.max(v, quizDone[k] ?? 0);
-  commit({ ...p, unlocked, quizDone, badges: Array.from(new Set([...state.badges, ...p.badges])), xp: Math.max(p.xp, state.xp) });
+  mutate((base) => mergeProgress(p, base));
 }
 
 export interface Achievement {

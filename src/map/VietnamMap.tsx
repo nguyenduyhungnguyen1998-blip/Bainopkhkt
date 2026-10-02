@@ -16,6 +16,7 @@ import { useMapGestures } from './useMapGestures';
 import { SITES } from '../data/content';
 import type { Region, Site } from '../data/types';
 import type { NodeStatus, UnlockResult } from '../lib/progress';
+import { takePendingMapUnlocks } from '../lib/progress';
 import { inspector, useInspector } from '../debug/inspector';
 import { t, UI, type Lang } from '../lib/i18n';
 import { iconPath } from '../components/Icon';
@@ -227,7 +228,22 @@ export function VietnamMap({
       setTimeout(() => setRipples((rs) => rs.slice(1)), 1400);
     };
     window.addEventListener('mdv:unlock', onUnlock);
-    return () => window.removeEventListener('mdv:unlock', onUnlock);
+    // Dấu nhận khi đang ở màn khác (quét QR trong trang điểm) — sóng lan vẫn bắn lại
+    // lần đầu map mount, xếp so le để khách nhìn thấy hành trình sáng lên.
+    const pending = takePendingMapUnlocks();
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    pending.forEach((siteId, i) => {
+      timers.push(
+        setTimeout(() => {
+          setRipples((rs) => [...rs, { id: ++rippleSeq.current, siteId }]);
+          setTimeout(() => setRipples((rs) => rs.slice(1)), 1400);
+        }, 350 * i)
+      );
+    });
+    return () => {
+      window.removeEventListener('mdv:unlock', onUnlock);
+      timers.forEach(clearTimeout);
+    };
   }, []);
 
   // Đường hành trình

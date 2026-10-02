@@ -101,6 +101,9 @@
   align-items: baseline;
   gap: 6px;
   font-size: var(--text-md);
+  /* Bản Anh dài hơn nhiều — cho xuống dòng thay vì tràn ra ngoài thẻ. */
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .finale__stats b {
   font-size: var(--text-xl);

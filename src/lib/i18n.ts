@@ -150,6 +150,10 @@ export const UI = {
   // P3 – quét QR & hộ chiếu
   scanValid: { vi: 'Mã QR hợp lệ', en: 'Valid QR code' },
   scanInvalid: { vi: 'Mã QR không đúng – có thể đã bị sửa. Bạn vẫn xem được nội dung.', en: 'QR signature mismatch – the code may be tampered. Content is still readable.' },
+  saveFailed: {
+    vi: 'Dấu đã nhận nhưng máy này không lưu được tiến độ — hãy tải thẻ hộ chiếu để giữ lại dấu',
+    en: 'Stamp collected but progress could not be saved on this device — download the passport card to keep it',
+  },
   confirmUnlock: { vi: 'Nhận dấu & xem tổng quan', en: 'Stamp & view overview' },
   unlockedDone: { vi: 'Điểm này đã có dấu', en: 'Stamp already collected' },
   chooseLangShort: { vi: 'Ngôn ngữ', en: 'Language' },

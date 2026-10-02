@@ -81,7 +81,7 @@ export const IMAGE_CREDITS: Record<string, Credit> = {
   '/img/van-mieu/vuon-giam-duong-di.webp': khkt('Đường đi trong Vườn Giám', 'Walkway inside the Giám gardens'),
   '/img/van-mieu/vuon-giam-canh-quan.webp': khkt('Cảnh quan cây xanh Vườn Giám', 'Greenery of the Giám gardens'),
   '/img/van-mieu/kvc-gac-cau-doi.webp': khkt('Gác Khuê Văn Các nhìn cận', 'Khuê Văn pavilion close-up'),
-  '/img/van-mieu/kvc-qua-dai-trung-mon.webp': khkt('Khuê Văn Các qua Đại Trung Môn', 'Khuê Văn pavilion through Đại Trung gate'),
+  '/img/van-mieu/kvc-qua-dai-trung-mon.webp': khkt('Khuê Văn Các bên giếng Thiên Quang', 'Khuê Văn pavilion beside Thiên Quang well'),
   '/img/van-mieu/toan-canh-tren-cao.webp': khkt('Toàn cảnh Văn Miếu từ trên cao', 'Aerial view of the complex'),
   '/img/van-mieu/toan-canh-truc-chinh.webp': khkt('Toàn cảnh trục chính Văn Miếu', 'Main axis of the complex'),
   '/img/van-mieu/bia-nha-bia-gieng.webp': khkt('Nhà bia và Giếng Văn', 'Stelae house and Văn well'),

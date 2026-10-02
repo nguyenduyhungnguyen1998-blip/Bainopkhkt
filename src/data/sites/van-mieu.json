@@ -77,6 +77,47 @@
           ]
         },
         {
+          "type": "video",
+          "size": "lg",
+          "src": "media/vm-tien-an.mp4",
+          "srcEn": "media/vm-tien-an-en.mp4",
+          "poster": "/media/vm-tien-an-poster.jpg",
+          "title": {
+            "vi": "Khu Tiền Án",
+            "en": "The Tien An forecourt"
+          }
+        },
+        {
+          "type": "audio",
+          "size": "md",
+          "ambient": "garden",
+          "script": {
+            "vi": [
+              "Từ phía ngoài, khu Tiền Án là khoảng không gian mở dẫn vào khu di tích.",
+              "Nơi đây được mở đầu bởi bốn cột trụ lớn và hai bia Hạ mã ở hai bên.",
+              "Bốn cột trụ được xây bằng gạch, trong đó hai trụ ở giữa cao hơn.",
+              "Hai trụ phía ngoài được trang trí hình chim phượng xòe cánh, chắp đuôi vào nhau.",
+              "Không gian này vừa tạo nên điểm nhấn cho lối vào, vừa mang lại cảm giác trang nghiêm ngay từ những bước chân đầu tiên."
+            ],
+            "en": [
+              "First, we enter the inner area, the central part of the complex, where many of its most important architectural structures are located.",
+              "The inner area is organized into several successive sections.",
+              "Each area has its own distinctive features, while together they form a unified and harmonious architectural complex.",
+              "From the outside, the Tien An area is an open space leading into the site.",
+              "The entrance begins with four large pillars and two Ha ma stelae on either side.",
+              "The four pillars are made of brick, with the two central pillars standing higher than the outer ones.",
+              "The two outer pillars are decorated with images of phoenixes spreading their wings, with their tails joined together.",
+              "This space not only creates a distinctive entrance, but also gives visitors a sense of solemnity from the very first steps."
+            ]
+          },
+          "src": "media/vm-audio-tien-an-vi.mp3",
+          "srcEn": "media/vm-audio-tien-an-en.m4a",
+          "label": {
+            "vi": "Bản thu: Khu Tiền Án · 0:24",
+            "en": "Recording: the Tien An forecourt · 0:45"
+          }
+        },
+        {
           "type": "aspects",
           "size": "lg",
           "aspects": [
@@ -87,8 +128,8 @@
                 "en": "History"
               },
               "body": {
-                "vi": "Lịch sử hình thành quần thể: năm 1070, vua Lý Thánh Tông cho dựng Văn Miếu tại kinh thành Thăng Long, thờ Khổng Tử cùng các bậc hiền Nho – cũng là nơi Hoàng thái tử Lý Càn Đức, sau này là vua Lý Nhân Tông, đến học. Năm 1075, Lý Nhân Tông mở khoa thi Nho học đầu tiên; năm 1076 lập Quốc Tử Giám – thiết chế giáo dục quan trọng của nhà nước Đại Việt. Đến thời Lê, vua Lê Thánh Tông cho tu sửa Văn Miếu và mở rộng Quốc Tử Giám (1483), rồi dựng những tấm bia Tiến sĩ đầu tiên (1484). Cổng Văn Miếu Môn hiện nay mang kiến trúc thời Hậu Lê, đã qua nhiều lần trùng tu.\n\nMỗi nhân vật được thờ tự tại đây gắn với một khía cạnh của truyền thống học tập và trọng dụng hiền tài: các vua Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông đặt nền móng giáo dục Đại Việt; danh sư Chu Văn An truyền bá tri thức; Khổng Tử và Tứ Phối là cội nguồn của Nho học.",
-                "en": "How the complex took shape: in 1070, king Ly Thanh Tong built the Temple of Literature in the Thang Long capital, honouring Confucius and the Confucian sages – it was also where Crown Prince Ly Can Duc, the future Ly Nhan Tong, came to study. In 1075 Ly Nhan Tong held the first Confucian examination; in 1076 he founded Quoc Tu Giam, a key state education institution. Under the Le dynasty, king Le Thanh Tong restored the temple and expanded the academy (1483), then erected the first doctoral steles (1484). The present Van Mieu Mon gate is in Later Le style and has been restored several times.\n\nEach figure honoured here embodies one strand of the tradition of learning and respect for talent: kings Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông who founded Đại Việt education; the great teacher Chu Văn An; and Confucius with the Four Associates at the root of Confucian learning."
+                "vi": "Lịch sử hình thành quần thể: năm 1070, vua Lý Thánh Tông cho dựng Văn Miếu tại kinh thành Thăng Long, thờ Khổng Tử cùng các bậc hiền Nho – cũng là nơi Hoàng thái tử Lý Càn Đức, sau này là vua Lý Nhân Tông, đến học. Năm 1075, Lý Nhân Tông mở khoa thi Nho học đầu tiên; năm 1076 lập Quốc Tử Giám – thiết chế giáo dục quan trọng của nhà nước Đại Việt. Đến thời Lê, vua Lê Thánh Tông cho tu sửa Văn Miếu và mở rộng Quốc Tử Giám (1483), rồi dựng những tấm bia Tiến sĩ đầu tiên (1484). Cổng Văn Miếu Môn hiện nay mang kiến trúc thời Hậu Lê, đã qua nhiều lần trùng tu.\n\nKhu Tiền Án là khoảng sân phía trước cổng Văn Miếu Môn: bốn trụ gạch lớn đứng thành hai hàng – hai trụ ngoài đắp bốn chim phượng xoè cánh, cùng đôi nghê đá canh giữ; hai bên đường là hai tấm bia Hạ mã nhắc mọi người xuống ngựa khi bước vào nơi trang nghiêm.\n\nMỗi nhân vật được thờ tự tại đây gắn với một khía cạnh của truyền thống học tập và trọng dụng hiền tài: các vua Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông đặt nền móng giáo dục Đại Việt; danh sư Chu Văn An truyền bá tri thức; Khổng Tử và Tứ Phối là cội nguồn của Nho học.",
+                "en": "How the complex took shape: in 1070, king Ly Thanh Tong built the Temple of Literature in the Thang Long capital, honouring Confucius and the Confucian sages – it was also where Crown Prince Ly Can Duc, the future Ly Nhan Tong, came to study. In 1075 Ly Nhan Tong held the first Confucian examination; in 1076 he founded Quoc Tu Giam, a key state education institution. Under the Le dynasty, king Le Thanh Tong restored the temple and expanded the academy (1483), then erected the first doctoral steles (1484). The present Van Mieu Mon gate is in Later Le style and has been restored several times.\n\nThe Tien An forecourt opens before the Van Mieu Mon gate: four great brick pillars in two rows – the outer pair crowned by four spreading phoenixes, the inner pair guarded by stone nghe creatures – and two 'Ha ma' dismount steles reminding all visitors to dismount before this sacred ground.\n\nEach figure honoured here embodies one strand of the tradition of learning and respect for talent: kings Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông who founded Đại Việt education; the great teacher Chu Văn An; and Confucius with the Four Associates at the root of Confucian learning."
               },
               "video": {
                 "src": "media/nguon-goc-lich-su.mp4",
@@ -135,71 +176,6 @@
               }
             },
             {
-              "id": "tien-an",
-              "title": {
-                "vi": "Khu Tiền Án",
-                "en": "Tien An forecourt"
-              },
-              "body": {
-                "vi": "Khu Tiền Án là khoảng sân phía trước cổng Văn Miếu Môn: bốn trụ gạch lớn đứng thành hai hàng – hai trụ ngoài đắp bốn chim phượng xoè cánh, cùng đôi nghê đá canh giữ; hai bên đường là hai tấm bia Hạ mã nhắc mọi người xuống ngựa khi bước vào nơi trang nghiêm.",
-                "en": "The Tien An forecourt opens before the Van Mieu Mon gate: four great brick pillars in two rows – the outer pair crowned by four spreading phoenixes, the inner pair guarded by stone nghe creatures – and two 'Ha ma' dismount steles reminding all visitors to dismount before this sacred ground."
-              },
-              "video": {
-                "src": "media/vm-tien-an.mp4",
-                "poster": "/media/vm-tien-an-poster.jpg",
-                "title": {
-                  "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
-                  "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
-                }
-              },
-              "videoEn": {
-                "src": "media/vm-tien-an-en.mp4",
-                "poster": "/media/vm-tien-an-poster.jpg",
-                "title": {
-                  "vi": "Clip thuyết minh Khu Tiền Án – Văn Miếu Môn",
-                  "en": "Narrated clip: Tien An forecourt – Van Mieu Gate"
-                }
-              }
-            },
-            {
-              "id": "khu-vuc",
-              "title": {
-                "vi": "Nhập Đạo & Đại Trung Môn",
-                "en": "Nhap Dao & Dai Trung gate"
-              },
-              "body": {
-                "vi": "Qua cổng Văn Miếu Môn là khu Nhập Đạo – sân trong thứ nhất của nội tự, nhiều cây xanh với hồ nước hai bên. Con đường lát gạch đỏ dẫn tới cổng Đại Trung theo lối kiến trúc Hậu Lê: gỗ ba gian, mái ngói mũi hài, nóc đắp đôi cá chép chầu vào bình móc, nền lát gạch đá Bát Tràng với ba bậc lên xuống tôn nghiêm.",
-                "en": "Beyond the Van Mieu Mon gate lies the Nhap Dao precinct – the first inner courtyard, leafy and flanked by ponds. A red-tiled path leads to the Dai Trung gate in Later Le style: three timber bays, a 'mui hai' tiled roof, twin carps bowing to the ridge, Bat Trang paving and three ceremonial steps."
-              },
-              "video": {
-                "src": "media/vm-nhap-dao.mp4",
-                "poster": "/media/vm-nhap-dao-poster.jpg",
-                "title": {
-                  "vi": "Clip thuyết minh Khu Nhập Đạo",
-                  "en": "Narrated clip: Nhap Dao gate area"
-                }
-              },
-              "videoEn": {
-                "src": "media/vm-nhap-dao-en.mp4",
-                "poster": "/media/vm-nhap-dao-poster.jpg",
-                "title": {
-                  "vi": "Clip thuyết minh Khu Nhập Đạo",
-                  "en": "Narrated clip: Nhap Dao gate area"
-                }
-              }
-            },
-            {
-              "id": "khong-gian",
-              "title": {
-                "vi": "Hồ Văn & Vườn Giám",
-                "en": "Van Lake & Giam Garden"
-              },
-              "body": {
-                "vi": "Phía trước Văn Miếu là Hồ Văn rộng hơn 12.000 m²; giữa hồ nổi lên gò Kim Châu – xưa là nơi nho sĩ kinh thành bình thơ đàm đạo, nay có tòa Phương Đình hai tầng tám mái được phục dựng năm 2022 cùng cầu đá và những cây si cổ thụ. Hồ Văn được trả lại cho di tích năm 1940 – sự kiện ghi trên bia 'Hoàn Văn hồ bi'. Phía Tây, Vườn Giám được trùng tu 1996–2004 với Nhà Bát Giác mặt bằng bát giác, mái ngói nhiều lớp góc đao cong, hòa mình giữa cây xanh và mặt nước – vừa là điểm dừng chân vừa là nơi tổ chức hoạt động văn hóa, giáo dục. Ngày nay Hồ Văn còn là nơi diễn ra Hội chữ Xuân, hội sách, rối nước và các trò chơi dân gian.",
-                "en": "In front of the temple lies Hồ Văn lake, over 12,000 m²; on its Kim Châu islet – where capital scholars once composed poetry – stands the Phương Đình pavilion with two tiers and eight roofs, restored in 2022 amid stone bridges and ancient banyans. The lake was returned to the monument in 1940, an event recorded on the 'Hoàn Văn hồ bi' stele. To the west, Giám garden (restored 1996–2004) holds the octagonal pavilion with layered curved roofs amid greenery and water – both a resting place and a venue for cultural activities. Today the lake still hosts spring calligraphy fairs, book festivals, water puppetry and folk games."
-              }
-            },
-            {
               "id": "y-nghia",
               "title": {
                 "vi": "Ý nghĩa",
@@ -211,97 +187,6 @@
               }
             }
           ]
-        },
-        {
-          "type": "audio",
-          "size": "md",
-          "ambient": "garden",
-          "script": {
-            "vi": [
-              "Nhắc đến những nhân vật được tôn vinh tại Văn Miếu – Quốc Tử Giám, trước hết phải kể đến những vị vua đã đặt nền móng và phát triển nền giáo dục của Đại Việt.",
-              "Mở đầu là vua Lý Thánh Tông, tên húy là Nhật Tôn, con trưởng của vua Lý Thái Tông. Ông được phong làm Đông cung Thái tử năm 1028 và lên ngôi năm 1054, trị vì 17 năm, đến năm 1072.",
-              "Lý Thánh Tông là một vị vua có nhiều đóng góp cho sự phát triển của Đại Việt. Năm 1054, dưới triều đại của ông, quốc hiệu Đại Việt được đặt, thể hiện ý thức về một quốc gia độc lập và tự chủ.",
-              "Đặc biệt, năm 1070, nhận thấy vai trò của Nho học đối với việc xây dựng đất nước, vua Lý Thánh Tông cho dựng Văn Miếu tại kinh thành Thăng Long. Văn Miếu là nơi thờ Khổng Tử cùng các bậc tiên hiền, tiên nho, đồng thời cũng là nơi Hoàng thái tử Lý Càn Đức, sau này là vua Lý Nhân Tông, đến học.",
-              "Sự kiện ấy không chỉ đánh dấu sự ra đời của Văn Miếu mà còn mở đầu cho một giai đoạn mới trong lịch sử giáo dục và Nho học của Đại Việt.",
-              "Sau khi Lý Thánh Tông qua đời năm 1072, người kế vị ông là Lý Nhân Tông. Chính dưới triều đại của vị vua này, những nền móng giáo dục được đặt ra từ thời Lý Thánh Tông tiếp tục được phát triển.",
-              "Lý Nhân Tông, tên húy là Càn Đức, là con trưởng của vua Lý Thánh Tông và Linh Nhân Hoàng thái hậu, tức Nguyên phi Ỷ Lan. Ông lên ngôi năm 1072, khi mới 7 tuổi, và trị vì 56 năm, đến năm 1128.",
-              "Từ khi còn là Thái tử, Lý Nhân Tông đã có mối liên hệ đặc biệt với Văn Miếu. Năm 1070, ông được ghi nhận là người học trò đầu tiên vào học tại đây.",
-              "Năm 1075, vua Lý Nhân Tông cho tổ chức khoa thi Minh kinh bác học và Nho học tam trường để tuyển chọn nhân tài. Đây được xem là khoa thi Nho học đầu tiên trong lịch sử khoa cử Việt Nam.",
-              "Chỉ một năm sau, năm 1076, vua cho lập Quốc Tử Giám, tạo nên một thiết chế giáo dục quan trọng của nhà nước Đại Việt. Những sự kiện này đã đặt nền móng cho sự phát triển lâu dài của giáo dục và khoa cử Nho học ở nước ta.",
-              "Nếu Lý Thánh Tông đặt nền móng bằng việc dựng Văn Miếu, Lý Nhân Tông tiếp tục phát triển nền giáo dục bằng khoa cử và Quốc Tử Giám, thì đến thời Lê sơ, vua Lê Thánh Tông đã đưa hoạt động giáo dục và khoa cử phát triển mạnh mẽ hơn nữa.",
-              "Lê Thánh Tông, tên húy là Tư Thành, sinh năm 1442 và lên ngôi năm 1460, khi mới 18 tuổi. Ông trị vì 38 năm, qua hai niên hiệu Quang Thuận và Hồng Đức.",
-              "Dưới thời Lê Thánh Tông, Đại Việt đạt nhiều thành tựu về chính trị, văn hóa, giáo dục và pháp luật. Nhà vua đặc biệt coi trọng việc đào tạo và tuyển chọn nhân tài.",
-              "Trong thời gian trị vì, ông tổ chức 12 khoa thi và tuyển chọn được 502 vị Tiến sĩ. Năm 1483, vua cho tu sửa Văn Miếu và mở rộng Quốc Tử Giám.",
-              "Đến năm 1484, những tấm bia Tiến sĩ đầu tiên được dựng tại Văn Miếu, ghi danh những người đỗ đạt qua các khoa thi.",
-              "Những tấm bia ấy không chỉ lưu giữ tên tuổi của các bậc hiền tài mà còn thể hiện quan niệm coi trọng người tài và việc học của xã hội Đại Việt thời bấy giờ.",
-              "Ba vị vua Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông vì thế đều có những dấu ấn riêng trong lịch sử hình thành và phát triển của Văn Miếu – Quốc Tử Giám.",
-              "Tuy nhiên, Văn Miếu không chỉ là nơi ghi dấu công lao của các vị vua. Nơi đây còn tôn vinh những người đã trực tiếp truyền bá tri thức và vun đắp truyền thống giáo dục. Tiêu biểu trong số đó là danh sư Chu Văn An.",
-              "Chu Văn An sinh năm 1292, mất năm 1370. Ông nổi tiếng là người học rộng, cương trực, thanh liêm và hết lòng với sự nghiệp giáo dục.",
-              "Trước khi ra làm quan, Chu Văn An mở trường Huỳnh Cung và thu nhận rất nhiều học trò. Nhiều học trò của ông sau này trở thành những nhân vật có vị trí trong triều đình nhà Trần.",
-              "Dưới thời vua Trần Minh Tông, Chu Văn An được mời ra kinh đô giữ chức Tư nghiệp Quốc Tử Giám. Ông phụ trách việc giáo dục, rèn luyện sĩ tử và từng dạy các hoàng tử Trần Vượng và Trần Hạo, sau này lần lượt trở thành vua Trần Hiến Tông và Trần Dụ Tông.",
-              "Đến thời Trần Dụ Tông, trước tình trạng triều chính có nhiều vấn đề, Chu Văn An dâng Thất trảm sớ, đề nghị xử lý bảy quyền thần. Khi không được chấp thuận, ông từ quan, trở về núi Phượng Hoàng ở Chí Linh để dạy học và sống cuộc đời thanh cao.",
-              "Sau khi qua đời, Chu Văn An được vua Trần Nghệ Tông ban thụy hiệu Khang Tiết và cho phối thờ tại Văn Miếu. Ngày nay, tượng thờ ông được đặt tại tầng dưới nhà Hậu đường khu Thái Học, thể hiện sự tôn vinh đối với một người thầy tiêu biểu trong lịch sử giáo dục Việt Nam.",
-              "Từ một người thầy tiêu biểu của Việt Nam, không gian thờ tự tại Văn Miếu tiếp tục đưa chúng ta trở về với cội nguồn của Nho học – Khổng Tử, nhà tư tưởng và nhà giáo dục có ảnh hưởng sâu rộng trong lịch sử Đông Á.",
-              "Khổng Tử, tên là Khâu, tự Trọng Ni, sinh khoảng năm 551 trước Công nguyên và mất năm 479 trước Công nguyên. Ông là nhà tư tưởng và nhà giáo dục lớn của Trung Quốc cổ đại, đồng thời là người đặt nền móng quan trọng cho Nho giáo.",
-              "Trong cuộc đời mình, Khổng Tử dành nhiều thời gian nghiên cứu, giảng dạy và truyền bá tư tưởng. Ông có nhiều học trò và đặc biệt coi trọng việc giáo dục, tu dưỡng đạo đức và hoàn thiện nhân cách con người.",
-              "Tư tưởng của Khổng Tử xoay quanh nhiều giá trị như Nhân, Lễ, Nghĩa, Trí và Tín. Trong đó, “Nhân” giữ vị trí đặc biệt quan trọng, thể hiện lý tưởng về cách con người đối xử với nhau và xây dựng một xã hội có trật tự, đạo đức.",
-              "Những tư tưởng ấy được các thế hệ học trò và hậu thế truyền lại, trở thành nền tảng quan trọng của Nho giáo và có ảnh hưởng rộng lớn ở nhiều quốc gia Đông Á.",
-              "Tại Văn Miếu – Quốc Tử Giám, Khổng Tử được thờ tại điện Đại Thành. Sự hiện diện của ông tại đây gắn với mục đích ban đầu của Văn Miếu là nơi thờ Khổng Tử cùng các bậc tiên hiền, tiên nho.",
-              "Bên cạnh Khổng Tử, điện Đại Thành còn thờ bốn vị được gọi là Tứ Phối. Đây là những nhân vật tiêu biểu của Nho giáo, được phối thờ với Khổng Tử trong hệ thống thờ tự.",
-              "Bốn vị đó gồm Nhan Hồi, Tăng Sâm, Tử Tư và Mạnh Tử.",
-              "Đầu tiên là Nhan Hồi, còn gọi là Nhan Tử, một trong những học trò xuất sắc nhất của Khổng Tử. Ông nổi tiếng là người hiếu học, sống giản dị và có đức hạnh. Nho gia đời sau tôn ông là Phục Thánh.",
-              "Tiếp theo là Tăng Sâm, thường gọi là Tăng Tử, một học trò của Khổng Tử. Ông đặc biệt chú trọng việc tu dưỡng bản thân và có vai trò quan trọng trong việc truyền bá tư tưởng của Khổng Tử cho các thế hệ sau. Ông được tôn là Tông Thánh.",
-              "Người thứ ba là Tử Tư, tên là Khổng Cấp, cháu nội của Khổng Tử và là học trò của Tăng Sâm. Ông được xem là một nhân vật quan trọng trong việc tiếp nối và phát triển tư tưởng Nho học. Tác phẩm Trung dung gắn với Tử Tư và tư tưởng Trung dung có vị trí quan trọng trong lịch sử Nho giáo. Ông được tôn là Thuật Thánh.",
-              "Cuối cùng là Mạnh Tử, tên là Mạnh Kha, một trong những nhà tư tưởng lớn của Nho giáo thời Chiến Quốc. Ông phát triển nhiều tư tưởng của Khổng Tử, nổi bật là quan niệm về “tính thiện”, tư tưởng “nhân nghĩa” và quan điểm “dân vi quý”. Tác phẩm Mạnh Tử ghi lại nhiều cuộc đối thoại và lập luận của ông, góp phần quan trọng vào sự phát triển của Nho giáo. Mạnh Tử được tôn là Á Thánh.",
-              "Từ những vị vua đặt nền móng cho giáo dục Đại Việt, đến người thầy Chu Văn An, rồi Khổng Tử và Tứ Phối, mỗi nhân vật tại Văn Miếu – Quốc Tử Giám đều gắn với một khía cạnh của truyền thống học tập, giáo dục và trọng dụng hiền tài.",
-              "Qua hệ thống thờ tự ấy, Văn Miếu – Quốc Tử Giám không chỉ lưu giữ những dấu ấn của quá khứ, mà còn phản ánh một truyền thống lâu đời: coi trọng việc học, đề cao đạo lý và tôn vinh những người có đóng góp cho giáo dục và đất nước."
-            ],
-            "en": [
-              "When talking about the figures honored at the Temple of Literature – Imperial Academy, we should first mention the kings who laid the foundations for and contributed to the development of education in Đại Việt.",
-              "The first is King Lý Thánh Tông, whose personal name was Nhật Tôn, the eldest son of King Lý Thái Tông. He was appointed Crown Prince in 1028 and ascended the throne in 1054. He ruled for 17 years, until 1072.",
-              "Lý Thánh Tông made many important contributions to the development of Đại Việt. In 1054, during his reign, the name “Đại Việt” was officially adopted, reflecting the sense of an independent and sovereign nation.",
-              "In particular, in 1070, recognizing the importance of Confucianism in building the country, King Lý Thánh Tông ordered the construction of the Temple of Literature in the capital city of Thăng Long. The Temple of Literature was a place of worship for Confucius and other Confucian sages. It was also where Crown Prince Lý Càn Đức, who later became King Lý Nhân Tông, came to study.",
-              "This event not only marked the establishment of the Temple of Literature, but also opened a new chapter in the history of education and Confucianism in Đại Việt.",
-              "After Lý Thánh Tông passed away in 1072, he was succeeded by Lý Nhân Tông. Under his reign, the educational foundations established during the time of Lý Thánh Tông continued to develop.",
-              "Lý Nhân Tông, whose personal name was Càn Đức, was the eldest son of King Lý Thánh Tông and Linh Nhân Empress Dowager, also known as Nguyên Phi Ỷ Lan. He ascended the throne in 1072 at the age of seven and ruled for 56 years, until 1128.",
-              "From an early age, when he was still Crown Prince, Lý Nhân Tông had a special connection with the Temple of Literature. In 1070, he was recorded as the first student to study there.",
-              "In 1075, King Lý Nhân Tông organized the Minh Kinh Bác Học and Nho Học Tam Trường examinations to select talented people. This is considered the first Confucian examination in the history of Vietnam's imperial examination system.",
-              "Just one year later, in 1076, the king established the Imperial Academy, creating an important educational institution of the Đại Việt state. These events laid the foundation for the long-term development of education and Confucian examinations in Vietnam.",
-              "If Lý Thánh Tông laid the foundation by establishing the Temple of Literature, and Lý Nhân Tông continued to develop education through examinations and the Imperial Academy, then during the Early Lê Dynasty, King Lê Thánh Tông further strengthened the development of education and the examination system.",
-              "Lê Thánh Tông, whose personal name was Tư Thành, was born in 1442 and ascended the throne in 1460 at the age of 18. He ruled for 38 years under the reign eras of Quang Thuận and Hồng Đức.",
-              "Under Lê Thánh Tông, Đại Việt achieved many important accomplishments in politics, culture, education, and law. The king placed particular importance on educating and selecting talented people.",
-              "During his reign, he organized 12 examinations and selected 502 doctoral laureates. In 1483, the king ordered the renovation of the Temple of Literature and the expansion of the Imperial Academy.",
-              "In 1484, the first doctoral steles were erected at the Temple of Literature to record the names of successful candidates from the examinations.",
-              "These steles not only preserve the names of talented scholars, but also reflect the importance that Đại Việt society at the time placed on education and talented people.",
-              "Therefore, the three kings, Lý Thánh Tông, Lý Nhân Tông, and Lê Thánh Tông, each left their own mark on the formation and development of the Temple of Literature – Imperial Academy.",
-              "However, the Temple of Literature is not only a place that commemorates the contributions of kings. It also honors those who directly spread knowledge and cultivated the educational tradition. One of the most notable figures is the great scholar and teacher Chu Văn An.",
-              "Chu Văn An was born in 1292 and died in 1370. He was renowned for his extensive knowledge, integrity, honesty, and dedication to education.",
-              "Before entering government service, Chu Văn An established Huỳnh Cung School and taught many students. Many of his students later became important figures in the Trần Dynasty court.",
-              "During the reign of King Trần Minh Tông, Chu Văn An was invited to the capital to serve as the Director of the Imperial Academy. He was responsible for educating and training students, and he also taught the princes Trần Vượng and Trần Hạo, who later became King Trần Hiến Tông and King Trần Dụ Tông.",
-              "During the reign of Trần Dụ Tông, concerned about problems within the royal court, Chu Văn An submitted the “Seven Executions Petition,” calling for seven powerful officials to be punished. When his proposal was not accepted, he resigned from office and returned to Phượng Hoàng Mountain in Chí Linh, where he continued teaching and lived a simple and dignified life.",
-              "After his death, Chu Văn An was given the posthumous title Khang Tiết by King Trần Nghệ Tông and was enshrined at the Temple of Literature. Today, his statue is placed on the lower floor of the Rear Hall in the Thái Học area, honoring him as an outstanding teacher in the history of Vietnamese education.",
-              "From a great Vietnamese teacher, the worship space at the Temple of Literature now takes us back to the origins of Confucianism – Confucius, a philosopher and educator whose influence spread widely throughout East Asia.",
-              "Confucius, whose name was Qiu and whose courtesy name was Zhongni, was born around 551 BC and died in 479 BC. He was a great philosopher and educator of ancient China and played an important role in laying the foundations of Confucianism.",
-              "Throughout his life, Confucius devoted much of his time to studying, teaching, and spreading his ideas. He had many students and placed great importance on education, moral cultivation, and the development of human character.",
-              "The philosophy of Confucius centered on values such as benevolence, propriety, righteousness, wisdom, and trustworthiness. Among them, benevolence held a particularly important position, expressing an ideal of how people should treat one another and build an orderly and moral society.",
-              "These ideas were passed down by generations of students and later followers, becoming an important foundation of Confucianism and having a wide influence across many East Asian countries.",
-              "At the Temple of Literature – Imperial Academy, Confucius is worshipped at Đại Thành Hall. His presence here is closely connected with the original purpose of the Temple of Literature as a place of worship for Confucius and other Confucian sages.",
-              "Alongside Confucius, Đại Thành Hall also enshrines four figures known as the Four Associates. These were prominent figures of Confucianism who were worshipped alongside Confucius.",
-              "They are Yan Hui, Zeng Shen, Zisi, and Mencius.",
-              "The first is Yan Hui, also known as Yan Zi, one of Confucius's most outstanding students. He was known for his love of learning, simple lifestyle, and virtue. Later Confucian scholars honored him as Fusheng.",
-              "Next is Zeng Shen, commonly known as Zeng Zi, a student of Confucius. He placed particular emphasis on self-cultivation and played an important role in passing down the teachings of Confucius to later generations. He was honored as Zongsheng.",
-              "The third is Zisi, whose name was Kong Ji. He was Confucius's grandson and a student of Zeng Shen. He is considered an important figure in continuing and developing Confucian thought. The Doctrine of the Mean is associated with Zisi, and the concept of the Middle Way holds an important place in the history of Confucianism. He was honored as Shusheng.",
-              "Finally, there is Mencius, whose name was Meng Ke, one of the great philosophers of Confucianism during the Warring States period. He developed many of Confucius's ideas, particularly the concept of innate human goodness, the principle of benevolence and righteousness, and the belief that the people should come first. The book Mencius records many of his dialogues and arguments and made an important contribution to the development of Confucianism. Mencius was honored as Yasheng.",
-              "From the kings who laid the foundations of education in Đại Việt, to the teacher Chu Văn An, and then to Confucius and the Four Associates, each figure honored at the Temple of Literature – Imperial Academy represents an important aspect of the tradition of learning, education, and respect for talented people.",
-              "Through this system of worship, the Temple of Literature – Imperial Academy not only preserves the marks of the past, but also reflects a long-standing tradition: valuing learning, upholding moral principles, and honoring those who contributed to education and the country."
-            ]
-          },
-          "src": "media/vm-audio-vi.m4a",
-          "srcEn": "media/vm-audio-en.m4a",
-          "label": {
-            "vi": "Bản thu: Các danh nhân được thờ tại Văn Miếu · 7:41",
-            "en": "Recording: the honoured figures of Van Mieu · 7:41"
-          }
         },
         {
           "type": "fact",
@@ -564,8 +449,8 @@
             {
               "src": "/img/van-mieu/kvc-qua-dai-trung-mon.webp",
               "caption": {
-                "vi": "Khuê Văn Các nhìn qua cổng Đại Trung",
-                "en": "Khue Van Cac seen through Dai Trung gate"
+                "vi": "Khuê Văn Các bên giếng Thiên Quang",
+                "en": "Khue Van Cac beside Thien Quang well"
               }
             },
             {
@@ -594,15 +479,37 @@
           "ambient": "wind-water",
           "script": {
             "vi": [
-              "Bạn đang đứng trước Khuê Văn Các, biểu tượng của Hà Nội.",
-              "Bốn cửa sổ tròn trên gác tượng trưng cho ánh sao Khuê, ánh sáng của tri thức tỏa ra bốn phương.",
-              "Phía sau là giếng Thiên Quang, nơi trời và đất soi vào nhau."
+              "Bước qua cổng Đại Trung, không gian kiến trúc tiếp tục được mở rộng.",
+              "Phía trước là khu Thành Đạt, nơi nổi bật với Khuê Văn Các, một công trình đã trở thành biểu tượng quen thuộc của Hà Nội.",
+              "Khu vực này có ba lối dẫn vào bên trong.",
+              "Lối chính nối từ cổng Đại Trung đến Khuê Văn Các, trong khi hai lối bên dẫn tới cổng Bí Văn và Súc Văn, gợi nhắc đến vẻ đẹp của văn chương và tri thức.",
+              "Khuê Văn Các được xây dựng vào năm 1805 dưới thời Tổng trấn Bắc Thành Nguyễn Văn Thành.",
+              "Công trình gây ấn tượng bởi kiến trúc cân đối và thanh thoát.",
+              "Phía dưới là phần đế vuông, phía trên là gác có những cửa sổ hình tròn.",
+              "Mái gồm hai tầng, lợp ngói ống, tạo nên vẻ đẹp vừa giản dị vừa tao nhã.",
+              "Tên gọi Khuê Văn Các gắn với sao Khuê, biểu tượng của văn chương theo quan niệm xưa.",
+              "Vì vậy, công trình không chỉ là một điểm nhấn kiến trúc của Văn Miếu - Quốc Tử Giám, mà còn trở thành biểu tượng cho truyền thống văn hiến và tinh thần trọng tri thức của Hà Nội.",
+              "Năm 2012, Khuê Văn Các chính thức được lựa chọn làm biểu tượng của Thủ đô."
             ],
             "en": [
-              "You are standing before the Khue Van Pavilion, the symbol of Hanoi.",
-              "Its four round windows represent the light of the Khue star, knowledge radiating in all directions.",
-              "Behind it lies the Well of Heavenly Clarity, where sky and earth reflect one another."
+              "Passing through Dai Trung gate, the architectural space gradually opens up.",
+              "Ahead lies the Thanh Dat area, home to Khue Van Cac, a structure that has become one of the familiar symbols of Hanoi.",
+              "This area has three entrances.",
+              "The main path connects Dai Trung gate to Khue Van Cac, while the two side paths lead to Bi Van gate and Suc Van gate, evoking the beauty of literature and knowledge.",
+              "Khue Van Cac was built in 1805 under Nguyen Van Thanh, the Governor of Bac Thanh.",
+              "The structure is distinguished by its balanced and elegant architecture.",
+              "The lower section is a square base, while the upper section is a pavilion featuring circular windows.",
+              "Its roof has two tiers covered with traditional cylindrical tiles, creating a beauty that is both simple and graceful.",
+              "The name Khue Van Cac is associated with the Khue star, which was traditionally regarded as a symbol of literature.",
+              "Therefore, the structure is not only an architectural highlight of Van Mieu - Quoc Tu Giam, but has also become a symbol of Hanoi's literary tradition and respect for knowledge.",
+              "In 2012, Khue Van Cac was officially selected as a symbol of the capital city."
             ]
+          },
+          "src": "media/vm-audio-thanh-dat-vi.mp3",
+          "srcEn": "media/vm-audio-thanh-dat-en.m4a",
+          "label": {
+            "vi": "Bản thu: Khu Thành Đạt & Khuê Văn Các · 1:01",
+            "en": "Recording: Thanh Dat & Khue Van Cac · 1:06"
           }
         },
         {
@@ -817,8 +724,8 @@
         "en": "Vuon Bia Tien Si (Stelae Garden)"
       },
       "hook": {
-        "vi": "82 tấm bia trên lưng rùa này là 'sổ danh sách' 700 năm các tiến sĩ Việt Nam — được UNESCO công nhận Tư liệu Thế giới.",
-        "en": "These 82 turtle-borne stelae are a 700-year roll of Vietnam's doctors — a UNESCO Memory of the World entry."
+        "vi": "82 tấm bia trên lưng rùa này là 'sổ danh sách' gần ba thế kỷ các tiến sĩ Việt Nam — được UNESCO công nhận Tư liệu Thế giới.",
+        "en": "These 82 turtle-borne stelae are a roll covering nearly three centuries of Vietnam's doctors — a UNESCO Memory of the World entry."
       },
       "coords": [
         105.8356,
@@ -868,15 +775,31 @@
           "ambient": "garden",
           "script": {
             "vi": [
-              "Trước mặt bạn là 82 tấm bia đá ghi danh hơn một nghìn ba trăm tiến sĩ.",
-              "Mỗi tấm bia đặt trên lưng một con rùa, biểu tượng của sự trường tồn.",
-              "Đây là Di sản tư liệu thế giới được UNESCO công nhận."
+              "Rời Khuê Văn Các, hành trình tiếp tục đưa chúng ta đến khu vườn bia Tiến sĩ, nơi những dấu ấn của nền khoa cử Việt Nam được lưu giữ qua những tấm bia đá.",
+              "Ở trung tâm khu vườn là Thiên Quang Tỉnh, một giếng nước cổ có hình vuông, mỗi cạnh dài khoảng 30 mét.",
+              "Mặt nước phẳng lặng kết hợp với cây xanh và những dãy bia đá tạo nên một không gian vừa trang nghiêm vừa thanh tịnh.",
+              "Hai bên giếng là những hàng bia Tiến sĩ.",
+              "Những tấm bia đầu tiên được dựng vào năm 1484 dưới triều vua Lê Thánh Tông nhằm tôn vinh những người đỗ đạt và khuyến khích việc học.",
+              "Ngày nay, 82 tấm bia vẫn được bảo tồn, ghi danh 1304 vị Tiến sĩ của 82 khoa thi trong lịch sử.",
+              "Những tấm bia không chỉ là những hiện vật quý giá mà còn là minh chứng cho truyền thống hiếu học và trọng dụng nhân tài của dân tộc Việt Nam."
             ],
             "en": [
-              "Before you stand 82 stone steles naming more than thirteen hundred doctoral laureates.",
-              "Each rests on the back of a tortoise, the symbol of longevity.",
-              "They are inscribed on UNESCO's Memory of the World Register."
+              "Leaving Khue Van Cac behind, our journey continues to the Doctoral Stele Garden, where the legacy of Vietnam's tradition of Imperial Examinations is preserved through rows of stone stele.",
+              "At the center of the garden is Thien Quang Well, an ancient square-shaped pond, with each side measuring approximately 30 meters.",
+              "Its calm surface combined with the surrounding trees and rows of stone stele, creates an atmosphere that is both solemn and peaceful.",
+              "On both sides of the well stand the Doctoral Stele.",
+              "The first stele were erected in 1484 under the reign of King Le Thanh Tong to honor successful candidates and encourage learning.",
+              "Today, 82 stele remain preserved, recording the names of 1,304 doctoral laureates from 82 Imperial Examinations throughout history.",
+              "These stele are not only valuable historical artifacts, but also evidence of Vietnam's long-standing tradition of learning and respect for talented people.",
+              "To protect the stele from the effects of weather, eight rows of protective houses were built in 1994.",
+              "These structures were designed to blend harmoniously with the ancient landscape of the site."
             ]
+          },
+          "src": "media/vm-audio-vuon-bia-vi.mp3",
+          "srcEn": "media/vm-audio-vuon-bia-en.m4a",
+          "label": {
+            "vi": "Bản thu: Vườn bia Tiến sĩ · 0:47",
+            "en": "Recording: the Doctoral Stele Garden · 1:07"
           }
         },
         {
@@ -1118,15 +1041,31 @@
           "ambient": "temple-bell",
           "script": {
             "vi": [
-              "Bạn đã bước vào sân Đại Thành, không gian thiêng nhất của Văn Miếu.",
-              "Điện thờ Khổng Tử và các bậc hiền triết nằm ngay trước mặt.",
-              "Hãy giữ yên lặng và cảm nhận nhịp thời gian gần một nghìn năm."
+              "Tiếp tục hành trình, chúng ta đến với khu Đại Thành, không gian tập trung những công trình quan trọng trong khu vực thờ tự Khổng Tử và các bậc hiền triết Nho giáo.",
+              "Ở trung tâm là sân Đại Bái, hai bên là những dãy nhà chạy song song.",
+              "Phía trước là Bái Đường, nơi từng diễn ra các nghi lễ tế Khổng Tử.",
+              "Công trình gồm chín gian, nổi bật với hệ thống cột gỗ lim, mái ngói mũi hài, và những hoạ tiết trang trí mang đậm dấu ấn kiến trúc truyền thống.",
+              "Phía sau Bái Đường là Điện Đại Thành, được nối với nhau bằng một Tiểu Đình.",
+              "Điện cũng gồm chín gian, với hệ thống cột được sơn son thếp vàng, mái ngói mũi hài, và hình tượng đôi rồng chầu Nhật Nguyệt trên nóc.",
+              "Đây là nơi thờ Khổng Tử, Tứ Phối, và Thập Triết.",
+              "Chính giữa Điện là tượng Khổng Tử, quay về hướng Nam, thể hiện vị trí trung tâm của Ngài trong không gian thờ tự và truyền thống Nho học tại Văn Miếu."
             ],
             "en": [
-              "You have entered the Great Success courtyard, the most sacred space of the temple.",
-              "The hall honouring Confucius and the sages lies straight ahead.",
-              "Keep quiet and feel the rhythm of nearly a thousand years."
+              "Continuing our journey, we arrive at the Dai Thanh area, which contains important structures within the worshipping space dedicated to Confucius and other great Confucian scholars.",
+              "At the center is the Dai Bai courtyard, with parallel rows of buildings on both sides.",
+              "At the front is Bai Duong, where ceremonies honoring Confucius were once held.",
+              "The building consists of nine bays, and features a system of ironwood columns, traditional mui hai tiled roofs, and decorative motifs characteristic of traditional Vietnamese architecture.",
+              "Behind Bai Duong stands Dai Thanh Hall, connected to it by a small pavilion.",
+              "The hall also consists of nine bays, featuring red lacquered and gilded columns, traditional mui hai tiled roofs, and images of two dragons facing the sun and moon on the roof ridge.",
+              "This is the place where Confucius, the four companions, and the ten disciples are worshipped.",
+              "At the center of the hall is a statue of Confucius facing South, reflecting his central position in the worshipping space and in the Confucian tradition at Van Mieu."
             ]
+          },
+          "src": "media/vm-audio-dai-thanh-vi.mp3",
+          "srcEn": "media/vm-audio-dai-thanh-en.m4a",
+          "label": {
+            "vi": "Bản thu: Khu Đại Thành · 0:49",
+            "en": "Recording: the Dai Thanh area · 0:59"
           }
         },
         {
@@ -1169,33 +1108,31 @@
             {
               "id": "nhan-vat",
               "title": {
-                "vi": "Người được thờ",
-                "en": "Who is honoured"
+                "vi": "Danh nhân",
+                "en": "Honoured figures"
               },
               "body": {
                 "vi": "Chính giữa thờ Đức Khổng Tử (551–479 TCN) – nhà giáo dục vĩ đại mở trường dạy cho mọi tầng lớp, san định Kinh Thi, Thư, Lễ, Nhạc, Dịch và Xuân Thu. Trung tâm học thuyết của ông là chữ 'Nhân' gắn với 'Lễ', cùng Tam cương – Ngũ thường (Nhân, Lễ, Nghĩa, Trí, Tín). Tượng gỗ mít sơn son thếp vàng, ngồi hướng Nam theo ý 'Thánh nhân nam diện nhi thính thiên hạ'. Hai bên thờ Tứ Phối – bốn đại tử phối hưởng cùng Khổng Tử: Nhan Hồi (Phục thánh) – học trò 'nghe một biết mười', an bần lạc đạo; Tăng Sâm (Tông thánh) – giữ tinh tuý thuyết Khổng môn với lời 'Mỗi nhật tam tỉnh ngô thân'; Tử Tư (Thuật thánh) – cháu nội Khổng Tử, soạn sách Trung dung; Mạnh Tử (Á thánh) – đề cao thuyết 'Dân vi quý', tác giả kinh điển Mạnh Tử.",
                 "en": "At the centre sits Confucius (551–479 BCE) – the great educator who taught disciples of every class and edited the Books of Songs, Documents, Rites, Music, Changes and the Spring and Autumn Annals. The heart of his teaching is 'Nhan' (benevolence) bound with 'Le' (ritual propriety), together with the Three Bonds and Five Constants (benevolence, propriety, righteousness, wisdom, faithfulness). His jackwood statue, red-lacquered and gilded, faces south – 'the sage faces south to hear all under heaven'. Flanking him stand the Four Correlates (Tu Phoi), disciples honoured alongside him: Yan Hui (Phuc Thanh), the pupil who 'hears one thing and knows ten', content in poverty; Zengzi (Tong Thanh), keeper of the doctrine's essence, famed for 'examining himself thrice daily'; Zisi (Shu Sheng), Confucius' grandson and compiler of the Doctrine of the Mean; and Mencius (A Thanh), champion of 'the people are most precious'."
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/tu-phoi-1.webp",
+                  "caption": {
+                    "vi": "Tượng Nhan Tử — Phục thánh, đứng đầu Tứ Phối phối thờ trong điện Đại Thành.",
+                    "en": "Statue of Yan Hui (Nhan Tu) — the Second Sage, first of the Four Correlates honoured in the Hall of Great Success."
+                  }
+                },
+                {
+                  "src": "/img/van-mieu/tu-phoi-2.webp",
+                  "caption": {
+                    "vi": "Tượng Tử Tư — Thuật thánh, cháu nội Khổng Tử, tác giả sách Trung Dung.",
+                    "en": "Statue of Zisi (Tu Tu) — the Transmitting Sage, Confucius's grandson and author of the Doctrine of the Mean."
+                  }
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "image",
-          "size": "lg",
-          "image": "/img/van-mieu/tu-phoi-1.webp",
-          "caption": {
-            "vi": "Tứ Phối — bốn học trò xuất sắc của Khổng Tử, phối thờ hai bên trong điện Đại Thành: Nhan Tử (513–482 TCN), Tăng Tử (505–436 TCN).",
-            "en": "The Four Correlates — Confucius's four principal disciples honoured beside him in the Hall of Great Success: Yan Hui (513–482 BCE), Zengzi (505–436 BCE)."
-          }
-        },
-        {
-          "type": "image",
-          "size": "lg",
-          "image": "/img/van-mieu/tu-phoi-2.webp",
-          "caption": {
-            "vi": "…và Tử Tư (492–431 TCN), Mạnh Tử (371–289 TCN).",
-            "en": "…along with Zisi (492–431 BCE) and Mencius (371–289 BCE)."
-          }
         }
       ],
       "sources": [
@@ -1242,8 +1179,8 @@
           },
           "options": [
             {
-              "vi": "Bốn học trò xuất sắc của Khổng Tử",
-              "en": "Confucius' four most distinguished disciples"
+              "vi": "Bốn bậc hiền phối thờ Khổng Tử",
+              "en": "The four sage disciples honoured beside Confucius"
             },
             {
               "vi": "Bốn vị vua nhà Lý",
@@ -1392,12 +1329,21 @@
           "ambient": "garden",
           "script": {
             "vi": [
-              "Điểm cuối hành trình: Nhà Thái Học, nơi từng là trường Quốc Tử Giám.",
-              "Tầng dưới thờ thầy Chu Văn An, tầng trên thờ ba vị vua có công lập trường."
+              "Sau không gian thờ tự của khu Đại Thành, hành trình tiếp tục đến khu Thái Học, nơi gắn với hoạt động giáo dục và đào tạo nhân tài của Quốc Tử Giám xưa.",
+              "Khu Thái Học ngày nay được xây dựng vào năm 2000 trên nền Quốc Tử Giám xưa, mang dáng dấp kiến trúc truyền thống với các công trình như Tiền Đường, Hậu Đường, Tả Vu, Hữu Vu, cùng nhà chuông và nhà trống.",
+              "Tiền Đường là không gian diễn ra nhiều hoạt động văn hóa, khoa học và nghệ thuật.",
+              "Hậu Đường gồm hai tầng.",
+              "Tầng dưới giới thiệu lịch sử Văn Miếu, Quốc Tử Giám và tôn vinh người thầy giáo tiêu biểu Chu Văn An.",
+              "Tầng trên là nơi thờ ba vị vua có nhiều đóng góp cho sự hình thành và phát triển của nền giáo dục Nho học Việt Nam: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông."
             ],
             "en": [
-              "The final stop: Thai Hoc House, once the Imperial Academy itself.",
-              "The ground floor honours teacher Chu Van An; the upper floor, three founding kings."
+              "After the worshipping space of the Dai Thanh area, our journey continues to the Thai Hoc area, which is associated with education and the training of talented scholars at the former Quoc Tu Giam.",
+              "Today's Thai Hoc area was built in 2000 on the site of the former Quoc Tu Giam.",
+              "It follows traditional architectural styles and includes structures such as Tien Duong, Hau Duong, Ta Vu, Huu Vu, as well as the bell house and drum house.",
+              "Tien Duong serves as a venue for various cultural, scientific, and artistic activities.",
+              "Hau Duong has two floors.",
+              "The lower floor introduces the history of Van Mieu Quoc Tu Giam and honors Chu Van An, an outstanding Vietnamese teacher.",
+              "The upper floor is dedicated to three kings who made significant contributions to the formation and development of Confucian education in Vietnam: Ly Thanh Tong, Ly Nhan Tong, and Le Thanh Tong."
             ]
           },
           "scriptComplete": {
@@ -1407,6 +1353,12 @@
             "en": [
               "Congratulations – you have completed the scholar's journey."
             ]
+          },
+          "src": "media/vm-audio-thai-hoc-vi.mp3",
+          "srcEn": "media/vm-audio-thai-hoc-en.m4a",
+          "label": {
+            "vi": "Bản thu: Nhà Thái Học · 0:42",
+            "en": "Recording: the Thai Hoc house · 0:51"
           }
         },
         {
@@ -1466,18 +1418,18 @@
               "body": {
                 "vi": "Tầng dưới thờ Chu Văn An (1292–1370) – từng làm Tư nghiệp Quốc Tử Giám, thầy của hai vua Trần, người dâng 'Thất trảm sớ' xin chém bảy gian thần; dâng sớ không thành, ông thẳng thắn từ quan về núi ở ẩn – chuẩn mực khí tiết người thầy Việt Nam. Năm 2019 UNESCO tôn vinh ông là nhà giáo dục tiêu biểu của Việt Nam. Tượng thờ bằng đồng do nghệ nhân làng Ngũ Xã đúc năm 2003; riêng tượng Chu Văn An nặng khoảng 3 tấn.",
                 "en": "The ground floor honours Chu Van An (1292–1370) – once Director of Quoc Tu Giam and tutor to two Tran kings, who submitted the 'Seven Executions' petition demanding the removal of seven corrupt courtiers; when it failed he frankly resigned and withdrew to the mountains – the moral standard of the Vietnamese teacher. UNESCO honoured him in 2019 as a model educator of Vietnam. The bronze statues were cast by artisans of Ngu Xa village in 2003; Chu Van An's alone weighs about 3 tonnes."
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/chu-van-an.webp",
+                  "caption": {
+                    "vi": "Tượng thầy Chu Văn An ở tầng dưới nhà Thái Học – đúc năm 2003, nặng khoảng 3 tấn.",
+                    "en": "The statue of teacher Chu Van An on the ground floor – cast in 2003, weighing about 3 tonnes."
+                  }
+                }
+              ]
             }
           ]
-        },
-        {
-          "type": "image",
-          "size": "lg",
-          "image": "/img/van-mieu/chu-van-an.webp",
-          "caption": {
-            "vi": "Tượng thầy Chu Văn An ở tầng dưới nhà Thái Học – đúc năm 2003, nặng khoảng 3 tấn.",
-            "en": "The statue of teacher Chu Van An on the ground floor – cast in 2003, weighing about 3 tonnes."
-          }
         }
       ],
       "sources": [
@@ -1701,17 +1653,33 @@
           "ambient": "garden",
           "script": {
             "vi": [
-              "Bạn đang đứng trong Vườn Giám, khoảng xanh phía Tây của khu di tích Văn Miếu – Quốc Tử Giám.",
-              "Phần đất này vốn thuộc Hồ Văn, được trả lại cho Văn Miếu vào năm 1940 và mang tên Vườn Giám theo Quốc Tử Giám khi ấy.",
-              "Từ năm 1996 đến 2004, khu vườn được trùng tu, cải tạo, khôi phục không gian xanh gắn với Hồ Văn.",
-              "Nổi bật trong vườn là Nhà Bát Giác – ngôi nhà mặt bằng bát giác, mái ngói nhiều lớp cong đao, điểm dừng chân cho các hoạt động văn hóa, giáo dục."
+              "Rời khu nội tự, chúng ta đến với vườn Giám, một không gian rộng mở, nơi kiến trúc được hòa quyện cùng cây xanh và mặt nước.",
+              "Phần đất còn lại của hồ Văn được trả lại cho Văn Miếu vào năm 1940 và được gọi là vườn Giám, theo tên Quốc Tử Giám khi đó.",
+              "Trải qua nhiều giai đoạn, khu vực này từng bị sử dụng sai mục đích và lấn chiếm, làm ảnh hưởng đến cảnh quan của di tích.",
+              "Từ năm 1996, vườn Giám được triển khai trùng tu và cải tạo, đến năm 2004 thì hoàn thành, từng bước khôi phục không gian xanh gắn với hồ Văn và Văn Miếu - Quốc Tử Giám.",
+              "Nổi bật trong khu vực là nhà Bát Giác, một công trình mang phong cách kiến trúc truyền thống, hài hòa với cây xanh và mặt nước.",
+              "Đúng như tên gọi, công trình có mặt bằng hình bát giác, mái ngói nhiều lớp với những góc đao cong, kết hợp cùng hệ thống cột gỗ tạo nên vẻ thanh thoát và cổ kính.",
+              "Không gian mở giúp nhà Bát Giác hòa mình với cảnh quan xung quanh.",
+              "Ngày nay, nơi đây vừa là điểm dừng chân của du khách, vừa là không gian tổ chức các hoạt động văn hóa và giáo dục trong khu di tích."
             ],
             "en": [
-              "You are standing in the Academy Garden, the green quarter on the west side of the Temple of Literature complex.",
-              "This land once belonged to the Literature Lake; it was returned to the complex in 1940 and named after the Quoc Tu Giam of that era.",
-              "From 1996 to 2004 the garden was restored, bringing back the green landscape linked with the lake.",
-              "Its landmark is the Octagonal Pavilion – a multi-tiered roofed structure with curved ridges, now a resting point for cultural and educational activities."
+              "Leaving the inner area, we arrive at Giam Garden, an open space where architecture blends harmoniously with trees and water.",
+              "The remaining land of Van Lake was returned to Van Mieu in 1940, and became known as Giam Garden, named after Quoc Tu Giam at that time.",
+              "Over the years, this area was used for various purposes and became encroached upon, affecting the landscape of the heritage site.",
+              "Beginning in 1996, Giam Garden underwent restoration and renovation.",
+              "The work was completed in 2004, gradually restoring the green space associated with Van Lake and Van Mieu Quoc Tu Giam.",
+              "One of the most prominent structures in this area is the octagonal house, a traditional architectural structure that blends harmoniously with the surrounding greenery and water.",
+              "As its name suggests, the building has an octagonal floor plan and a multi-tiered tiled roof with curved corners.",
+              "Combined with its wooden columns, these features create an elegant and traditional appearance.",
+              "Its open design allows the octagonal house to blend naturally into the surrounding landscape.",
+              "Today, it serves both as a resting place for visitors and as a venue for cultural and educational activities within the heritage site."
             ]
+          },
+          "src": "media/vm-audio-vuon-giam-vi.mp3",
+          "srcEn": "media/vm-audio-vuon-giam-en.m4a",
+          "label": {
+            "vi": "Bản thu: Vườn Giám · 1:04",
+            "en": "Recording: Giam Garden · 1:10"
           }
         },
         {
@@ -2009,7 +1977,7 @@
           "en": "The 54,331 m² complex faces south and comprises Hồ Văn lake, Giám garden and the walled inner quarters. The Tiền Án forecourt opens with four great brick pillars – the outer pair crowned by four spreading phoenixes – and two dismount steles. Beyond the Văn Miếu gate lies the leafy Nhập Đạo quarter flanked by ponds. A red-tiled path leads to the Đại Trung gate in Later Lê style: three timber bays, a 'mũi hài' tiled roof, twin carps bowing to the ridge, Bát Tràng tile flooring and three ceremonial steps. The main portico itself has three passages on two levels – the central one once reserved for the king – flanked by a pair of Lê-dynasty stone dragons."
         },
         "spotId": "van-mieu-mon",
-        "aspect": "tien-an",
+        "aspect": "lich-su",
         "lead": {
           "vi": "Bốn trụ gạch, chim phượng và cổng tam quan hai tầng",
           "en": "Four brick pillars, phoenixes and a two-storey triple gate"
@@ -2025,11 +1993,26 @@
           "vi": "Qua cổng Văn Miếu Môn là khu Nhập Đạo – sân trong thứ nhất của nội tự, nhiều cây xanh với hồ nước hai bên. Con đường lát gạch đỏ dẫn tới cổng Đại Trung theo lối kiến trúc Hậu Lê: gỗ ba gian, mái ngói mũi hài, nóc đắp đôi cá chép chầu vào bình móc, nền lát gạch đá Bát Tràng với ba bậc lên xuống tôn nghiêm.",
           "en": "Beyond the Van Mieu Mon gate lies the Nhap Dao precinct – the first inner courtyard, leafy and flanked by ponds. A red-tiled path leads to the Dai Trung gate in Later Le style: three timber bays, a 'mui hai' tiled roof, twin carps bowing to the ridge, Bat Trang paving and three ceremonial steps."
         },
-        "spotId": "van-mieu-mon",
-        "aspect": "khu-vuc",
         "lead": {
           "vi": "Đường gạch qua hồ nước và rừng cây tới cổng Đại Trung",
           "en": "A brick path past ponds and trees to Dai Trung gate"
+        },
+        "video": {
+          "src": "media/vm-nhap-dao.mp4",
+          "srcEn": "media/vm-nhap-dao-en.mp4",
+          "poster": "/media/vm-nhap-dao-poster.jpg",
+          "title": {
+            "vi": "Nhập Đạo & Đại Trung Môn",
+            "en": "Nhap Dao & Dai Trung gate"
+          }
+        },
+        "audio": {
+          "src": "media/vm-audio-nhap-dao-vi.mp3",
+          "srcEn": "media/vm-audio-nhap-dao-en.m4a",
+          "label": {
+            "vi": "Bản thu: Nhập Đạo & Đại Trung Môn · 0:35",
+            "en": "Recording: Nhap Dao & Dai Trung gate · 0:38"
+          }
         }
       },
       {
@@ -2130,10 +2113,52 @@
         "lead": {
           "vi": "Hồ hơn 12.000 m² trước khu di tích, có gò Kim Châu",
           "en": "A 12,000 m² lake before the site, with Kim Chau islet"
+        },
+        "audio": {
+          "src": "media/vm-audio-ho-van-vi.mp3",
+          "srcEn": "media/vm-audio-ho-van-en.m4a",
+          "label": {
+            "vi": "Bản thu: Hồ Văn · 1:49",
+            "en": "Recording: Van Lake · 2:15"
+          }
         }
       }
     ],
     "danhNhan": [
+      {
+        "id": "danh-nhan-tong-quan",
+        "title": {
+          "vi": "Danh nhân được thờ",
+          "en": "The honoured figures"
+        },
+        "lead": {
+          "vi": "Ba vị vua đặt nền giáo dục, thầy Chu Văn An và các bậc hiền Nho.",
+          "en": "The kings who founded it, teacher Chu Van An and the Confucian sages."
+        },
+        "body": {
+          "vi": "Tổng quan về các danh nhân được thờ tại Văn Miếu — Quốc Tử Giám: các vua Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông đặt nền móng giáo dục Đại Việt; danh sư Chu Văn An truyền bá tri thức; Khổng Tử cùng Tứ Phối là cội nguồn của Nho học.",
+          "en": "An overview of the figures honoured at Van Mieu - Quoc Tu Giam: kings Ly Thanh Tong, Ly Nhan Tong and Le Thanh Tong who laid the foundations of Dai Viet education; the great teacher Chu Van An who spread knowledge; Confucius and the Four Correlates at the root of Confucian learning."
+        },
+        "spotId": "van-mieu-mon",
+        "aspect": "lich-su",
+        "video": {
+          "src": "media/nguon-goc-lich-su.mp4",
+          "srcEn": "media/nguon-goc-lich-su-en.mp4",
+          "poster": "/media/nguon-goc-poster.jpg",
+          "title": {
+            "vi": "Nguồn gốc lịch sử & các danh nhân",
+            "en": "Historical origins & honoured figures"
+          }
+        },
+        "audio": {
+          "src": "media/vm-audio-vi.m4a",
+          "srcEn": "media/vm-audio-en.m4a",
+          "label": {
+            "vi": "Bản thu: Các danh nhân được thờ · 7:41",
+            "en": "Recording: the honoured figures · 8:40"
+          }
+        }
+      },
       {
         "id": "cac-vua",
         "title": {

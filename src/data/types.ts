@@ -11,13 +11,16 @@ export type ThemeContext = 'lich-su' | 'tu-nhien' | 'tam-linh';
 
 export type CardSize = 'lg' | 'md' | 'sm';
 
+/** Một phần tử gallery: chuỗi trần = chỉ ảnh, object = kèm caption riêng. */
+export type GalleryItem = string | { src: string; caption?: Localized };
+
 export interface HeroCard {
   type: 'hero';
   size: CardSize;
   image: string;
   /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu.
       Mỗi ảnh có thể mang caption riêng {src, caption}; chuỗi trần dùng caption chung. */
-  images?: (string | { src: string; caption?: Localized })[];
+  images?: GalleryItem[];
   caption?: Localized;
 }
 
@@ -28,8 +31,12 @@ export interface AspectsCard {
     id: string;
     title: Localized;
     body: Localized;
+    /** Ảnh gắn đúng chủ thể của tab (tượng, hiện vật…) — hiện dưới body, chỉ trong tab đó. */
+    images?: GalleryItem[];
     video?: { src: string; poster?: string; title?: Localized };
     videoEn?: { src: string; poster?: string; title?: Localized };
+    /** Bản thu gắn chủ thể của tab (có thể chỉ có một ngôn ngữ — srcEn chỉ hiện khi lang='en'). */
+    audio?: { src?: string; srcEn?: string; label?: Localized };
   }[];
 }
 
@@ -73,7 +80,7 @@ export interface ImageCard {
   image: string;
   /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu.
       Mỗi ảnh có thể mang caption riêng {src, caption}; chuỗi trần dùng caption chung. */
-  images?: (string | { src: string; caption?: Localized })[];
+  images?: GalleryItem[];
   caption?: Localized;
 }
 
@@ -143,6 +150,10 @@ export interface ExploreEntry {
   /** Aspect chứa clip nhúng ở trang chi tiết — khi clip của khu nằm tab khác `aspect`
       (vd clip cảnh khu nằm tab 'kien-truc' còn link vào 'lich-su'). */
   clipAspect?: string;
+  /** Video riêng của mục (mục không gắn điểm QR — Nhập Đạo, Danh nhân…). */
+  video?: { src: string; srcEn?: string; poster?: string; title?: Localized };
+  /** Audio riêng của mục — bản thu giọng đọc thật theo khu. */
+  audio?: { src: string; srcEn?: string; label?: Localized };
 }
 
 export interface Site {

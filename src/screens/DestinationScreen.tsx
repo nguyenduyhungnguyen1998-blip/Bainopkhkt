@@ -8,7 +8,7 @@ import type { Card, HeroCard, ImageCard, Site, Spot, AudioCard, AspectsCard, Vid
 import { UI, t, useLang, type Lang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
 import { asset } from '../lib/asset';
-import { getProgress, isSpotUnlocked, unlockSpot, useProgress } from '../lib/progress';
+import { getProgress, isSpotUnlocked, progressPersistFailed, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
@@ -188,6 +188,7 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   const [badgeName, setBadgeName] = useState<string | null>(null);
   const [totalXp, setTotalXp] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(progressPersistFailed());
   const [, setLang] = useLang();
   // Khách quét QR lần đầu chưa từng chọn ngôn ngữ -> hỏi 1 lần, nhớ luôn (mdv.lang).
   // Tránh rơi thẳng vào nội dung tiếng Việt/audio mặc định cho du khách nước ngoài.
@@ -234,13 +235,27 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     navigate(`d/${site.entityId}/${spot.spotId}${a ? `?a=${a}` : ''}`, true);
   };
 
+  // Flag "không lưu được" có thể lật trong lúc toast đang mở — nghe event cập nhật trực tiếp.
+  useEffect(() => {
+    const on = () => setSaveFailed(true);
+    window.addEventListener('mdv:savefail', on);
+    return () => window.removeEventListener('mdv:savefail', on);
+  }, []);
+
   const doUnlock = () => {
     // Chỉ mở dấu khi chữ ký đã verify ok — không đường nào vào được với tem sai.
     if (unlocked || state !== 'ok') return;
     const r = unlockSpot(site.entityId, spot.spotId);
+    // Dấu đã có (tab khác vừa ghi, hoặc race) — đóng êm, không hiện toast '+0 XP'.
+    if (r.alreadyUnlocked) {
+      setDismissed(true);
+      dropSig();
+      return;
+    }
     setReward(r.gainedXp);
     setBadgeName(r.newBadge ? t(r.newBadge.name, lang) : null);
     setTotalXp(getProgress().xp);
+    setSaveFailed(progressPersistFailed());
     if (navigator.vibrate) navigator.vibrate(30);
   };
 
@@ -311,6 +326,11 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
           <span>
             +{reward} XP · {t(UI.totalXp, lang)} {totalXp} XP{badgeName ? ` · ${badgeName}` : ''}
           </span>
+          {saveFailed && (
+            <span class="dtoast__warn">
+              <Icon name="warn" size={13} /> {t(UI.saveFailed, lang)}
+            </span>
+          )}
         </div>
         <a class="dtoast__link" href={routeHref.passport}>
           {t(UI.viewStamp, lang)}
@@ -444,25 +464,45 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
  */
 type ExploreBranch = 'khuVuc' | 'danhNhan';
 
-/** Clip của mục đang xem (?e=): nhúng đúng video của tab aspect tương ứng,
- *  nhãn dưới player = tiêu đề clip + thời lượng + ngôn ngữ thuyết minh. */
+/** Clip/audio của mục đang xem (?e=): mục không có điểm QR (Nhập Đạo, Hồ Văn,
+ *  Danh nhân) mang media riêng trên entry; mục gắn điểm lấy clip của tab aspect,
+ *  cuối cùng mới đến video card chung của điểm. Nhãn = tiêu đề + thời lượng + ngôn ngữ. */
 function EntryMedia({ site, entry, lang }: { site: Site; entry: ExploreEntry; lang: Lang }) {
   const [dur, setDur] = useState<number | null>(null);
   const sp = site.spots.find((s) => s.spotId === entry.spotId);
   const aspect = sp?.layoutSchema.flatMap((c) => (c.type === 'aspects' ? c.aspects : [])).find((x) => x.id === (entry.clipAspect ?? entry.aspect));
-  if (!aspect) return null;
-  const enClip = lang === 'en' && !!aspect.videoEn;
-  const vid = enClip ? aspect.videoEn : aspect.video;
-  if (!vid) return null;
+  const vcard = sp?.layoutSchema.find((c): c is VideoCard => c.type === 'video');
+  const enClip = lang === 'en' && (!!entry.video?.srcEn || !!aspect?.videoEn || !!vcard?.srcEn);
+  const cardSrc = vcard ? (lang === 'en' && vcard.srcEn ? vcard.srcEn : vcard.src) : undefined;
+  const ev = entry.video;
+  const vid =
+    (ev ? { src: lang === 'en' && ev.srcEn ? ev.srcEn : ev.src, poster: ev.poster, title: ev.title } : undefined) ??
+    (enClip ? aspect?.videoEn : aspect?.video) ??
+    (vcard && cardSrc ? { src: cardSrc, poster: vcard.poster, title: vcard.title } : undefined);
+  const aSrc = entry.audio ? (lang === 'en' && entry.audio.srcEn ? entry.audio.srcEn : entry.audio.src) : undefined;
+  if (!vid && !aSrc) return null;
+  const vtitle = vid?.title ? t(vid.title, lang) : aspect ? t(aspect.title, lang) : '';
   const mmss = `${Math.floor((dur ?? 0) / 60)}:${String(Math.floor((dur ?? 0) % 60)).padStart(2, '0')}`;
   return (
-    <figure class="xplrd__media">
-      <LocalVideo src={vid.src} poster={vid.poster} label={vid.title ? t(vid.title, lang) : t(aspect.title, lang)} lang={lang} onDur={setDur} />
-      <figcaption class="xplrd__mnote">
-        <Icon name="play" size={12} /> {vid.title ? t(vid.title, lang) : t(aspect.title, lang)}
-        {dur ? ` · ${mmss}` : ''} · {enClip ? t(UI.clipEn, lang) : t(UI.clipVi, lang)}
-      </figcaption>
-    </figure>
+    <>
+      {vid && (
+        <figure class="xplrd__media">
+          <LocalVideo src={vid.src} poster={vid.poster} label={vtitle} lang={lang} onDur={setDur} />
+          <figcaption class="xplrd__mnote">
+            <Icon name="play" size={12} /> {vtitle}
+            {dur ? ` · ${mmss}` : ''} · {enClip ? t(UI.clipEn, lang) : t(UI.clipVi, lang)}
+          </figcaption>
+        </figure>
+      )}
+      {aSrc && (
+        <figure class="xplrd__media">
+          <audio class="xplrd__audio" controls preload="metadata" src={asset(aSrc)} />
+          <figcaption class="xplrd__mnote">
+            <Icon name="headphones" size={12} /> {entry.audio?.label ? t(entry.audio.label, lang) : t(UI.recordedNarration, lang)}
+          </figcaption>
+        </figure>
+      )}
+    </>
   );
 }
 
@@ -843,6 +883,9 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
       ) : (
         <iframe src={src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
+      <span class="dcard__vlabel">
+        <Icon name="play" size={11} /> {t(card.title, lang)}
+      </span>
     </div>
   );
 }
@@ -1038,9 +1081,36 @@ function AspectsCardView({ card, lang, initial }: { card: AspectsCard; lang: Lan
           </button>
         ))}
       </div>
-      <p key={cur.id} class="dcard__body">
-        {t(cur.body, lang)}
-      </p>
+      {t(cur.body, lang)
+        .split(/\n\s*\n/)
+        .map((para, i) => (
+          <p key={`${cur.id}-${i}`} class="dcard__body">
+            {para}
+          </p>
+        ))}
+      {cur.images?.map((item, i) => {
+        const im = typeof item === 'string' ? { src: item, caption: undefined } : item;
+        return (
+          <figure key={`${cur.id}-img-${i}`} class="dcard__aimg">
+            <img src={asset(im.src)} alt={im.caption ? t(im.caption, lang) : t(cur.title, lang)} loading="lazy" />
+            {im.caption && <figcaption>{t(im.caption, lang)}</figcaption>}
+          </figure>
+        );
+      })}
+      {(() => {
+        const aSrc = lang === 'en' ? (cur.audio?.srcEn ?? cur.audio?.src) : cur.audio?.src;
+        if (!aSrc) return null;
+        return (
+          <figure class="dcard__aimg dcard__aaudio">
+            <audio class="xplrd__audio" controls preload="metadata" src={asset(aSrc)} />
+            {cur.audio?.label && (
+              <figcaption>
+                <Icon name="headphones" size={12} /> {t(cur.audio.label, lang)}
+              </figcaption>
+            )}
+          </figure>
+        );
+      })()}
       {(() => {
         const vid = lang === 'en' && cur.videoEn ? cur.videoEn : cur.video;
         if (!vid) return null;

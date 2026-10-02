@@ -16,6 +16,7 @@ import { useMapGestures } from './useMapGestures';
 import { SITES } from '../data/content';
 import type { Region, Site } from '../data/types';
 import type { NodeStatus, UnlockResult } from '../lib/progress';
+import { takePendingMapUnlocks } from '../lib/progress';
 import { inspector, useInspector } from '../debug/inspector';
 import { t, UI, type Lang } from '../lib/i18n';
 import { iconPath } from '../components/Icon';
@@ -227,7 +228,22 @@ export function VietnamMap({
       setTimeout(() => setRipples((rs) => rs.slice(1)), 1400);
     };
     window.addEventListener('mdv:unlock', onUnlock);
-    return () => window.removeEventListener('mdv:unlock', onUnlock);
+    // Dấu nhận khi đang ở màn khác (quét QR trong trang điểm) — sóng lan vẫn bắn lại
+    // lần đầu map mount, xếp so le để khách nhìn thấy hành trình sáng lên.
+    const pending = takePendingMapUnlocks();
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    pending.forEach((siteId, i) => {
+      timers.push(
+        setTimeout(() => {
+          setRipples((rs) => [...rs, { id: ++rippleSeq.current, siteId }]);
+          setTimeout(() => setRipples((rs) => rs.slice(1)), 1400);
+        }, 350 * i)
+      );
+    });
+    return () => {
+      window.removeEventListener('mdv:unlock', onUnlock);
+      timers.forEach(clearTimeout);
+    };
   }, []);
 
   // Đường hành trình
@@ -336,10 +352,7 @@ export function VietnamMap({
       aria-label={lang === 'vi' ? 'Bản đồ hành trình di sản Việt Nam' : 'Vietnam heritage journey map'}
     >
       <defs>
-        <radialGradient id="vmap-sea" cx="60%" cy="45%" r="80%">
-          <stop offset="0" stop-color="var(--color-sea)" stop-opacity="0.35" />
-          <stop offset="1" stop-color="var(--color-sea)" />
-        </radialGradient>
+
         <pattern id="vmap-waves" width="36" height="18" patternUnits="userSpaceOnUse">
           <path d="M0 9c6-6 12-6 18 0s12 6 18 0" fill="none" stroke="currentColor" stroke-opacity="0.07" stroke-width="1" />
         </pattern>
@@ -348,12 +361,12 @@ export function VietnamMap({
         </pattern>
         {/* Vignette: láng giềng/nội dung tan vào biển ở rìa khung (không còn cạnh thẳng cắt) */}
         <radialGradient id="vmap-vignette" cx="50%" cy="50%" r="72%">
-          <stop offset="54%" stop-color="var(--color-sea)" stop-opacity="0" />
-          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="1" />
+          <stop offset="62%" stop-color="var(--color-sea)" stop-opacity="0" />
+          <stop offset="100%" stop-color="var(--color-sea)" stop-opacity="0.72" />
         </radialGradient>
       </defs>
 
-      <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-sea)" />
+      <rect class="vmap__sea" width={MAP_WIDTH} height={MAP_HEIGHT} fill="var(--color-sea)" />
       <rect class="vmap__waves" width={MAP_WIDTH} height={MAP_HEIGHT} fill="url(#vmap-waves)" />
 
       <g ref={gRef} class="vmap__world">

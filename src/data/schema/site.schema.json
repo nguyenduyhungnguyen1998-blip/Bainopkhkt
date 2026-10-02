@@ -78,6 +78,20 @@
         "title": { "$ref": "#/definitions/localized" }
       }
     },
+    "galleryItem": {
+      "oneOf": [
+        { "$ref": "#/definitions/assetPath" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src"],
+          "properties": {
+            "src": { "$ref": "#/definitions/assetPath" },
+            "caption": { "$ref": "#/definitions/localized" }
+          }
+        }
+      ]
+    },
     "exploreEntry": {
       "type": "object",
       "additionalProperties": false,
@@ -89,7 +103,28 @@
         "body": { "$ref": "#/definitions/localized" },
         "spotId": { "$ref": "#/definitions/slug" },
         "aspect": { "$ref": "#/definitions/slug" },
-        "clipAspect": { "$ref": "#/definitions/slug" }
+        "clipAspect": { "$ref": "#/definitions/slug" },
+        "video": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src"],
+          "properties": {
+            "src": { "type": "string", "format": "uri-reference" },
+            "srcEn": { "type": "string", "format": "uri-reference" },
+            "poster": { "$ref": "#/definitions/assetPath" },
+            "title": { "$ref": "#/definitions/localized" }
+          }
+        },
+        "audio": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["src"],
+          "properties": {
+            "src": { "type": "string", "format": "uri-reference" },
+            "srcEn": { "type": "string", "format": "uri-reference" },
+            "label": { "$ref": "#/definitions/localized" }
+          }
+        }
       }
     },
     "localized": {
@@ -212,20 +247,7 @@
             "image": { "$ref": "#/definitions/assetPath" },
             "images": {
               "type": "array",
-              "items": {
-                "oneOf": [
-                  { "$ref": "#/definitions/assetPath" },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["src"],
-                    "properties": {
-                      "src": { "$ref": "#/definitions/assetPath" },
-                      "caption": { "$ref": "#/definitions/localized" }
-                    }
-                  }
-                ]
-              }
+              "items": { "$ref": "#/definitions/galleryItem" }
             },
             "caption": { "$ref": "#/definitions/localized" }
           }
@@ -249,8 +271,21 @@
                   "id": { "$ref": "#/definitions/slug" },
                   "title": { "$ref": "#/definitions/localized" },
                   "body": { "$ref": "#/definitions/localized" },
+                  "images": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/galleryItem" }
+                  },
                   "video": { "$ref": "#/definitions/videoRef" },
-                  "videoEn": { "$ref": "#/definitions/videoRef" }
+                  "videoEn": { "$ref": "#/definitions/videoRef" },
+                  "audio": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "src": { "type": "string", "format": "uri-reference" },
+                      "srcEn": { "type": "string", "format": "uri-reference" },
+                      "label": { "$ref": "#/definitions/localized" }
+                    }
+                  }
                 }
               }
             }
@@ -321,20 +356,7 @@
             "image": { "$ref": "#/definitions/assetPath" },
             "images": {
               "type": "array",
-              "items": {
-                "oneOf": [
-                  { "$ref": "#/definitions/assetPath" },
-                  {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": ["src"],
-                    "properties": {
-                      "src": { "$ref": "#/definitions/assetPath" },
-                      "caption": { "$ref": "#/definitions/localized" }
-                    }
-                  }
-                ]
-              }
+              "items": { "$ref": "#/definitions/galleryItem" }
             },
             "caption": { "$ref": "#/definitions/localized" }
           }

@@ -175,29 +175,12 @@
                 }
               },
               "audio": {
-                "src": "media/vm-audio-kien-truc-en.m4a",
                 "srcEn": "media/vm-audio-kien-truc-en.m4a",
                 "label": {
                   "vi": "Bản thu tiếng Anh: Kiến trúc toàn quần thể · 9:48",
-                  "en": "Recording: complex-wide architecture · 9:48"
+                  "en": "Recorded narration: complex-wide architecture · 9:48"
                 }
-              },
-              "images": [
-                {
-                  "src": "/img/van-mieu/so-do-van-mieu.webp",
-                  "caption": {
-                    "vi": "Sơ đồ tham quan di tích Văn Miếu – Quốc Tử Giám",
-                    "en": "Visitor map of the Van Mieu – Quoc Tu Giam complex"
-                  }
-                },
-                {
-                  "src": "/img/van-mieu/tien-an-tu-tru.webp",
-                  "caption": {
-                    "vi": "Bốn trụ gạch và bia Hạ mã ở Khu Tiền Án",
-                    "en": "Brick pillars and dismount steles at Tien An"
-                  }
-                }
-              ]
+              }
             },
             {
               "id": "y-nghia",

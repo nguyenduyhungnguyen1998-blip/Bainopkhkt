@@ -227,3 +227,32 @@ details.steptext p {
   margin: 0;
   text-align: center;
 }
+
+/* Hàng 2 nút đối lập (xóa cache nhỏ / xóa toàn bộ dữ liệu) */
+.setrow--split {
+  justify-content: space-between;
+}
+.mdv-btn--sm {
+  padding: 7px 13px;
+  font-size: var(--text-sm);
+}
+.mdv-btn--danger {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* Trang xem hộ chiếu được chia sẻ (#/pp/…) — thẻ chỉ-đọc trong khung riêng. */
+.pshare .pshare__card {
+  display: block;
+  width: 100%;
+  height: min(72vh, 780px);
+  border: 1px solid var(--mdv-line, rgba(140, 110, 60, 0.25));
+  border-radius: 18px;
+  background: #f4f1ea;
+}
+.pshare__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}

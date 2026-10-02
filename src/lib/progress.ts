@@ -11,6 +11,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { SITES } from '../data/content';
 import type { Site } from '../data/types';
 import { idbGet, idbSet } from './db';
+import { siteEmoji } from './siteEmoji';
 
 export type NodeStatus = 'locked' | 'next' | 'active' | 'done';
 
@@ -436,11 +437,13 @@ export function quizBest(siteId: string, spotId: string): number | undefined {
 
 export function resetProgress() {
   // Reset hành trình -> cho phép finale 9/9 và finale cấp khu xuất hiện lại ở hành trình mới.
+  // Cũng xóa cờ "đã xem intro/màn chào/thẻ gợi ý" để khách được hướng dẫn lại như lần đầu.
   try {
     localStorage.removeItem('mdv.finale.v1');
     for (const k of Object.keys(localStorage)) {
       if (k.startsWith('mdv.sitefin.')) localStorage.removeItem(k);
     }
+    for (const k of ['mdv.seen', 'mdv.welcomed', 'mdv.hintDone']) localStorage.removeItem(k);
   } catch {
     /* bộ nhớ riêng tư */
   }
@@ -485,32 +488,34 @@ const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').re
  * Bản sao "thẻ hộ chiếu": file .html tự chứa — du khách mở lên thấy ngay hành trình của mình
  * (đẹp, in/chia sẻ được), đồng thời nhúng JSON vào <script id="mdv-backup"> để app nhập lại được.
  */
-export function exportPassportCardHtml(): string {
+export function exportPassportCardHtml(p: Progress = state, payload?: string): string {
   const exportedAt = new Date();
   const totalSpots = SITES.reduce((n, s) => n + s.spots.length, 0);
-  const doneSpots = Object.keys(state.unlocked).length;
+  const doneSpots = Object.keys(p.unlocked).length;
   const pct = totalSpots ? Math.round((doneSpots / totalSpots) * 100) : 0;
   const dateVi = exportedAt.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   const siteRows = SITES.map((site) => {
-    const n = site.spots.filter((sp) => `${site.entityId}/${sp.spotId}` in state.unlocked).length;
+    const n = site.spots.filter((sp) => `${site.entityId}/${sp.spotId}` in p.unlocked).length;
     const cls = n === site.spots.length ? 'done' : n > 0 ? 'mid' : 'none';
     const segs = site.spots
       .map((sp) => {
-        const on = `${site.entityId}/${sp.spotId}` in state.unlocked;
-        return `<span class="seg${on ? ' on' : ''}">${on ? '✓' : ''}<em>${escHtml(sp.name.vi)}</em></span>`;
+        const on = `${site.entityId}/${sp.spotId}` in p.unlocked;
+        return `<span class="seg${on ? ' on' : ''}" title="${escHtml(sp.name.vi)}">${on ? '<i class="ck">✓</i>' : ''}<em>${escHtml(sp.name.vi)}</em></span>`;
       })
       .join('');
-    const badge = state.badges.includes(site.gamificationConfig.badge.id)
+    const badge = p.badges.includes(site.gamificationConfig.badge.id)
       ? `<span class="badge">🏅 ${escHtml(site.gamificationConfig.badge.name.vi)}</span>`
       : '';
     return `<li class="site ${cls}">
-      <div class="site__head"><b>${escHtml(site.name.vi)}</b>${badge}<span class="cnt">${n}/${site.spots.length} điểm</span></div>
+      <div class="site__head"><b>${siteEmoji(site)} ${escHtml(site.name.vi)}</b>${badge}<span class="cnt">${n}/${site.spots.length} điểm</span></div>
       <div class="segs">${segs}</div>
     </li>`;
   }).join('');
 
-  const payload = exportPassportJson().replace(/</g, '\\u003c');
+  const payloadJson =
+    payload ?? JSON.stringify({ app: 'mo-dau-viet', kind: 'passport', exportedAt: exportedAt.toISOString(), progress: p }, null, 2);
+  const payloadSafe = payloadJson.replace(/</g, '\\u003c');
   return `<!DOCTYPE html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hộ chiếu Du lịch Việt Nam</title><style>
@@ -530,27 +535,28 @@ ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
 .cnt{font-size:12px;color:#8a7f6f;white-space:nowrap}
 .badge{font-size:11px;background:#fdf1d7;color:#8a6408;border-radius:8px;padding:2px 7px;white-space:nowrap}
 .segs{display:flex;gap:4px;margin-top:8px}
-.seg{flex:1;min-width:0;height:26px;border-radius:8px;background:#eee6d4;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;position:relative}
-.seg em{font-style:normal;font-size:8.5px;color:#8a7f6f;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 3px}
+.seg{flex:1;min-width:0;height:26px;border-radius:8px;background:#eee6d4;display:flex;align-items:center;justify-content:center;position:relative;padding:0 4px}
+.seg .ck{position:absolute;top:1px;right:4px;font-style:normal;font-size:9px;font-weight:800;line-height:1;color:#8a6408}
+.seg em{font-style:normal;font-size:9px;color:#8a7f6f;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
 .site.mid .seg.on{background:#ffd56a}.site.done .seg.on{background:#7fd8b0}
-.seg.on em{color:#4a3c10}.site.done .seg.on em{color:#0c4a2e}
-.seg.on{font-weight:700;color:#4a3c10}.site.done .seg.on{color:#0c4a2e}
+.seg.on em{color:#4a3c10;font-weight:600}.site.done .seg.on em{color:#0c4a2e}
+.site.done .seg .ck{color:#0c4a2e}
 .foot{margin-top:20px;font-size:11.5px;color:#8a7f6f;text-align:center;line-height:1.55}
 .foot b{color:#b23a2e}
 @media print{body{padding:0}.card{box-shadow:none}}
 </style></head><body><div class="card">
-<div class="brand">DU LỊCH VIỆT NAM</div>
-<h1>Hộ chiếu hành trình</h1>
+<div class="brand">🧭 DU LỊCH VIỆT NAM 🇻🇳</div>
+<h1>🛂 Hộ chiếu hành trình</h1>
 <p class="sub">Heritage Journey Passport — ${dateVi}</p>
 <div class="stats">
   <div class="ring"><i>${pct}%</i></div>
   <div class="nums"><div class="big">${doneSpots}/${totalSpots} điểm</div><div class="lbl">đã nhận dấu trên hành trình</div></div>
-  <div class="xp"><b>${state.xp}</b><div class="lbl">XP</div></div>
+  <div class="xp"><b>${p.xp}</b><div class="lbl">XP</div></div>
 </div>
 <ul>${siteRows}</ul>
-<p class="foot">Để chuyển tiến độ sang thiết bị khác: mở app <b>Du lịch Việt Nam</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
+<p class="foot">📲 Để chuyển tiến độ sang thiết bị khác: mở app <b>Du lịch Việt Nam</b> → Cài đặt → <b>Khôi phục bản sao</b> → chọn đúng file này.<br>Xuất lúc ${exportedAt.toLocaleString('vi-VN')} · Dữ liệu khôi phục nằm trong file, không cần mạng.</p>
 </div>
-<script type="application/json" id="mdv-backup">${payload}</script>
+<script type="application/json" id="mdv-backup">${payloadSafe}</script>
 </body></html>`;
 }
 
@@ -603,6 +609,32 @@ export function applyPassportImport(p: Progress, mode: 'merge' | 'replace'): voi
     return;
   }
   mutate((base) => mergeProgress(p, base));
+}
+
+/**
+ * Link chia sẻ hành trình: chuỗi base64url của JSON hộ chiếu — người nhận mở
+ * #/pp/<payload> sẽ thấy đúng thẻ hộ chiếu (chỉ-đọc) + nút nhập vào máy mình.
+ */
+export function sharePassportPayload(): string {
+  const json = JSON.stringify({
+    app: 'mo-dau-viet',
+    kind: 'passport',
+    exportedAt: new Date().toISOString(),
+    progress: state,
+  });
+  return btoa(unescape(encodeURIComponent(json))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+/** Giải mã payload từ link chia sẻ → tiến độ đã chuẩn hoá + JSON gốc (null nếu mã lạ/hỏng). */
+export function decodePassportPayload(payload: string): { progress: Progress; json: string } | null {
+  try {
+    const json = decodeURIComponent(escape(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))));
+    const prev = previewPassportJson(json);
+    if (!prev) return null;
+    return { progress: prev.progress, json };
+  } catch {
+    return null;
+  }
 }
 
 export interface Achievement {

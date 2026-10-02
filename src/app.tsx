@@ -11,7 +11,7 @@ import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
-import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
+import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, PassportShareScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
 import { GuidedTour, type TourStep } from './components/Tour';
 import { TOUR_STEPS } from './lib/tour';
@@ -82,7 +82,10 @@ export function App() {
         /* bộ nhớ riêng tư */
       }
       window.dispatchEvent(new CustomEvent('mdv:tour-end'));
-      if (route.name !== 'map') navigate('map');
+      // Chỉ đưa về map khi tour đang đứng trong một điểm (camera đã bay vào).
+      // User tự đi sang màn khác — ví dụ mở link hộ chiếu #/pp của bạn bè —
+      // thì không được kéo đi, nếu không người nhận link mất luôn trang chia sẻ.
+      if (route.name === 'destination') navigate('map');
     }
   };
 
@@ -143,6 +146,9 @@ export function App() {
       break;
     case 'sources':
       screen = <SourcesScreen />;
+      break;
+    case 'passportShare':
+      screen = <PassportShareScreen payload={route.payload} />;
       break;
     default:
       screen = (

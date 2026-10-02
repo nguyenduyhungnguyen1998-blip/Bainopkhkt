@@ -79,3 +79,11 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 - `python3 -m http.server` has NO Range support → returns 200 to Range requests. Under the app's SW (`e.respondWith(fetch(req))` / `caches.match→200-to-range-req`), Chrome's media loader can stall forever on a COLD mp4: readyState 0, networkState 2, no error, poster shows, duration NaN, and the `m:ss` label never renders. Clips previously fetched may still work (runtime/HTTP cache hits), so ONE clip can look broken while others play.
 - Diagnose: curl the mp4 (healthy ≠ enough — check server Range support via `curl -H "Range: bytes=0-99"`, want 206), check server access log (requests arrive + 200 but page never resolves = env stall), ffprobe moov position.
 - Fix for testing: serve dist on a Range-capable server (a ~25-line node http server emitting 206/Content-Range, or any proper static host) on a NEW port/origin — fresh origin also avoids the old SW entirely. GitHub Pages/nginx send 206 so prod is unaffected.
+
+## Base path + serving-root trap
+- `npm run check` builds may emit base `/` (index.html refs `/assets/*`) while `npm run build -- --base=/Bainopkhkt/` emits `/Bainopkhkt/assets/*`. Check `dist/index.html` asset srcs first: absolute `/assets/…` → serve dist AT ROOT; `/Bainopkhkt/assets/…` → serve under that subpath. Wrong root → every js/css hits your SPA fallback (index.html) → Chrome module MIME refusal → app hangs at splash forever.
+- A broken-serving-era asset (js cached as text/html) poisons Chrome's HTTP cache: later 304 revalidates keep failing → splash hangs even after the server is fixed. Cure: `Network.enable` + `Network.setCacheDisabled{true}` on the page session (browser-level `Network.clearBrowserCache` may be unsupported on this Chrome) then reload; or nuke profile cache.
+- Symptom triage for "app stuck at splash": fetch the js URL in-page and check content-type; `performance.getEntriesByType('resource')` shows if it downloaded; `import('/assets/x.js').catch` surfaces module MIME failures.
+
+## lang toggle in-page
+- `localStorage.mdv.lang`='vi'|'en' — but SPA hash navs don't re-read it; only a full reload applies the change. EN mode swaps clip variants (videoEn → `*-en.mp4`, label "Narrated clip: … · English narration", link "Visit spot: …"). My regex `/Clip|thuyết minh/` misses EN text — check both languages' patterns.

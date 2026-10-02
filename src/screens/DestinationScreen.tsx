@@ -847,6 +847,9 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
       ) : (
         <iframe src={src} title={t(card.title, lang)} loading="lazy" allowFullScreen allow="fullscreen; picture-in-picture" />
       )}
+      <span class="dcard__vlabel">
+        <Icon name="play" size={11} /> {t(card.title, lang)}
+      </span>
     </div>
   );
 }

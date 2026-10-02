@@ -134,6 +134,26 @@ a.dest__crumb--link:active {
   object-fit: contain;
   background: #000;
 }
+.dcard__vlabel {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 16px);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(7, 15, 30, 0.68);
+  color: #f2f6ff;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  pointer-events: none;
+}
+.dcard__vlabel svg {
+  flex: none;
+}
 .dcard__video-ph {
   position: absolute;
   inset: 0;

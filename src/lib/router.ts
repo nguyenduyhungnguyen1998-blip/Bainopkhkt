@@ -15,6 +15,7 @@ export type Route =
   | { name: 'help' }
   | { name: 'about' }
   | { name: 'sources' }
+  | { name: 'passportShare'; payload: string }
   | { name: 'notfound'; path: string };
 
 export function parseHash(hash: string): Route {
@@ -43,6 +44,10 @@ export function parseHash(hash: string): Route {
       return { name: 'about' };
     case 'sources':
       return { name: 'sources' };
+    case 'pp':
+      // Link hành trình chia sẻ: #/pp/<payload base64url> — chỉ-đọc, người nhận xem thẻ hộ chiếu.
+      if (!segs[1]) return { name: 'notfound', path: raw };
+      return { name: 'passportShare', payload: decodeURIComponent(segs[1]) };
     default:
       return { name: 'notfound', path: raw };
   }

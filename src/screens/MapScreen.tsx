@@ -8,7 +8,7 @@ import { SITES } from '../data/content';
 import { computeStatuses, isSpotUnlocked, siteUnlockedCount, unlockSpot, useProgress, type UnlockResult } from '../lib/progress';
 import { UI, t, useLang } from '../lib/i18n';
 import { navigate, routeHref } from '../lib/router';
-import { Icon, FlagVN } from '../components/Icon';
+import { Icon, BrandMark } from '../components/Icon';
 import { HelpMenu, WelcomeModal } from '../components/Onboarding';
 import { HINT_REQ_KEY, TOUR_REQ_KEY, WELCOME_KEY } from '../lib/tour';
 import { asset } from '../lib/asset';
@@ -370,6 +370,9 @@ export function MapScreen() {
       if (deepExit.current) return;
       const cx = (MAP_WIDTH / 2 - t.tx) / t.k;
       const cy = (MAP_HEIGHT / 2 - t.ty) / t.k;
+      // Giới hạn nhảy vào sơ đồ khu: chỉ khi node khu thật sự nằm trong khung nhìn
+      // (trước đây chỉ lấy node GẦN NHẤT -> zoom sâu ở vùng trống cạnh Văn Miếu cũng bị "tóm").
+      const reach = (Math.min(MAP_WIDTH, MAP_HEIGHT) / 2) * 1.15;
       let best: MapNode | null = null;
       let bestD = Infinity;
       for (const n of nodesRef.current) {
@@ -379,7 +382,7 @@ export function MapScreen() {
           bestD = d;
         }
       }
-      if (best && best.site.spots.length > 1) {
+      if (best && best.site.spots.length > 1 && bestD * t.k < reach) {
         setSelectedId(null);
         setSiteLevel(best.site.entityId);
       }
@@ -445,7 +448,7 @@ export function MapScreen() {
       <header class="mscreen__top">
         <div class="mscreen__title">
           <span class="mdv-eyebrow mscreen__brand">
-            <FlagVN size={15} /> {t(UI.appName, lang)}
+            <BrandMark size={16} /> {t(UI.appName, lang)}
           </span>
           <h1>{lang === 'vi' ? 'Hành trình di sản' : 'Heritage journey'}</h1>
         </div>

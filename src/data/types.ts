@@ -15,8 +15,9 @@ export interface HeroCard {
   type: 'hero';
   size: CardSize;
   image: string;
-  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
-  images?: string[];
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu.
+      Mỗi ảnh có thể mang caption riêng {src, caption}; chuỗi trần dùng caption chung. */
+  images?: (string | { src: string; caption?: Localized })[];
   caption?: Localized;
 }
 
@@ -55,6 +56,8 @@ export interface AudioCard {
   src?: string;
   /** Bản thu tiếng Anh tương ứng. */
   srcEn?: string;
+  /** Nhãn chủ đề + thời lượng của bản thu — hiện dưới player thay nhãn mặc định. */
+  label?: Localized;
 }
 
 export interface FactCard {
@@ -68,8 +71,9 @@ export interface ImageCard {
   type: 'image';
   size: CardSize;
   image: string;
-  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu. */
-  images?: string[];
+  /** Ảnh bổ sung cho gallery vuốt ‹ › — image luôn đứng đầu.
+      Mỗi ảnh có thể mang caption riêng {src, caption}; chuỗi trần dùng caption chung. */
+  images?: (string | { src: string; caption?: Localized })[];
   caption?: Localized;
 }
 
@@ -129,11 +133,16 @@ export interface SiteMap {
 export interface ExploreEntry {
   id: string;
   title: Localized;
+  /** Câu dẫn biên soạn sẵn cho mục lục (dòng 2 của hàng) — thiếu thì lấy câu đầu của body. */
+  lead?: Localized;
   body: Localized;
   /** Điểm QR tương ứng để nhảy tới — mục chỉ-tham-khảo (vd Hồ Văn) không có. */
   spotId?: string;
   /** Tab aspect trong điểm đó muốn mở sẵn (route `?a=`). */
   aspect?: string;
+  /** Aspect chứa clip nhúng ở trang chi tiết — khi clip của khu nằm tab khác `aspect`
+      (vd clip cảnh khu nằm tab 'kien-truc' còn link vào 'lich-su'). */
+  clipAspect?: string;
 }
 
 export interface Site {

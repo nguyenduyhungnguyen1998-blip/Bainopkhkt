@@ -88,7 +88,8 @@
         "lead": { "$ref": "#/definitions/localized" },
         "body": { "$ref": "#/definitions/localized" },
         "spotId": { "$ref": "#/definitions/slug" },
-        "aspect": { "$ref": "#/definitions/slug" }
+        "aspect": { "$ref": "#/definitions/slug" },
+        "clipAspect": { "$ref": "#/definitions/slug" }
       }
     },
     "localized": {

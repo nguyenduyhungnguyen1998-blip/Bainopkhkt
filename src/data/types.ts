@@ -140,6 +140,9 @@ export interface ExploreEntry {
   spotId?: string;
   /** Tab aspect trong điểm đó muốn mở sẵn (route `?a=`). */
   aspect?: string;
+  /** Aspect chứa clip nhúng ở trang chi tiết — khi clip của khu nằm tab khác `aspect`
+      (vd clip cảnh khu nằm tab 'kien-truc' còn link vào 'lich-su'). */
+  clipAspect?: string;
 }
 
 export interface Site {

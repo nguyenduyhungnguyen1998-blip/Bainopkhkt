@@ -449,7 +449,7 @@ type ExploreBranch = 'khuVuc' | 'danhNhan';
 function EntryMedia({ site, entry, lang }: { site: Site; entry: ExploreEntry; lang: Lang }) {
   const [dur, setDur] = useState<number | null>(null);
   const sp = site.spots.find((s) => s.spotId === entry.spotId);
-  const aspect = sp?.layoutSchema.flatMap((c) => (c.type === 'aspects' ? c.aspects : [])).find((x) => x.id === entry.aspect);
+  const aspect = sp?.layoutSchema.flatMap((c) => (c.type === 'aspects' ? c.aspects : [])).find((x) => x.id === (entry.clipAspect ?? entry.aspect));
   if (!aspect) return null;
   const enClip = lang === 'en' && !!aspect.videoEn;
   const vid = enClip ? aspect.videoEn : aspect.video;

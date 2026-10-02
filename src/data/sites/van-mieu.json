@@ -2075,7 +2075,8 @@
         "lead": {
           "vi": "Biểu tượng của Hà Nội – công trình 1805, đế vuông cửa tròn",
           "en": "Hanoi’s emblem – an 1805 pavilion, square base, round windows"
-        }
+        },
+        "clipAspect": "kien-truc"
       },
       {
         "id": "vuon-bia",
@@ -2092,7 +2093,8 @@
         "lead": {
           "vi": "Giếng Thiên Quang và 82 bia rùa ghi danh tiến sĩ",
           "en": "Thien Quang well and 82 tortoise-borne doctoral steles"
-        }
+        },
+        "clipAspect": "kien-truc"
       },
       {
         "id": "dai-thanh",
@@ -2109,7 +2111,8 @@
         "lead": {
           "vi": "Nơi thờ Khổng Tử và Tứ Phối – trung tâm tế lễ",
           "en": "Shrine of Confucius and the Four Correlates – the ceremonial heart"
-        }
+        },
+        "clipAspect": "kien-truc"
       },
       {
         "id": "nha-thai-hoc",
@@ -2126,7 +2129,8 @@
         "lead": {
           "vi": "Trường Quốc Tử Giám xưa, thờ các vua và Chu Văn An",
           "en": "The old Imperial Academy, honouring kings and Chu Van An"
-        }
+        },
+        "clipAspect": "kien-truc"
       },
       {
         "id": "vuon-giam",
@@ -2143,7 +2147,8 @@
         "lead": {
           "vi": "Vườn cây cổ thụ và Nhà Bát Giác bên mặt nước",
           "en": "Old trees and the Octagonal House by the water"
-        }
+        },
+        "clipAspect": "kien-truc"
       },
       {
         "id": "ho-van",

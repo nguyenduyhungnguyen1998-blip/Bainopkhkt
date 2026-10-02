@@ -481,11 +481,21 @@ function EntryMedia({ site, entry, lang }: { site: Site; entry: ExploreEntry; la
     (enClip ? aspect?.videoEn : aspect?.video) ??
     (vcard && cardSrc ? { src: cardSrc, poster: vcard.poster, title: vcard.title } : undefined);
   const aSrc = entry.audio ? (lang === 'en' && entry.audio.srcEn ? entry.audio.srcEn : entry.audio.src) : undefined;
-  if (!vid && !aSrc) return null;
+  const imgs = entry.images ?? [];
+  if (!vid && !aSrc && !imgs.length) return null;
   const vtitle = vid?.title ? t(vid.title, lang) : aspect ? t(aspect.title, lang) : '';
   const mmss = `${Math.floor((dur ?? 0) / 60)}:${String(Math.floor((dur ?? 0) % 60)).padStart(2, '0')}`;
   return (
     <>
+      {imgs.map((item, i) => {
+        const im = typeof item === 'string' ? { src: item, caption: undefined } : item;
+        return (
+          <figure key={`${entry.id}-img-${i}`} class="xplrd__media">
+            <img class="xplrd__img" src={asset(im.src)} alt={im.caption ? t(im.caption, lang) : t(entry.title, lang)} loading="lazy" />
+            {im.caption && <figcaption class="xplrd__mnote">{t(im.caption, lang)}</figcaption>}
+          </figure>
+        );
+      })}
       {vid && (
         <figure class="xplrd__media">
           <LocalVideo src={vid.src} poster={vid.poster} label={vtitle} lang={lang} onDur={setDur} />

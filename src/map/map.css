@@ -424,3 +424,34 @@
   vector-effect: non-scaling-stroke;
   opacity: 0.85;
 }
+
+/* Vùng tham khảo không-tem trên sơ đồ: hồ, cổng phụ, khoảng sân */
+.smap__lake {
+  fill: var(--color-sea);
+  stroke: var(--color-border-strong, var(--color-border));
+  stroke-width: 1.5;
+  stroke-dasharray: 5 5;
+  vector-effect: non-scaling-stroke;
+}
+.smap__gate-mid {
+  fill: var(--color-accent-secondary);
+  stroke: var(--color-bg);
+  stroke-width: 1.5;
+}
+.smap__zone {
+  fill: color-mix(in srgb, var(--color-accent-tertiary) 9%, transparent);
+  stroke: var(--color-accent-tertiary);
+  stroke-opacity: 0.3;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  vector-effect: non-scaling-stroke;
+}
+.smap__dlabel {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--color-muted);
+  pointer-events: none;
+}
+.smap__dlabel--in {
+  fill: var(--color-ink);
+}

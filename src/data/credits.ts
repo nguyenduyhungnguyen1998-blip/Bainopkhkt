@@ -37,6 +37,13 @@ const khkt = (noteVi: string, noteEn: string): Credit => ({
   note: { vi: noteVi, en: noteEn },
 });
 
+const khktDoc = (noteVi: string, noteEn: string): Credit => ({
+  author: 'Văn Miếu – Quốc Tử Giám',
+  license: 'Tư liệu nội bộ',
+  source: 'Tài liệu "Kiến Trúc Văn Miếu" (kênh KHKT, nguồn ảnh: ban quản lý di tích)',
+  note: { vi: noteVi, en: noteEn },
+});
+
 export const IMAGE_CREDITS: Record<string, Credit> = {
   // Dinh Độc Lập
   '/img/dinh-doc-lap/cong-chinh.webp': wm('Balon Greyjoy', 'CC0', PD0, '20190923_Independence_Palace-10.jpg'),
@@ -86,4 +93,11 @@ export const IMAGE_CREDITS: Record<string, Credit> = {
   '/img/van-mieu/toan-canh-truc-chinh.webp': khkt('Toàn cảnh trục chính Văn Miếu', 'Main axis of the complex'),
   '/img/van-mieu/bia-nha-bia-gieng.webp': khkt('Nhà bia và Giếng Văn', 'Stelae house and Văn well'),
   '/img/van-mieu/bia-rua-doc-bia.webp': khkt('Bia rùa đội bia tiến sĩ', 'Turtle stela close-up'),
+  '/img/van-mieu/so-do-van-mieu.webp': khktDoc('Sơ đồ tham quan di tích chính thức', 'Official visitor map of the complex'),
+  '/img/van-mieu/tien-an-tu-tru.webp': khktDoc('Bốn trụ gạch và bia Hạ mã Khu Tiền Án', 'Tien An brick pillars and dismount steles'),
+  '/img/van-mieu/thai-hoc-san.webp': khktDoc('Sân khu Thái Học với nhà chuông – nhà trống', 'Thai Hoc courtyard with bell and drum houses'),
+  '/img/van-mieu/dai-thanh-dien.webp': khktDoc('Điện Đại Thành nhìn từ sân Đại Bái', 'Dai Thanh hall from the courtyard'),
+  '/img/van-mieu/nhap-dao-duong.webp': khktDoc('Đường Nhập Đạo ra cổng Đại Trung', 'Nhap Dao path toward Dai Trung gate'),
+  '/img/van-mieu/ho-van-kim-chau.webp': khktDoc('Hồ Văn – gò Kim Châu và Phương Đình', 'Van Lake, Kim Chau mound and Phuong Dinh'),
+  '/img/van-mieu/ba-vua-tang-tren.webp': khkt('Ban thờ ba vua tầng trên Hậu Đường (trích clip Thái Học)', 'Three kings altar, upper floor (Thai Hoc clip frame)'),
 };

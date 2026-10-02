@@ -58,7 +58,7 @@ export const UI = {
   exploreListen: { vi: 'Nghe', en: 'Listen' },
   exploreRead: { vi: 'Đọc', en: 'Read' },
   exploreGoSpot: { vi: 'Đến điểm QR', en: 'Go to QR spot' },
-  exploreRefOnly: { vi: 'Tham khảo – không có tem QR', en: 'Reference – no QR tag' },
+  exploreRefOnly: { vi: 'Tham khảo – chưa có tem QR', en: 'Reference – no QR tag yet' },
   exploreBack: { vi: 'Về mục lục', en: 'Back to list' },
   exploreVisitSpot: { vi: 'Đến điểm', en: 'Visit spot' },
   exploreShrine: { vi: 'Nơi thờ', en: 'Enshrined at' },

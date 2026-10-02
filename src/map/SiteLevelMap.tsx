@@ -32,8 +32,8 @@ interface SpotNode {
  * Nếu không có siteMap, các điểm bố dọc trục giữa mặc định.
  */
 
-/** Trang trí riêng của khu (giếng, tường phụ, …) – rect, neo theo khung/node. */
-function siteDecors(site: Site, nodes: SpotNode[]) {
+/** Trang trí riêng của khu (giếng, tường phụ, hồ, cổng phụ, nhãn vùng…) – rect/ellipse, neo theo khung/node. */
+function siteDecors(site: Site, nodes: SpotNode[], lang: Lang) {
   const decor = site.siteMap?.decor;
   if (!decor || !decor.length) return null;
   const nodeBySpot = new Map(nodes.map((n) => [n.spotId, n]));
@@ -42,16 +42,20 @@ function siteDecors(site: Site, nodes: SpotNode[]) {
       {decor.map((d, i) => {
         const cx = d.cx === 'center' ? W / 2 : d.cx;
         const cy = typeof d.cy === 'number' ? d.cy : (nodeBySpot.get(d.cy)?.y ?? 0);
+        const ly = d.labelPos === 'above' ? cy - d.h / 2 - 7 : d.labelPos === 'inside' ? cy : cy + d.h / 2 + 11;
         return (
-          <rect
-            key={i}
-            class={d.cls}
-            x={cx - d.w / 2}
-            y={cy - d.h / 2}
-            width={d.w}
-            height={d.h}
-            rx={d.rx}
-          />
+          <g key={i}>
+            {d.shape === 'ellipse' ? (
+              <ellipse class={d.cls} cx={cx} cy={cy} rx={d.w / 2} ry={d.h / 2} />
+            ) : (
+              <rect class={d.cls} x={cx - d.w / 2} y={cy - d.h / 2} width={d.w} height={d.h} rx={d.rx} />
+            )}
+            {d.label && (
+              <text class={`smap__dlabel${d.labelPos === 'inside' ? ' smap__dlabel--in' : ''}`} x={cx} y={ly} text-anchor="middle" dominant-baseline="central">
+                {t(d.label, lang)}
+              </text>
+            )}
+          </g>
         );
       })}
     </g>
@@ -155,7 +159,7 @@ export function SiteLevelMap({ site, lang, onOpenSpot }: Props) {
           const y = (nodes[i].y + nd.y) / 2;
           return <line key={i} class="smap__band" x1={118} x2={W - 118} y1={y} y2={y} />;
         })}
-        {siteDecors(site, nodes)}
+        {siteDecors(site, nodes, lang)}
         {/* Trục hành trình trong khu */}
         <path class="vmap__journey vmap__journey--all" d={path} />
         {donePath && <path class="vmap__journey vmap__journey--done" d={donePath} />}

@@ -119,7 +119,7 @@ export interface SiteMapNode {
 
 /** Trang trí vẽ thêm trên sơ đồ cấp 2 (giếng, tường phụ, …), neo theo khu. */
 export interface SiteMapDecor {
-  shape: 'rect';
+  shape: 'rect' | 'ellipse';
   /** class CSS, vd "smap__well". */
   cls: string;
   /** toạ độ tâm theo phương ngang: số, hoặc "center" = giữa khung. */
@@ -129,6 +129,10 @@ export interface SiteMapDecor {
   w: number;
   h: number;
   rx?: number;
+  /** Nhãn cho vùng tham khảo không-tem trên sơ đồ (Hồ Văn, cổng Đại Trung…). */
+  label?: Localized;
+  /** Vị trí nhãn quanh hình — mặc định 'below'. */
+  labelPos?: 'below' | 'above' | 'inside';
 }
 
 /** Sơ đồ mặt bằng nội khu (dữ liệu hoá, không cần sửa component khi thêm khu). */
@@ -154,6 +158,8 @@ export interface ExploreEntry {
   video?: { src: string; srcEn?: string; poster?: string; title?: Localized };
   /** Audio riêng của mục — bản thu giọng đọc thật theo khu. */
   audio?: { src: string; srcEn?: string; label?: Localized };
+  /** Ảnh riêng của mục (trang chi tiết ?e=). */
+  images?: GalleryItem[];
 }
 
 export interface Site {

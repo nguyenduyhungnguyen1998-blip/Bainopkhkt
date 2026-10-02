@@ -128,8 +128,8 @@
                 "en": "History"
               },
               "body": {
-                "vi": "Lịch sử hình thành quần thể: năm 1070, vua Lý Thánh Tông cho dựng Văn Miếu tại kinh thành Thăng Long, thờ Khổng Tử cùng các bậc hiền Nho – cũng là nơi Hoàng thái tử Lý Càn Đức, sau này là vua Lý Nhân Tông, đến học. Năm 1075, Lý Nhân Tông mở khoa thi Nho học đầu tiên; năm 1076 lập Quốc Tử Giám – thiết chế giáo dục quan trọng của nhà nước Đại Việt. Đến thời Lê, vua Lê Thánh Tông cho tu sửa Văn Miếu và mở rộng Quốc Tử Giám (1483), rồi dựng những tấm bia Tiến sĩ đầu tiên (1484). Cổng Văn Miếu Môn hiện nay mang kiến trúc thời Hậu Lê, đã qua nhiều lần trùng tu.\n\nKhu Tiền Án là khoảng sân phía trước cổng Văn Miếu Môn: bốn trụ gạch lớn đứng thành hai hàng – hai trụ ngoài đắp bốn chim phượng xoè cánh, cùng đôi nghê đá canh giữ; hai bên đường là hai tấm bia Hạ mã nhắc mọi người xuống ngựa khi bước vào nơi trang nghiêm.\n\nMỗi nhân vật được thờ tự tại đây gắn với một khía cạnh của truyền thống học tập và trọng dụng hiền tài: các vua Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông đặt nền móng giáo dục Đại Việt; danh sư Chu Văn An truyền bá tri thức; Khổng Tử và Tứ Phối là cội nguồn của Nho học.",
-                "en": "How the complex took shape: in 1070, king Ly Thanh Tong built the Temple of Literature in the Thang Long capital, honouring Confucius and the Confucian sages – it was also where Crown Prince Ly Can Duc, the future Ly Nhan Tong, came to study. In 1075 Ly Nhan Tong held the first Confucian examination; in 1076 he founded Quoc Tu Giam, a key state education institution. Under the Le dynasty, king Le Thanh Tong restored the temple and expanded the academy (1483), then erected the first doctoral steles (1484). The present Van Mieu Mon gate is in Later Le style and has been restored several times.\n\nThe Tien An forecourt opens before the Van Mieu Mon gate: four great brick pillars in two rows – the outer pair crowned by four spreading phoenixes, the inner pair guarded by stone nghe creatures – and two 'Ha ma' dismount steles reminding all visitors to dismount before this sacred ground.\n\nEach figure honoured here embodies one strand of the tradition of learning and respect for talent: kings Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông who founded Đại Việt education; the great teacher Chu Văn An; and Confucius with the Four Associates at the root of Confucian learning."
+                "vi": "Lịch sử hình thành quần thể: năm 1070, vua Lý Thánh Tông cho dựng Văn Miếu tại kinh thành Thăng Long, thờ Khổng Tử cùng các bậc hiền Nho – cũng là nơi Hoàng thái tử Lý Càn Đức, sau này là vua Lý Nhân Tông, đến học. Năm 1075, Lý Nhân Tông mở khoa thi Nho học đầu tiên; năm 1076 lập Quốc Tử Giám – thiết chế giáo dục quan trọng của nhà nước Đại Việt. Đến thời Lê, vua Lê Thánh Tông cho tu sửa Văn Miếu và mở rộng Quốc Tử Giám (1483), rồi dựng những tấm bia Tiến sĩ đầu tiên (1484). Cổng Văn Miếu Môn hiện nay mang kiến trúc thời Hậu Lê, đã qua nhiều lần trùng tu.\n\nMỗi nhân vật được thờ tự tại đây gắn với một khía cạnh của truyền thống học tập và trọng dụng hiền tài: các vua Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông đặt nền móng giáo dục Đại Việt; danh sư Chu Văn An truyền bá tri thức; Khổng Tử và Tứ Phối là cội nguồn của Nho học.",
+                "en": "How the complex took shape: in 1070, king Ly Thanh Tong built the Temple of Literature in the Thang Long capital, honouring Confucius and the Confucian sages – it was also where Crown Prince Ly Can Duc, the future Ly Nhan Tong, came to study. In 1075 Ly Nhan Tong held the first Confucian examination; in 1076 he founded Quoc Tu Giam, a key state education institution. Under the Le dynasty, king Le Thanh Tong restored the temple and expanded the academy (1483), then erected the first doctoral steles (1484). The present Van Mieu Mon gate is in Later Le style and has been restored several times.\n\nEach figure honoured here embodies one strand of the tradition of learning and respect for talent: kings Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông who founded Đại Việt education; the great teacher Chu Văn An; and Confucius with the Four Associates at the root of Confucian learning."
               },
               "video": {
                 "src": "media/nguon-goc-lich-su.mp4",
@@ -180,7 +180,23 @@
                   "vi": "Bản thu tiếng Anh: Kiến trúc toàn quần thể · 9:48",
                   "en": "Recorded narration: complex-wide architecture · 9:48"
                 }
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/so-do-van-mieu.webp",
+                  "caption": {
+                    "vi": "Sơ đồ tham quan di tích Văn Miếu – Quốc Tử Giám",
+                    "en": "Visitor map of the Van Mieu – Quoc Tu Giam complex"
+                  }
+                },
+                {
+                  "src": "/img/van-mieu/tien-an-tu-tru.webp",
+                  "caption": {
+                    "vi": "Bốn trụ gạch và bia Hạ mã ở Khu Tiền Án",
+                    "en": "Brick pillars and dismount steles at Tien An"
+                  }
+                }
+              ]
             },
             {
               "id": "y-nghia",
@@ -1099,7 +1115,16 @@
               "body": {
                 "vi": "Trung tâm khu thờ tự là sân Đại Bái, hai bên là các dãy nhà chạy song song. Phía trước là Bái Đường chín gian – nơi từng diễn ra nghi lễ tế Khổng Tử – với hệ cột gỗ lim, mái ngói mũi hài và họa tiết truyền thống. Phía sau, một tiểu đình nối với Điện Đại Thành chín gian: cột sơn son thếp vàng, mái ngói mũi hài, trên nóc là đôi rồng chầu nhật nguyệt. Trong điện thờ Khổng Tử – tượng chính giữa hướng về phương Nam – cùng Tứ Phối và Thập Triết.",
                 "en": "The worship quarter centres on the Đại Bái courtyard, flanked by parallel rows of buildings. In front stands the nine-bay Bái Đường – where ceremonies honouring Confucius were held – with ironwood columns and a 'mũi hài' tiled roof. A small pavilion links it to the nine-bay Điện Đại Thành: gilded lacquered columns, mũi hài tiles, and twin dragons bowing to the sun and moon on the roof. Inside are worshipped Confucius – the central statue facing south – together with the Four Paragons and Ten Philosophers."
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/dai-thanh-dien.webp",
+                  "caption": {
+                    "vi": "Điện Đại Thành nhìn từ sân Đại Bái",
+                    "en": "Dai Thanh hall seen from the courtyard"
+                  }
+                }
+              ]
             },
             {
               "id": "y-nghia",
@@ -1392,7 +1417,16 @@
               "body": {
                 "vi": "Nhà Thái Học được xây năm 2000 trên nền Quốc Tử Giám xưa, mang dáng dấp kiến trúc truyền thống gồm Tiền Đường, Hậu Đường, Tả vu, Hữu vu cùng nhà Chuông và nhà Trống. Tiền Đường là không gian diễn ra các hoạt động văn hóa, khoa học và nghệ thuật; Hậu Đường hai tầng – tầng dưới giới thiệu lịch sử Văn Miếu – Quốc Tử Giám và tôn vinh thầy Chu Văn An, tầng trên thờ ba vua có công lập trường: Lý Thánh Tông, Lý Nhân Tông và Lê Thánh Tông.",
                 "en": "The Thái Học house was built in 2000 on the foundations of the old Imperial Academy, in traditional style with Tiền Đường and Hậu Đường halls, left and right wings, plus a bell house and drum house. Tiền Đường hosts cultural, scientific and artistic events; the two-storey Hậu Đường presents the site's history and honours teacher Chu Văn An below, while the upper floor worships the three kings who founded the school: Lý Thánh Tông, Lý Nhân Tông and Lê Thánh Tông."
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/thai-hoc-san.webp",
+                  "caption": {
+                    "vi": "Sân rộng khu Thái Học, hai bên nhà chuông và nhà trống",
+                    "en": "Thai Hoc courtyard between the bell and drum houses"
+                  }
+                }
+              ]
             },
             {
               "id": "y-nghia",
@@ -1414,7 +1448,16 @@
               "body": {
                 "vi": "Tầng trên thờ ba vua có công lập trường. Lý Thánh Tông (trị vì 1054–1072) đặt quốc hiệu Đại Việt và mùa thu năm 1070 cho dựng Văn Miếu, thờ Khổng Tử cùng các bậc hiền Nho – sự kiện được Ngô Sĩ Liên chép trong Đại Việt sử ký toàn thư. Con trưởng của ông, Lý Nhân Tông (1066–1128), từng là Thái tử Càn Đức – học trò đầu tiên của Văn Miếu; năm 1075 mở khoa thi đầu tiên trong lịch sử khoa cử nước ta, năm 1076 lập Quốc Tử Giám. Lê Thánh Tông (trị vì 1460–1497) mở 12 khoa thi chọn 502 tiến sĩ; năm 1483 tu sửa và mở rộng Quốc Tử Giám, 1484 cho dựng những bia tiến sĩ đầu tiên để biểu dương người hiền tài – 'Hiền tài là nguyên khí quốc gia, nguyên khí thịnh thì thế nước mạnh'.",
                 "en": "The upper floor honours the academy's three founding kings. Ly Thanh Tong (r. 1054–1072) gave the nation the name Dai Viet and built Van Mieu in autumn 1070, enshrining Confucius and the Confucian sages – an event recorded by Ngo Si Lien in Dai Viet su ky toan thu. His eldest son Ly Nhan Tong (1066–1128), once Crown Prince Can Duc, was Van Mieu's first student; in 1075 he held Vietnam's first imperial examination and in 1076 founded Quoc Tu Giam. Le Thanh Tong (r. 1460–1497) held 12 examinations selecting 502 doctoral laureates; he restored and expanded the academy in 1483 and in 1484 erected the first doctors' steles to honour the talented – 'Talented scholars are the nation's vital energy; when it thrives, the nation is strong.'"
-              }
+              },
+              "images": [
+                {
+                  "src": "/img/van-mieu/ba-vua-tang-tren.webp",
+                  "caption": {
+                    "vi": "Ban thờ ba vua tầng trên Hậu Đường: Lý Thánh Tông, Lý Nhân Tông, Lê Thánh Tông",
+                    "en": "Upper-floor altar of the three kings: Ly Thanh Tong, Ly Nhan Tong, Le Thanh Tong"
+                  }
+                }
+              ]
             },
             {
               "id": "thay-chu",
@@ -1954,6 +1997,47 @@
         "cy": "bia-tien-si",
         "w": 64,
         "h": 64
+      },
+      {
+        "shape": "ellipse",
+        "cls": "smap__lake",
+        "cx": 150,
+        "cy": 538,
+        "w": 124,
+        "h": 30,
+        "label": {
+          "vi": "Hồ Văn",
+          "en": "Van Lake"
+        },
+        "labelPos": "inside"
+      },
+      {
+        "shape": "rect",
+        "cls": "smap__zone",
+        "cx": "center",
+        "cy": 437,
+        "w": 190,
+        "h": 32,
+        "rx": 10,
+        "label": {
+          "vi": "Nhập Đạo",
+          "en": "Nhap Dao court"
+        },
+        "labelPos": "inside"
+      },
+      {
+        "shape": "rect",
+        "cls": "smap__gate-mid",
+        "cx": "center",
+        "cy": 414,
+        "w": 54,
+        "h": 10,
+        "rx": 3,
+        "label": {
+          "vi": "Cổng Đại Trung",
+          "en": "Dai Trung gate"
+        },
+        "labelPos": "above"
       }
     ]
   },
@@ -2020,7 +2104,16 @@
             "vi": "Bản thu: Nhập Đạo & Đại Trung Môn · 0:35",
             "en": "Recording: Nhap Dao & Dai Trung gate · 0:38"
           }
-        }
+        },
+        "images": [
+          {
+            "src": "/img/van-mieu/nhap-dao-duong.webp",
+            "caption": {
+              "vi": "Đường Nhập Đạo rợp bóng cây dẫn ra cổng Đại Trung",
+              "en": "Shaded Nhap Dao path toward Dai Trung gate"
+            }
+          }
+        ]
       },
       {
         "id": "khue-van-cac",
@@ -2128,7 +2221,16 @@
             "vi": "Bản thu: Hồ Văn · 1:49",
             "en": "Recording: Van Lake · 2:15"
           }
-        }
+        },
+        "images": [
+          {
+            "src": "/img/van-mieu/ho-van-kim-chau.webp",
+            "caption": {
+              "vi": "Hồ Văn với gò Kim Châu và tòa Phương Đình",
+              "en": "Van Lake with Kim Chau mound and the Phuong Dinh pavilion"
+            }
+          }
+        ]
       }
     ],
     "danhNhan": [

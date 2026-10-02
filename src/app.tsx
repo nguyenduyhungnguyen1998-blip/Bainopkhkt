@@ -82,7 +82,10 @@ export function App() {
         /* bộ nhớ riêng tư */
       }
       window.dispatchEvent(new CustomEvent('mdv:tour-end'));
-      if (route.name !== 'map') navigate('map');
+      // Chỉ đưa về map khi tour đang đứng trong một điểm (camera đã bay vào).
+      // User tự đi sang màn khác — ví dụ mở link hộ chiếu #/pp của bạn bè —
+      // thì không được kéo đi, nếu không người nhận link mất luôn trang chia sẻ.
+      if (route.name === 'destination') navigate('map');
     }
   };
 

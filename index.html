@@ -179,6 +179,9 @@
           var hasQ = q.get('q') != null;
           var hasD = q.get('d') != null;
           if (!hasQ && !hasD) return;
+          // Cờ cho script mark bên dưới: location.replace ngay sau đây nuốt mất
+          // ?q=/?d= khỏi location.search, nên không thể check search lần nữa.
+          document.documentElement.dataset.qrscan = '1';
           var MAP = {
             mdvq01: 'dinh-doc-lap/cong-chinh',
             mdvq02: 'ha-long/hang-sung-sot',
@@ -229,12 +232,11 @@
     </div>
     <script>
       // Đổi chữ splash NGAY khi splash vừa parse — script đứng sau markup nên
-      // phần tử đã tồn tại, không chờ DOMContentLoaded (DCL đợi cả module bundle
-      // → trên mạng chậm khách phải thấy 'Đang kiểm tra mã QR…' suốt thời gian chờ).
+      // phần tử đã tồn tại, không chờ DOMContentLoaded. Cổng bằng cờ dataset
+      // (head redirect đã nuốt ?q=/?d= khỏi location.search trước khi script này chạy).
       (function () {
         try {
-          var q = new URLSearchParams(location.search);
-          if (q.get('q') == null && q.get('d') == null) return;
+          if (document.documentElement.dataset.qrscan !== '1') return;
           var el = document.querySelector('#splash .brand p');
           if (el) el.textContent = 'Đang kiểm tra mã QR…';
         } catch (e) {}

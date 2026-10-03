@@ -17,6 +17,10 @@ export type NodeStatus = 'locked' | 'next' | 'active' | 'done';
 
 export interface Progress {
   schemaVersion: 2;
+  /** Epoch tiến độ: reset/nhập-thay-thế tăng gen — merge luôn ưu tiên gen cao hơn
+   *  (QR-03: bản EMPTY của tab reset phải thắng bản có dấu cũ ở tab khác, thay vì
+   *  union-merge làm dấu "sống lại"). */
+  gen?: number;
   /** khóa "siteId/spotId" -> thời điểm mở (ms) */
   unlocked: Record<string, number>;
   /** khóa "siteId/spotId" -> số câu đúng cao nhất ở quiz điểm đó */
@@ -27,7 +31,7 @@ export interface Progress {
 
 const LS_KEY = 'mdv.progress.v1';
 const IDB_KEY = 'progress';
-const EMPTY: Progress = { schemaVersion: 2, unlocked: {}, quizDone: {}, xp: 0, badges: [] };
+const EMPTY: Progress = { schemaVersion: 2, gen: 0, unlocked: {}, quizDone: {}, xp: 0, badges: [] };
 
 /** Khóa điểm hợp lệ hiện hữu — dữ liệu sao lưu/nhập có khóa lạ (điểm đổi tên, bản app mới hơn) bị loại ra khỏi số đếm. */
 const KNOWN_SPOTS = new Set(SITES.flatMap((s) => s.spots.map((sp) => `${s.entityId}/${sp.spotId}`)));
@@ -46,6 +50,7 @@ function migrate(raw: unknown): Progress | null {
     for (const [k, v] of Object.entries(p.quizDone)) if (KNOWN_SPOTS.has(k) && typeof v === 'number') quizDone[k] = v;
   return {
     schemaVersion: 2,
+    gen: typeof p.gen === 'number' ? p.gen : 0,
     unlocked,
     quizDone,
     xp: typeof p.xp === 'number' ? p.xp : 0,
@@ -77,14 +82,18 @@ export function takePendingMapUnlocks(): string[] {
   return pendingMapUnlocks.splice(0, pendingMapUnlocks.length);
 }
 
-/** Hợp hai trạng thái: unlocked là union (xoá chỉ bằng mutate), quiz lấy max, badge union. */
+/** Hợp hai trạng thái: khác gen thì gen cao thắng trọn (epoch mới hơn);
+ *  cùng gen thì unlocked union (xoá chỉ bằng mutate), quiz lấy max, badge union. */
 function mergeProgress(a: Progress, b: Progress): Progress {
+  const ga = a.gen ?? 0;
+  const gb = b.gen ?? 0;
+  if (ga !== gb) return { ...(ga > gb ? a : b) };
   const unlocked = { ...a.unlocked };
   for (const [k, v] of Object.entries(b.unlocked)) if (!(k in unlocked)) unlocked[k] = v;
   const quizDone = { ...a.quizDone };
   for (const [k, v] of Object.entries(b.quizDone)) quizDone[k] = Math.max(quizDone[k] ?? 0, v);
   const badges = [...new Set([...a.badges, ...b.badges])];
-  const merged: Progress = { schemaVersion: 2, unlocked, quizDone, xp: Math.max(a.xp, b.xp), badges };
+  const merged: Progress = { schemaVersion: 2, gen: ga, unlocked, quizDone, xp: Math.max(a.xp, b.xp), badges };
   // XP không được thấp hơn mức tối thiểu suy ra từ dấu+quiz đã hợp — cộng của cả hai tab đều còn nguyên.
   merged.xp = Math.max(merged.xp, floorXp(merged));
   return merged;
@@ -119,15 +128,13 @@ function persist(p: Progress) {
     lsOk = false;
   }
   // localStorage fail (private mode) không sao nếu IDB còn ghi được; chỉ báo lỗi khi cả hai cùng chết.
-  void idbSet(IDB_KEY, p).then(
-    () => {},
-    () => {
-      if (!lsOk) {
-        persistFailed = true;
-        window.dispatchEvent(new CustomEvent('mdv:savefail'));
-      }
+  // idbSet trả false khi ghi thật sự hỏng (QR-01) — trước đây luôn resolve nên nhánh này không bao giờ chạy.
+  void idbSet(IDB_KEY, p).then((ok) => {
+    if (!ok && !lsOk) {
+      persistFailed = true;
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('mdv:savefail'));
     }
-  );
+  });
 }
 
 let channel: BroadcastChannel | null = null;
@@ -147,10 +154,13 @@ function applyState(next: Progress, broadcast: boolean) {
 /**
  * Đọc-hợp → biến đổi → ghi nguyên tử: mọi mutation đi qua đây, dựng trên bản đã merge
  * persist+state nên hai tab mở dấu hai điểm khác nhau không xoá nhau (Q01).
+ * `newEpoch` cho các biến đổi PHÁ DẤU (relock/revoke): bắt đầu epoch mới để
+ * union-merge cross-tab không "hồi sinh" dấu vừa gỡ (cùng cơ chế reset QR-03).
  */
-function mutate(fn: (base: Progress) => Progress): Progress {
+function mutate(fn: (base: Progress) => Progress, newEpoch = false): Progress {
   const base = mergeBase();
   const next = fn(base);
+  if (newEpoch) next.gen = (base.gen ?? 0) + 1;
   applyState(next, true);
   return next;
 }
@@ -185,15 +195,20 @@ export async function initProgress(): Promise<void> {
   try {
     const fromIdb = migrate(await idbGet(IDB_KEY));
     if (fromIdb) {
-      if (JSON.stringify(fromIdb) !== JSON.stringify(state)) {
-        state = fromIdb;
+      // MERGE thay vì để IDB thắng tuyệt đối (QR-02): snapshot IDB cũ không được
+      // nuốt dấu mới hơn ở localStorage — union giữ dấu cả hai phía, gen quyết epoch.
+      const merged = mergeProgress(fromIdb, state);
+      if (JSON.stringify(merged) !== JSON.stringify(state)) {
+        state = merged;
         try {
-          localStorage.setItem(LS_KEY, JSON.stringify(fromIdb));
+          localStorage.setItem(LS_KEY, JSON.stringify(merged));
         } catch {
           /* bộ nhớ riêng tư */
         }
         listeners.forEach((l) => l());
       }
+      // Đồng bộ ngược: IDB cũ được nâng lên bản đã hợp để các bên converge.
+      if (JSON.stringify(merged) !== JSON.stringify(fromIdb)) void idbSet(IDB_KEY, merged);
       return;
     }
     // Chỉ có localStorage (legacy v1 hoặc mirror): đẩy lên IDB.
@@ -301,7 +316,7 @@ export function relockSpot(siteId: string, spotId: string): void {
     const unlocked = { ...base.unlocked };
     delete unlocked[key];
     return { ...base, unlocked, xp: Math.max(0, base.xp - (spot?.xp ?? 0)) };
-  });
+  }, true);
 }
 
 /** Công cụ demo: gỡ dấu mọi điểm + hoàn XP của các điểm đó (huy hiệu/quiz giữ nguyên). */
@@ -313,12 +328,12 @@ export function relockAll(): void {
       refund += SITES.find((s) => s.entityId === siteId)?.spots.find((s) => s.spotId === spotId)?.xp ?? 0;
     }
     return { ...base, unlocked: {}, xp: Math.max(0, base.xp - refund) };
-  });
+  }, true);
 }
 
 /** Công cụ demo: xóa mọi điểm quiz (giữ dấu + XP) — để giám khảo chơi lại và thấy XP thưởng thật. */
 export function clearQuizResults(): void {
-  mutate((base) => ({ ...base, quizDone: {} }));
+  mutate((base) => ({ ...base, quizDone: {} }), true);
 }
 
 /** Công cụ demo: tước huy hiệu khu + hoàn XP thưởng hoàn thành — diễn lại khoảnh khắc nhận huy hiệu. */
@@ -407,7 +422,7 @@ export function revokeAchievement(id: string): void {
       default:
         return base;
     }
-  });
+  }, true);
 }
 
 export const QUIZ_XP_PER_CORRECT = 5;
@@ -447,7 +462,9 @@ export function resetProgress() {
   } catch {
     /* bộ nhớ riêng tư */
   }
-  mutate(() => ({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [] }));
+  // Epoch mới: bản EMPTY gen+1 thắng trọn mọi merge — tab khác không thể
+  // union-merge để "hồi sinh" dấu cũ (QR-03).
+  mutate((base) => ({ ...EMPTY, unlocked: {}, quizDone: {}, badges: [], gen: (base.gen ?? 0) + 1 }));
 }
 
 export function siteUnlockedCount(site: Site, p: Progress = state): number {
@@ -577,7 +594,8 @@ export function importPassportJson(json: string): boolean {
     if (raw?.kind !== 'passport') return false;
     const p = migrate(raw.progress);
     if (!p) return false;
-    mutate(() => p);
+    // Epoch mới: bản nhập phải thắng mọi trạng thái cũ còn sót ở tab/store khác.
+    mutate((base) => ({ ...p, gen: (base.gen ?? 0) + 1 }));
     return true;
   } catch {
     return false;
@@ -605,10 +623,12 @@ export function previewPassportJson(json: string): { progress: Progress; spots: 
  */
 export function applyPassportImport(p: Progress, mode: 'merge' | 'replace'): void {
   if (mode === 'replace') {
-    mutate(() => p);
+    // Epoch mới: ghi đè trọn, không để dữ liệu cũ union-merge quay lại.
+    mutate((base) => ({ ...p, gen: (base.gen ?? 0) + 1 }));
     return;
   }
-  mutate((base) => mergeProgress(p, base));
+  // Cùng epoch: union thật sự — dấu bản nhập + dấu hiện tại đều còn.
+  mutate((base) => mergeProgress({ ...p, gen: base.gen ?? 0 }, base));
 }
 
 /**

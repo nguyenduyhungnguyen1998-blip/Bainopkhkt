@@ -65,6 +65,9 @@
 }
 .finale__card {
   width: min(400px, 100%);
+  /* Màn thấp (điện thoại xoay ngang): thẻ nội dung cuộn trong khung thay vì tràn. */
+  max-height: calc(100dvh - var(--space-8, 48px));
+  overflow-y: auto;
   padding: var(--space-6) var(--space-5);
   border-radius: var(--radius-lg);
   background: var(--color-surface-solid);

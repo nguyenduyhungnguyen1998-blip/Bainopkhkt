@@ -182,7 +182,10 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
 
 type SigState = 'checking' | 'ok' | 'bad';
 
-/** Bước "xác nhận" của luồng quét QR (P3): chữ ký hợp lệ -> bấm để mở khóa; sai -> cảnh báo êm. */
+/** Bước "xác nhận" của luồng quét QR: chữ ký hợp lệ của điểm mới → NHẬN DẤU NGAY
+ * (quét tem thật chính là hành động xác nhận — không cổng phụ, không CTA ẩn).
+ * Không còn cổng chọn ngôn ngữ trước quét (đã giết luồng trên thiết bị thật):
+ * chips VI/EN vẫn nằm sẵn trong panel kết quả. Tem sai → cảnh báo êm. */
 function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Spot; sig: string; unlocked: boolean; lang: Lang }) {
   const [state, setState] = useState<SigState>('checking');
   const [reward, setReward] = useState<number | null>(null);
@@ -191,15 +194,7 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
   const [dismissed, setDismissed] = useState(false);
   const [saveFailed, setSaveFailed] = useState(progressPersistFailed());
   const [, setLang] = useLang();
-  // Khách quét QR lần đầu chưa từng chọn ngôn ngữ -> hỏi 1 lần, nhớ luôn (mdv.lang).
-  // Tránh rơi thẳng vào nội dung tiếng Việt/audio mặc định cho du khách nước ngoài.
-  const [needLang, setNeedLang] = useState(() => {
-    try {
-      return !localStorage.getItem('mdv.lang');
-    } catch {
-      return false;
-    }
-  });
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let live = true;
@@ -260,31 +255,25 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     if (navigator.vibrate) navigator.vibrate(30);
   };
 
-  // Sau khi nhận dấu: toast nổi bật vài giây (tên điểm + XP + tổng + đường tới hộ chiếu),
-  // rồi tự thu gọn — khoảnh khắc thưởng không thể bị bỏ lỡ.
+  // QR hợp lệ của điểm mới → nhận dấu tự động ngay khi verify xong (ít chạm:
+  // quét → thấy "Đã nhận dấu +XP" luôn, không bắt chọn chủ đề/ngôn ngữ trước).
   useEffect(() => {
-    if (reward === null) return;
-    const id = setTimeout(() => {
-      setDismissed(true);
-      dropSig();
-    }, 6000);
-    return () => clearTimeout(id);
+    if (state === 'ok' && !unlocked && reward === null) doUnlock();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reward]);
+  }, [state, unlocked, reward]);
 
-  if (needLang) {
-    const pick = (l: Lang) => {
-      setLang(l);
-      setNeedLang(false);
-    };
-    return (
-      <div class="dscan" role="dialog" aria-label={t(UI.chooseLang, lang)}>
-        <span class="dscan__txt">{t(UI.chooseLang, lang)}</span>
-        <button class="mdv-chip" onClick={() => pick('vi')}>Tiếng Việt</button>
-        <button class="mdv-chip" onClick={() => pick('en')}>English</button>
-      </div>
-    );
-  }
+  // Focus vào panel khi modal hiện (QR-09 — hook phải đứng trước mọi early return).
+  const modalOpen = !dismissed && (unlocked || reward !== null);
+  useEffect(() => {
+    if (modalOpen) panelRef.current?.focus();
+  }, [modalOpen]);
+
+  // Đóng modal (✕/backdrop/Esc): dấu đã nhận tự động hoặc điểm vốn có dấu —
+  // dọn chữ ký khỏi URL để reload không mở lại panel, rồi trả trang sạch.
+  useEffect(() => {
+    if (dismissed && (unlocked || reward !== null)) dropSig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dismissed, unlocked, reward]);
 
   if (state === 'checking') {
     return (
@@ -314,71 +303,29 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     );
   }
 
-  if (reward !== null) {
-    // Toast nhận thưởng được xét TRƯỚC nhánh dismissed: đóng bảng chọn rồi nhận
-    // qua thanh gọn vẫn phải hiện đầy đủ (tên điểm + XP + tổng + hộ chiếu).
+  if (dismissed) return null;
+
+  // Verify xong nhưng effect nhận dấu chưa chạy xong — giữ trạng thái "đang kiểm"
+  // thay vì lóe nhầm nhãn "đã có dấu" trước khi grant.
+  if (!unlocked && reward === null) {
     return (
-      <div class="dtoast" role="status">
-        <Icon name="check" size={22} />
-        <div class="dtoast__txt">
-          <b>
-            {t(UI.gotStamp, lang)}: {t(spot.name, lang)}
-          </b>
-          <span>
-            +{reward} XP · {t(UI.totalXp, lang)} {totalXp} XP{badgeName ? ` · ${badgeName}` : ''}
-          </span>
-          {saveFailed && (
-            <span class="dtoast__warn">
-              <Icon name="warn" size={13} /> {t(UI.saveFailed, lang)}
-            </span>
-          )}
-        </div>
-        <a class="dtoast__link" href={routeHref.passport}>
-          {t(UI.viewStamp, lang)}
-        </a>
-        <button
-          class="dscan__x"
-          onClick={() => {
-            setDismissed(true);
-            dropSig();
-          }}
-          aria-label={t(UI.dismiss, lang)}
-        >
-          ✕
-        </button>
+      <div class="dscan dscan--checking" role="status" aria-live="polite">
+        <span class="dscan__spin" aria-hidden="true" />
+        <span class="dscan__txt">{t(UI.verifyingCode, lang)}</span>
       </div>
     );
   }
 
-  // Đóng modal bằng ✕/backdrop: nếu chưa nhận dấu thì vẫn giữ thanh xác nhận
-  // gọn trên đầu trang — không bỏ mất cửa mở khóa cho khách bấm nhầm.
-  if (dismissed) {
-    // Thanh xác nhận gọn chỉ tồn tại khi chữ ký đã verify ok — tem sai/đang kiểm
-    // khi đóng panel thì không còn cửa mở dấu nào (bấm Esc trên tem sai từng cấp dấu).
-    // Nhận qua đường này đi chung doUnlock -> toast + tổng XP y như CTA chính.
-    if (unlocked || state !== 'ok') return null;
-    return (
-      <div class="dscan" role="group" aria-label={t(UI.scanValid, lang)}>
-        <Icon name="check" size={18} />
-        <span class="dscan__txt">{t(UI.scanValid, lang)}</span>
-        <button class="mdv-btn mdv-btn--primary dscan__cta" onClick={doUnlock}>
-          {t(UI.confirmUnlock, lang)} (+{spot.xp} XP)
-        </button>
-      </div>
-    );
-  }
-
-  // Điểm đã có dấu nhưng khách vừa quét lại QR -> vẫn cho chọn mục khám phá.
+  // Chọn chủ đề trong panel kết quả: dấu đã nhận (hoặc điểm vốn có dấu) → đi
+  // thẳng tới aspect, gỡ `s` khỏi URL. reward!==null tính là đã nhận — prop
+  // `unlocked` có thể trễ một nhịp re-render sau grant.
   const goAspect = (aspectId: string) => {
-    if (unlocked) {
-      // Đã có dấu từ trước: không toast, không giữ `s` — đóng panel và đi thẳng tới aspect.
+    if (unlocked || reward !== null) {
       setDismissed(true);
       navigate(`d/${site.entityId}/${spot.spotId}?a=${encodeURIComponent(aspectId)}`, true);
       return;
     }
     doUnlock();
-    // Giữ `s` trong URL để toast nhận dấu hiện sau khi cuộn tới aspect đã chọn;
-    // replace: back không quay lại panel chọn — khách đã vào điểm.
     navigate(`d/${site.entityId}/${spot.spotId}?s=${sig}&a=${encodeURIComponent(aspectId)}`, true);
   };
 
@@ -389,12 +336,31 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
     .flatMap((c) => c.aspects)
     .filter((a, i, arr) => arr.findIndex((x) => x.id === a.id) === i);
 
-  // Modal chặn đầu sau khi quét QR: nền mờ phủ toàn màn, chỉ panel nổi bật;
-  // khách buộc tương tác trước khi vào nội dung. ✕ = bỏ qua (về trang điểm).
+  // Trap focus trong panel (QR-09): focus vào dialog khi mở, Tab vòng trong panel.
+  const trapTab = (e: KeyboardEvent) => {
+    if (e.key !== 'Tab' || !panelRef.current) return;
+    const els = panelRef.current.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!els.length) return;
+    const first = els[0];
+    const last = els[els.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      last.focus();
+      e.preventDefault();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      first.focus();
+      e.preventDefault();
+    }
+  };
+
+  // Modal kết quả quét QR: nền mờ phủ toàn màn. Một bề mặt duy nhất mang đủ
+  // trạng thái — tên điểm, dấu vừa nhận + XP + tổng + huy hiệu, chủ đề tùy chọn.
+  // ✕/backdrop = vào trang điểm (dấu đã nhận thì không mất).
   return (
     <div class="dpick" role="presentation">
       <div class="dpick__backdrop" onClick={() => setDismissed(true)} aria-hidden="true" />
-      <div class="dpick__panel" role="dialog" aria-modal="true" aria-label={t(UI.scanValid, lang)}>
+      <div class="dpick__panel" role="dialog" aria-modal="true" aria-label={t(UI.scanValid, lang)} ref={panelRef} tabIndex={-1} onKeyDown={trapTab}>
         <button class="dscan__x dpick__x" onClick={() => setDismissed(true)} aria-label={t(UI.dismiss, lang)}>
           ✕
         </button>
@@ -416,6 +382,25 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             </span>
           )}
         </header>
+        {reward !== null ? (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.gotStamp, lang)} · +{reward} XP · {t(UI.totalXp, lang)} {totalXp} XP
+            {badgeName ? ` · ${badgeName}` : ''}
+            {saveFailed && (
+              <span class="dtoast__warn">
+                {' '}
+                <Icon name="warn" size={13} /> {t(UI.saveFailed, lang)}
+              </span>
+            )}
+          </p>
+        ) : (
+          <p class="dscan__okhint">
+            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)} · {t(UI.totalXp, lang)} {getProgress().xp} XP ·{' '}
+            <a class="dscan__plink" href={routeHref.passport}>
+              {t(UI.viewStamp, lang)}
+            </a>
+          </p>
+        )}
         {aspects.length > 0 && (
           <>
             <p class="dscan__ask">{t(UI.exploreWhat, lang)}</p>
@@ -428,30 +413,14 @@ function ScanConfirm({ site, spot, sig, unlocked, lang }: { site: Site; spot: Sp
             </div>
           </>
         )}
-        {unlocked ? (
-          <p class="dscan__okhint">
-            <Icon name="check" size={14} /> {t(UI.alreadyStamped, lang)} · {t(UI.totalXp, lang)} {getProgress().xp} XP ·{' '}
-            <a class="dscan__plink" href={routeHref.passport}>
-              {t(UI.viewStamp, lang)}
-            </a>
-          </p>
-        ) : (
-          <p class="dscan__okhint">
-            <Icon name="check" size={14} /> {t(UI.scanOkHint, lang)}
-          </p>
-        )}
         <button
           class="mdv-btn mdv-btn--primary dscan__cta"
           onClick={() => {
-            if (unlocked) {
-              setDismissed(true);
-              dropSig();
-            } else {
-              doUnlock();
-            }
+            setDismissed(true);
+            dropSig();
           }}
         >
-          {unlocked ? t(UI.exploreSpot, lang) : `${t(UI.confirmUnlock, lang)} (+${spot.xp} XP)`}
+          {t(UI.exploreSpot, lang)}
         </button>
       </div>
     </div>

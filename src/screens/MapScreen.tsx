@@ -200,8 +200,22 @@ export function MapScreen() {
       navigate(`d/${link[1]}/${link[2]}?s=${link[3]}`);
       return;
     }
-    // Link tem compact ?q=<nn>.<sig>: vòng verify phía dưới tự tìm đúng điểm.
-    const sig = c.match(/[?&]q=\d+\.([0-9a-f]{16})/)?.[1] ?? c.match(/[0-9a-f]{16}/)?.[0] ?? c;
+    // Link tem compact ?q=<nn>.<sig> (QR-08): phải resolve theo ĐÚNG qrId —
+    // trước đây chỉ lấy sig rồi quét mọi điểm nên `?q=99.<sig-thật>` vẫn mở điểm.
+    const compact = c.match(/[?&]q=(\d+)\.([0-9a-f]{16})/);
+    if (compact) {
+      const qrId = `mdvq${compact[1].padStart(2, '0')}`;
+      for (const s of SITES)
+        for (const sp of s.spots)
+          if (sp.qrId === qrId) {
+            setSearchOn(false);
+            navigate(`d/${s.entityId}/${sp.spotId}?s=${compact[2]}`);
+            return;
+          }
+      setCodeErr(true);
+      return;
+    }
+    const sig = c.match(/[0-9a-f]{16}/)?.[0] ?? c;
     for (const s of SITES)
       for (const sp of s.spots)
         if (await verifySignature(s.entityId, sp.spotId, sig, sp.qrId)) {
@@ -211,6 +225,15 @@ export function MapScreen() {
         }
     setCodeErr(true);
   };
+  // Vào map kèm ?code=1 (trang báo tem QR hỏng → "Nhập mã in dưới tem"): mở sẵn
+  // ô tìm kiếm/nhập mã cho khách — không bắt tự tìm nút FAB.
+  useEffect(() => {
+    if (/[?&]code=1/.test(location.hash)) {
+      setSearchOn(true);
+      history.replaceState(null, '', '#/map');
+    }
+  }, []);
+
   // Tìm kiếm địa danh/tỉnh: khách thường biết tên và muốn đi thẳng – bản đồ không phải đường duy nhất.
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();

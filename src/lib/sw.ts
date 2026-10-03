@@ -55,8 +55,13 @@ export function useSwStatus(): { status: SwStatus; hasUpdate: boolean } {
   return { status, hasUpdate };
 }
 
+/** Chỉ reload khi NGƯỜI DÙNG bấm cập nhật — controllerchange từ lần claim đầu tiên
+ * (SW mới cài + clients.claim()) KHÔNG được reload giữa luồng quét QR (QR-14). */
+let updateRequested = false;
+
 /** Yêu cầu SW đang chờ chiếm quyền → controllerchange reload trang. */
 export function applySwUpdate(): void {
+  updateRequested = true;
   void navigator.serviceWorker.getRegistration().then((reg) => reg?.waiting?.postMessage('SKIP_WAITING'));
 }
 
@@ -66,12 +71,14 @@ export async function clearSwCaches(): Promise<void> {
   await Promise.all(ks.filter((k) => k.startsWith('mdv-')).map((k) => caches.delete(k)));
 }
 
-/** Gọi một lần ở entry: đăng ký SW + auto reload khi SW mới chiếm quyền. */
+/** Gọi một lần ở entry: đăng ký SW + reload chỉ khi user xác nhận cập nhật. */
 export function registerSw(): void {
   if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
   const url = `${import.meta.env.BASE_URL}sw.js`;
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(url).catch((e) => logError('manual', 'sw: register failed', String(e)));
-    navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (updateRequested) window.location.reload();
+    });
   });
 }

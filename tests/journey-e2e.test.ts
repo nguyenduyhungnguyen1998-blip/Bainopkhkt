@@ -59,11 +59,15 @@ describe('tem QR → hash route (boot redirect)', () => {
   it('tem cũ ?d=site/spot&s=SIG chuyển hash giữ nguyên sig', () => {
     expect(resolveQrRedirect('?d=van-mieu/khue-van-cac&s=AbCd1234EfGh5678', spotIndex)).toBe('#/d/van-mieu/khue-van-cac?s=AbCd1234EfGh5678');
   });
-  it('URL lạ / sig sai định dạng → không redirect', () => {
+  it('URL sạch → không redirect', () => {
     expect(resolveQrRedirect('', spotIndex)).toBeNull();
-    expect(resolveQrRedirect('?q=abc.xyz', spotIndex)).toBeNull();
-    expect(resolveQrRedirect('?q=99.0123456789abcdef', spotIndex)).toBeNull(); // qrId không tồn tại
-    expect(resolveQrRedirect('?d=van-mieu', spotIndex)).toBeNull();
+  });
+  it('tem lạ / sai định dạng → báo #/qrfail thay vì rơi về map im lặng (QR-08)', () => {
+    expect(resolveQrRedirect('?q=abc.xyz', spotIndex)).toBe('#/qrfail');
+    expect(resolveQrRedirect('?q=99.0123456789abcdef', spotIndex)).toBe('#/qrfail'); // qrId không tồn tại
+    expect(resolveQrRedirect('?q=99', spotIndex)).toBe('#/qrfail'); // thiếu sig
+    expect(resolveQrRedirect('?d=van-mieu', spotIndex)).toBe('#/qrfail');
+    expect(resolveQrRedirect('?d=van-mieu//x&s=0123456789abcdef', spotIndex)).toBe('#/qrfail');
   });
 });
 

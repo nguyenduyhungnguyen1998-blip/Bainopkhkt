@@ -167,6 +167,57 @@
         } catch (e) {}
       })();
     </script>
+    <script>
+      // Đổi hướng tem QR TRƯỚC khi tải bundle: khách quét ?q=/?d= được đưa sang
+      // hash route ngay trong khi JS còn tải — thấy "Đang kiểm tra mã QR…" thay vì
+      // splash thường, và tem hỏng báo lỗi sớm thay vì rơi về bản đồ im lặng.
+      // Bảng qrId→site/spot inline là tập con để đi nhanh; qrId không khớp để
+      // main.tsx quyết bằng bảng đầy đủ (regen: đồng bộ qrId trong src/data/sites).
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search);
+          var hasQ = q.get('q') != null;
+          var hasD = q.get('d') != null;
+          if (!hasQ && !hasD) return;
+          var mark = function () {
+            var el = document.querySelector('#splash .brand p');
+            if (el) el.textContent = 'Đang kiểm tra mã QR…';
+          };
+          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mark);
+          else mark();
+          var MAP = {
+            mdvq01: 'dinh-doc-lap/cong-chinh',
+            mdvq02: 'ha-long/hang-sung-sot',
+            mdvq03: 'hue/ngo-mon',
+            mdvq04: 'my-son/nhom-thap-b',
+            mdvq05: 'van-mieu/van-mieu-mon',
+            mdvq06: 'van-mieu/khue-van-cac',
+            mdvq07: 'van-mieu/bia-tien-si',
+            mdvq08: 'van-mieu/dai-thanh-mon',
+            mdvq09: 'van-mieu/nha-thai-hoc',
+            mdvq10: 'van-mieu/vuon-giam'
+          };
+          var to = null;
+          var c = (q.get('q') || '').match(/^(\d+)\.([0-9a-f]{16})$/i);
+          if (c) {
+            var id = 'mdvq' + ('0' + c[1]).slice(-2);
+            if (MAP[id]) to = '#/d/' + MAP[id] + '?s=' + c[2].toLowerCase();
+            // qrId không có trong bảng inline → để bundle quyết (bảng đầy đủ / '#/qrfail').
+          } else if (hasQ) {
+            to = '#/qrfail';
+          } else if (hasD) {
+            var d = q.get('d');
+            if (d && /^[\w-]+\/[\w-]+$/.test(d)) {
+              var s = q.get('s');
+              to = '#/d/' + d + (s ? '?s=' + encodeURIComponent(s) : '');
+            } else {
+              to = '#/qrfail';
+            }
+          }
+          if (to) location.replace(location.pathname + to);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="app">

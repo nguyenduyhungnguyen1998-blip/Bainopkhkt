@@ -107,3 +107,12 @@ description: E2E test conventions for the Mở Dấu Việt Preact PWA — dev s
 - SLM auto-enter gate: k>4.6 AND nearest multi-spot node within ~reach (min(720,1000)/2*1.15=414 viewBox units ≈ 130-135 CSS px at 390w) of viewport center. Node off-frame → no hijack (the fix).
 - Lang: no per-page chip on spot pages — set localStorage mdv.lang + reload. Theme: mdv.theme dark|light + reload.
 - Emoji on this box render as □ (no emoji font) — verify via DOM innerText unicode match, not screenshots.
+
+## Nghiem-thu tong-dien additions (QR latency measuring + CDP survival)
+- Latency harness: inject a MutationObserver via `Page.addScriptToEvaluateOnNewDocument` BEFORE nav — MUST call `Page.enable` first or the script never runs. Observe `document` (not documentElement — null at inject time → observer dies silently). Record `performance.now()` into `window.__mt` for milestones: hash / app / .dscan / .dscan--checking / .dpick / .dtoast / .dscan--bad / .dscan[role=dialog] (needLang gate).
+- Registration is PER WS SESSION — if the ws reconnects, re-register all addScriptToEvaluateOnNewDocument scripts or they silently stop applying.
+- Network throttle doesn't bite while a SW controls the page — `Network.setBypassServiceWorker{bypass:true}` first (else Fast/Slow3G measure SW-cache speed, not real network).
+- CDP target WEDGE: long-lived page targets under heavy emulation churn (CPU throttle + cache-disabled + repeated navs) eventually stall their whole resource pipeline — new Image()/fetch() never resolve though curl serves fine; Runtime.evaluate starts timing out. Diagnose env vs app: same URL via curl + fresh /json/new tab. Recovery = fresh tab; there's no in-tab fix.
+- Cold "localhost" numbers are meaningless for cold-boot (rs ~3ms even cache-disabled) — only the CPU/network throttle combos produce realistic figures. Median first-visit QR→modal: ~2.7s (4xCPU+Fast3G), ~9.9s (6xCPU+Slow3G), ~90ms warm. QR-specific work (redirect+verify+render) is only ~50-250ms; the rest is full app boot gated on initProgress IDB hydrate.
+- Fresh user gate: `?q=`/`?d=` scan on origin WITHOUT mdv.lang shows `.dscan[role=dialog]` lang picker INSTEAD of scan UI — verify still runs in parallel, so the result is instant after the pick.
+- QR match matrix all in match_{q,d,edge}.json under /tmp/mdvtest.

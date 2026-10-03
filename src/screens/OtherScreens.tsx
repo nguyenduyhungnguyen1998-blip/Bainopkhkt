@@ -409,6 +409,37 @@ export function PassportShareScreen({ payload }: { payload: string }) {
   );
 }
 
+/** Tem QR không giải được (mờ/sai/không thuộc app) — báo rõ thay vì rơi về bản đồ im lặng. */
+export function QrFailScreen() {
+  const lang = useLang()[0];
+  return (
+    <main class="mdv-screen pshare">
+      <header class="mdv-screen__header">
+        <div>
+          <span class="mdv-eyebrow" style="display:inline-flex;align-items:center;gap:6px">
+            <BrandMark size={16} /> {t(UI.appName, lang)}
+          </span>
+          <h1>{t(UI.qrFailTitle, lang)}</h1>
+        </div>
+        <a class="mdv-btn mdv-btn--icon" href={routeHref.map} aria-label={t(UI.map, lang)}>
+          <Icon name="back" />
+        </a>
+      </header>
+      <p class="mdv-muted">
+        <Icon name="warn" size={16} /> {t(UI.qrFailBody, lang)}
+      </p>
+      <div class="pshare__actions">
+        <a class="mdv-btn mdv-btn--primary" href="#/map?code=1">
+          <Icon name="search" /> {t(UI.qrFailManual, lang)}
+        </a>
+        <a class="mdv-btn" href={routeHref.map}>
+          {t(UI.map, lang)}
+        </a>
+      </div>
+    </main>
+  );
+}
+
 /** Sao lưu & chuyển thiết bị (nhóm Hành trình trong Cài đặt): xuất/nhập có xem trước + chọn gộp/thay thế. */
 function BackupCard({ lang }: { lang: Lang }) {
   const fileRef = useRef<HTMLInputElement>(null);

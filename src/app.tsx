@@ -11,7 +11,7 @@ import { applySwUpdate, useSwStatus } from './lib/sw';
 import { isDebug } from './lib/debug';
 import { MapScreen } from './screens/MapScreen';
 import { DestinationScreen } from './screens/DestinationScreen';
-import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, PassportShareScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
+import { AboutScreen, AdminScreen, HelpScreen, PassportScreen, PassportShareScreen, QrFailScreen, QuizScreen, SettingsScreen, SourcesScreen } from './screens/OtherScreens';
 import { getSite } from './data/content';
 import { GuidedTour, type TourStep } from './components/Tour';
 import { TOUR_STEPS } from './lib/tour';
@@ -149,6 +149,9 @@ export function App() {
       break;
     case 'passportShare':
       screen = <PassportShareScreen payload={route.payload} />;
+      break;
+    case 'qrFail':
+      screen = <QrFailScreen />;
       break;
     default:
       screen = (

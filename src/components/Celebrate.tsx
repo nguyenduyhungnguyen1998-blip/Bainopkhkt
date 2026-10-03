@@ -178,7 +178,9 @@ export function Celebrate() {
 
   return (
     <>
-      {burst > 0 && (
+      {/* Khi modal hoàn thành khu/toàn hành trình đang mở thì dẹp confetti bên
+       *  dưới — modal là khoảnh khắc chính, giấy bay chỉ nhiễu (QR-07). */}
+      {burst > 0 && !finale && !siteFin && (
         <div class="celebrate" key={burst} aria-hidden="true">
           {PIECES.map((p, i) => (
             <i

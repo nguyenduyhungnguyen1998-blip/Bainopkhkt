@@ -178,6 +178,21 @@
           var q = new URLSearchParams(location.search);
           var hasQ = q.get('q') != null;
           var hasD = q.get('d') != null;
+          // Đánh dấu splash sớm NHẤT có thể: observer gắn trong head bắt được phần
+          // tử ngay khi nó parse trong luồng — phủ cả nhịp streaming đầu (doc sau
+          // redirect không còn ?q= nên nhận diện lượt quét qua hash '#/d/…?s=' | '#/qrfail').
+          var h0 = location.hash;
+          var qrScan = hasQ || hasD || h0 === '#/qrfail' || (h0.indexOf('#/d/') === 0 && h0.indexOf('s=') !== -1);
+          if (qrScan && typeof MutationObserver !== 'undefined') {
+            var mo = new MutationObserver(function () {
+              var el = document.querySelector('#splash .brand p');
+              if (el) {
+                el.textContent = 'Đang kiểm tra mã QR…';
+                mo.disconnect();
+              }
+            });
+            mo.observe(document.documentElement, { childList: true, subtree: true });
+          }
           if (!hasQ && !hasD) return;
           var MAP = {
             mdvq01: 'dinh-doc-lap/cong-chinh',

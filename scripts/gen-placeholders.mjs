@@ -1,5 +1,5 @@
 // Sinh ảnh SVG placeholder cho các khu/điểm chưa có ảnh thật.
-// Chạy: node scripts/gen-placeholders.mjs  (idempotent, KHÔNG ghi đè file đã tồn tại)
+// Chạy: node scripts/gen-placeholders.mjs  
 import { mkdirSync, writeFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 
@@ -35,7 +35,7 @@ for (const f of readdirSync(sitesDir).filter((f) => f.endsWith('.json'))) {
       if ((card.type === 'hero' || card.type === 'image') && card.image) targets.set(card.image, spot.name.vi);
       if (card.type === 'video' && card.poster) targets.set(card.poster, spot.name.vi);
     }
-  }
+  }  
   for (const [path, label] of targets) {
     if (!path.endsWith('.svg')) continue;
     const abs = join(pub, path);

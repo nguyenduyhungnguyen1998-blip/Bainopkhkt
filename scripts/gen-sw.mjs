@@ -53,12 +53,11 @@ self.addEventListener('fetch', (e) => {
 
   // Điều hướng trang: network-first, rớt mạng → trang tĩnh đã precache (qr-sheet…) rồi mới tới shell.
   // Không check cache trước thì tem QR dù đã cache vẫn bị nuốt thành index.html (văng về map).
+  // Deadline 4s (QR-15): mạng chập chờn treo fetch vô hạn — quá hạn rơi về cache/shell.
   if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req).catch(() =>
-        caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match(OFFLINE_URL))
-      )
-    );
+    const offline = () => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match(OFFLINE_URL));
+    const timed = new Promise((_, rej) => setTimeout(() => rej(new Error('nav-timeout')), 4000));
+    e.respondWith(Promise.race([fetch(req), timed]).catch(offline));
     return;
   }
 

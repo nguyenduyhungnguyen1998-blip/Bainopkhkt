@@ -42,27 +42,35 @@ export async function idbGet(key: string): Promise<unknown> {
   const db = await openDb();
   if (!db) return null;
   return new Promise((resolve) => {
+    // Deadline đọc: transaction có thể treo vô hạn (QR-11) — coi như không có dữ liệu.
+    const timer = setTimeout(() => resolve(null), 1200);
+    const done = (v: unknown) => {
+      clearTimeout(timer);
+      resolve(v);
+    };
     try {
       const req = db.transaction(STORE, 'readonly').objectStore(STORE).get(key);
-      req.onsuccess = () => resolve(req.result ?? null);
-      req.onerror = () => resolve(null);
+      req.onsuccess = () => done(req.result ?? null);
+      req.onerror = () => done(null);
     } catch {
-      resolve(null);
+      done(null);
     }
   });
 }
 
-export async function idbSet(key: string, value: unknown): Promise<void> {
+/** true = đã ghi xong; false = không ghi được (QR-01: caller phải biết để cảnh báo mất dữ liệu). */
+export async function idbSet(key: string, value: unknown): Promise<boolean> {
   const db = await openDb();
-  if (!db) return;
+  if (!db) return false;
   return new Promise((resolve) => {
     try {
       const tx = db.transaction(STORE, 'readwrite');
       tx.objectStore(STORE).put(value, key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => resolve();
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+      tx.onabort = () => resolve(false);
     } catch {
-      resolve();
+      resolve(false);
     }
   });
 }

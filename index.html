@@ -167,6 +167,66 @@
         } catch (e) {}
       })();
     </script>
+    <script>
+      // Đổi hướng tem QR TRƯỚC khi tải bundle: khách quét ?q=/?d= được đưa sang
+      // hash route ngay trong khi JS còn tải — thấy "Đang kiểm tra mã QR…" thay vì
+      // splash thường, và tem hỏng báo lỗi sớm thay vì rơi về bản đồ im lặng.
+      // Bảng qrId→site/spot inline là tập con để đi nhanh; qrId không khớp để
+      // main.tsx quyết bằng bảng đầy đủ (regen: đồng bộ qrId trong src/data/sites).
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search);
+          var hasQ = q.get('q') != null;
+          var hasD = q.get('d') != null;
+          // Đánh dấu splash sớm NHẤT có thể: observer gắn trong head bắt được phần
+          // tử ngay khi nó parse trong luồng — phủ cả nhịp streaming đầu (doc sau
+          // redirect không còn ?q= nên nhận diện lượt quét qua hash '#/d/…?s=' | '#/qrfail').
+          var h0 = location.hash;
+          var qrScan = hasQ || hasD || h0 === '#/qrfail' || (h0.indexOf('#/d/') === 0 && h0.indexOf('s=') !== -1);
+          if (qrScan && typeof MutationObserver !== 'undefined') {
+            var mo = new MutationObserver(function () {
+              var el = document.querySelector('#splash .brand p');
+              if (el) {
+                el.textContent = 'Đang kiểm tra mã QR…';
+                mo.disconnect();
+              }
+            });
+            mo.observe(document.documentElement, { childList: true, subtree: true });
+          }
+          if (!hasQ && !hasD) return;
+          var MAP = {
+            mdvq01: 'dinh-doc-lap/cong-chinh',
+            mdvq02: 'ha-long/hang-sung-sot',
+            mdvq03: 'hue/ngo-mon',
+            mdvq04: 'my-son/nhom-thap-b',
+            mdvq05: 'van-mieu/van-mieu-mon',
+            mdvq06: 'van-mieu/khue-van-cac',
+            mdvq07: 'van-mieu/bia-tien-si',
+            mdvq08: 'van-mieu/dai-thanh-mon',
+            mdvq09: 'van-mieu/nha-thai-hoc',
+            mdvq10: 'van-mieu/vuon-giam'
+          };
+          var to = null;
+          var c = (q.get('q') || '').match(/^(\d+)\.([0-9a-f]{16})$/i);
+          if (c) {
+            var id = 'mdvq' + ('0' + c[1]).slice(-2);
+            if (MAP[id]) to = '#/d/' + MAP[id] + '?s=' + c[2].toLowerCase();
+            // qrId không có trong bảng inline → để bundle quyết (bảng đầy đủ / '#/qrfail').
+          } else if (hasQ) {
+            to = '#/qrfail';
+          } else if (hasD) {
+            var d = q.get('d');
+            if (d && /^[\w-]+\/[\w-]+$/.test(d)) {
+              var s = q.get('s');
+              to = '#/d/' + d + (s ? '?s=' + encodeURIComponent(s) : '');
+            } else {
+              to = '#/qrfail';
+            }
+          }
+          if (to) location.replace(location.pathname + to);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="app">
@@ -182,6 +242,22 @@
         </div>
       </div>
     </div>
+    <script>
+      // Đổi chữ splash NGAY khi splash vừa parse — script đứng sau markup nên
+      // phần tử đã tồn tại, không chờ DOMContentLoaded. Cổng bằng URL (thứ duy
+      // nhất sống qua replace): '?q='/'?d=' còn sót trong search, hash '#/d/…?s='
+      // (redirect tem), hoặc '#/qrfail'. Link chia sẻ '#/d/…' không kèm s= giữ
+      // chữ splash thường — đúng, vì đó không phải lượt quét tem.
+      (function () {
+        try {
+          var h = location.hash;
+          var qr = /[?&](q|d)=/.test(location.search) || h === '#/qrfail' || (h.indexOf('#/d/') === 0 && h.indexOf('s=') !== -1);
+          if (!qr) return;
+          var el = document.querySelector('#splash .brand p');
+          if (el) el.textContent = 'Đang kiểm tra mã QR…';
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

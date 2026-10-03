@@ -159,6 +159,12 @@ export const UI = {
   chooseLangShort: { vi: 'Ngôn ngữ', en: 'Language' },
   exploreWhat: { vi: 'Bạn muốn khám phá gì?', en: 'What do you want to explore?' },
   exploreSpot: { vi: 'Vào trang điểm', en: 'Open the spot page' },
+  qrFailTitle: { vi: 'Mã QR không nhận diện được', en: 'QR code not recognised' },
+  qrFailBody: {
+    vi: 'Tem có thể bị mờ, hỏng, hoặc không thuộc ứng dụng này. Hãy thử quét lại — hoặc nhập 16 ký tự in dưới tem.',
+    en: 'The tag may be blurred, damaged, or not part of this app. Try scanning again — or type the 16 characters printed below the tag.',
+  },
+  qrFailManual: { vi: 'Nhập mã in dưới tem', en: 'Type the code under the tag' },
   exportPassport: { vi: 'Tải thẻ hộ chiếu', en: 'Download passport card' },
   importPassport: { vi: 'Khôi phục bản sao', en: 'Restore a backup' },
   importOk: { vi: 'Đã khôi phục tiến độ', en: 'Progress restored' },

@@ -16,6 +16,7 @@ export type Route =
   | { name: 'about' }
   | { name: 'sources' }
   | { name: 'passportShare'; payload: string }
+  | { name: 'qrFail' }
   | { name: 'notfound'; path: string };
 
 export function parseHash(hash: string): Route {
@@ -48,6 +49,9 @@ export function parseHash(hash: string): Route {
       // Link hành trình chia sẻ: #/pp/<payload base64url> — chỉ-đọc, người nhận xem thẻ hộ chiếu.
       if (!segs[1]) return { name: 'notfound', path: raw };
       return { name: 'passportShare', payload: decodeURIComponent(segs[1]) };
+    case 'qrfail':
+      // Tem QR mang theo param nhưng không giải được (mờ/sai/không thuộc app) — báo rõ thay vì rơi về map.
+      return { name: 'qrFail' };
     default:
       return { name: 'notfound', path: raw };
   }

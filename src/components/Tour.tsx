@@ -108,7 +108,14 @@ export function GuidedTour({ steps, onDone }: { steps: TourStep[]; onDone: () =>
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onDone();
-      else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+      else if (e.key === 'Enter') {
+        // Nút đang focus tự xử lý Enter (FX-01: preventDefault từng làm nút cuối
+        // "Bắt đầu khám phá" chết với bàn phím). Focus ngoài nút: bước cuối → xong.
+        if (e.target instanceof HTMLElement && e.target.closest('button')) return;
+        e.preventDefault();
+        if (i >= steps.length - 1) onDone();
+        else setI((v) => v + 1);
+      } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         setI((v) => Math.min(v + 1, steps.length - 1));
       } else if (e.key === 'ArrowLeft') {
@@ -118,7 +125,7 @@ export function GuidedTour({ steps, onDone }: { steps: TourStep[]; onDone: () =>
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [onDone, steps.length]);
+  }, [onDone, steps.length, i]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;

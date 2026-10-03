@@ -16,9 +16,16 @@ async function hmacHex(payload: string): Promise<string> {
   // kết quả bit-perfect nên chữ ký trên tem in vẫn khớp.
   if (typeof crypto !== 'undefined' && crypto.subtle) {
     try {
-      const key = await crypto.subtle.importKey('raw', enc.encode(QR_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-      const mac = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
-      return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
+      // Watchdog: một số webview treo promise crypto.subtle (QR-12) — quá hạn
+      // thì dùng bản JS thuần (kết quả bit-identical, vẫn là verify thật).
+      const web = (async () => {
+        const key = await crypto.subtle.importKey('raw', enc.encode(QR_SECRET), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+        const mac = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
+        return [...new Uint8Array(mac)].map((b) => b.toString(16).padStart(2, '0')).join('');
+      })();
+      const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500));
+      const got = await Promise.race([web, timeout]);
+      if (got !== null) return got;
     } catch {
       // Một số webview Android có subtle nhưng importKey/sign reject — rơi về bản JS thuần.
     }
@@ -119,7 +126,9 @@ type QrSpotIndex = { entityId: string; spotId: string; qrId?: string };
 /**
  * URL tem QR không-fragment (camera/scanner có thể cắt phần sau '#') → hash route đích.
  * Hai dạng tem in: `?q=<nn>.<sig>` (qrId mdvqNN, tem mới) và `?d=<site>/<spot>&s=<sig>` (tem cũ).
- * Trả về đoạn `#/d/...` để location.replace, hoặc null nếu URL không phải tem QR.
+ * Trả về đoạn `#/d/...` để location.replace; '#/qrfail' khi URL MANG tem nhưng
+ * không giải được (tem mờ/sai/không thuộc app — khách phải thấy lỗi, không rơi
+ * về map im lặng); null khi URL không có param QR nào.
  */
 export function resolveQrRedirect(search: string, spots: readonly QrSpotIndex[]): string | null {
   const q = new URLSearchParams(search);
@@ -128,12 +137,14 @@ export function resolveQrRedirect(search: string, spots: readonly QrSpotIndex[])
     const qrId = `mdvq${compact[1].padStart(2, '0')}`;
     const found = spots.find((sp) => sp.qrId === qrId);
     if (found) return `#/d/${found.entityId}/${found.spotId}?s=${compact[2].toLowerCase()}`;
-    return null;
+    return '#/qrfail';
   }
+  if (q.get('q') !== null) return '#/qrfail';
   const dParam = q.get('d');
   if (dParam && /^[\w-]+\/[\w-]+$/.test(dParam)) {
     const sParam = q.get('s');
     return `#/d/${dParam}${sParam ? `?s=${encodeURIComponent(sParam)}` : ''}`;
   }
+  if (dParam !== null) return '#/qrfail';
   return null;
 }

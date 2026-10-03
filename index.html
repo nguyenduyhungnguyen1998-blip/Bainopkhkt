@@ -179,12 +179,6 @@
           var hasQ = q.get('q') != null;
           var hasD = q.get('d') != null;
           if (!hasQ && !hasD) return;
-          var mark = function () {
-            var el = document.querySelector('#splash .brand p');
-            if (el) el.textContent = 'Đang kiểm tra mã QR…';
-          };
-          if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mark);
-          else mark();
           var MAP = {
             mdvq01: 'dinh-doc-lap/cong-chinh',
             mdvq02: 'ha-long/hang-sung-sot',
@@ -233,6 +227,19 @@
         </div>
       </div>
     </div>
+    <script>
+      // Đổi chữ splash NGAY khi splash vừa parse — script đứng sau markup nên
+      // phần tử đã tồn tại, không chờ DOMContentLoaded (DCL đợi cả module bundle
+      // → trên mạng chậm khách phải thấy 'Đang kiểm tra mã QR…' suốt thời gian chờ).
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search);
+          if (q.get('q') == null && q.get('d') == null) return;
+          var el = document.querySelector('#splash .brand p');
+          if (el) el.textContent = 'Đang kiểm tra mã QR…';
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

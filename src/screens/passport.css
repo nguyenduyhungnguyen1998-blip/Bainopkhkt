@@ -449,3 +449,32 @@
 .ppass__badgetoggle {
   margin-top: 10px;
 }
+
+.pstats summary {
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pstats__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0 8px;
+}
+.pstats__item {
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: var(--color-surface);
+}
+.pstats__item dt {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.pstats__item dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--color-text);
+}

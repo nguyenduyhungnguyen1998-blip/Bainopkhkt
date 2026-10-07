@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { SITES, getSpot } from '../data/content';
 import type { Site, Spot } from '../data/types';
 import { UI, t, useLang, type Lang } from '../lib/i18n';
-import { computeAchievements, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp, sharePassportPayload, decodePassportPayload } from '../lib/progress';
+import { computeAchievements, journeyStats, siteUnlockedCount, useProgress, resetProgress, quizBest, recordQuizResult, exportPassportCardHtml, previewPassportJson, applyPassportImport, isSpotUnlocked, unlockSpot, relockSpot, grantXp, sharePassportPayload, decodePassportPayload } from '../lib/progress';
 import type { Achievement, Progress } from '../lib/progress';
 import { asset } from '../lib/asset';
 import './passport.css';
@@ -17,6 +17,7 @@ import { siteEmoji } from '../lib/siteEmoji';
 import { ConfirmSheet, useConfirm } from '../components/ConfirmSheet';
 import './settings.css';
 import { enableDemoDock } from '../components/DemoDock';
+import { getAutoNarrate, setAutoNarrate } from '../lib/speech';
 
 export function PassportScreen() {
   const [lang] = useLang();
@@ -142,6 +143,8 @@ export function PassportScreen() {
 
       <ShareJourney lang={lang} done={doneSpots} total={totalSpots} xp={p.xp} />
 
+      <JourneyStatsCard lang={lang} />
+
       <section>
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{t(UI.heritageBadges, lang)}</h2>
         <div class="ppass__badges">
@@ -224,6 +227,36 @@ export function PassportScreen() {
         />
       )}
     </main>
+  );
+}
+
+function JourneyStatsCard({ lang }: { lang: Lang }) {
+  const st = journeyStats(useProgress());
+  const rate = st.quizAsked ? Math.round((st.quizCorrect / st.quizAsked) * 100) : null;
+  const first = st.firstStampAt ? new Date(st.firstStampAt).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-GB') : '—';
+  const rows: [string, string][] = [
+    [t(UI.statsStamps, lang), `${st.stamps}/${st.stampsTotal}`],
+    [t(UI.statsSites, lang), `${st.sitesDone}/${st.sitesTotal}`],
+    [t(UI.statsQuizSets, lang), `${st.quizSets}/${st.quizSetsTotal}`],
+    [t(UI.statsQuizRate, lang), rate === null ? '—' : `${rate}% (${st.quizCorrect}/${st.quizAsked})`],
+    [t(UI.statsDays, lang), String(st.activeDays)],
+    [t(UI.statsFirst, lang), first],
+  ];
+  return (
+    <details class="mdv-card pstats">
+      <summary>
+        <Icon name="spark" size={15} /> {t(UI.statsTitle, lang)}
+      </summary>
+      <dl class="pstats__grid">
+        {rows.map(([k, v]) => (
+          <div key={k} class="pstats__item">
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
+      <small class="mdv-muted">{t(UI.statsNote, lang)}</small>
+    </details>
   );
 }
 
@@ -835,6 +868,7 @@ export function SettingsScreen() {
   const [theme, setTheme] = useTheme();
   const [fontPct, setFontPct] = useFontScale();
   const [flatPct, setFlatPct] = useAmbientFlat();
+  const [autoNar, setAutoNar] = useState(getAutoNarrate);
   const { ask, setAsk } = useConfirm();
   return (
     <main class="mdv-screen">
@@ -869,6 +903,19 @@ export function SettingsScreen() {
               </button>
             </div>
           </div>
+          <p class="mdv-muted setrow__note">{t(UI.langAutoNote, lang)}</p>
+          <div class="setrow">
+            <span class="setrow__lbl">{t(UI.autoNarrate, lang)}</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="mdv-chip" aria-pressed={autoNar} onClick={() => { setAutoNarrate(true); setAutoNar(true); }}>
+                {t(UI.on, lang)}
+              </button>
+              <button class="mdv-chip" aria-pressed={!autoNar} onClick={() => { setAutoNarrate(false); setAutoNar(false); }}>
+                {t(UI.off, lang)}
+              </button>
+            </div>
+          </div>
+          <p class="mdv-muted setrow__note">{t(UI.autoNarrateNote, lang)}</p>
           <div class="setrow">
             <span class="setrow__lbl">{t(UI.fontSize, lang)}</span>
             <LevelSlider

@@ -10,8 +10,15 @@ let current: Lang = (() => {
   } catch {
     /* ignore */
   }
-  return 'vi';
+  return detectLang();
 })();
+
+/** Lần đầu mở (chưa chọn ngôn ngữ): theo ngôn ngữ của thiết bị — tiếng Việt giữ 'vi', ngôn ngữ khác dùng 'en'. */
+function detectLang(): Lang {
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return 'vi';
+  const first = (navigator.languages?.[0] ?? navigator.language ?? '').toLowerCase();
+  return !first || first.startsWith('vi') ? 'vi' : 'en';
+}
 
 // Đồng bộ <html lang> với lựa chọn đã lưu ngay từ lần tải đầu (SR đọc đúng ngôn ngữ).
 if (typeof document !== 'undefined') document.documentElement.lang = current;
@@ -274,6 +281,25 @@ export const UI = {
   lvMedium: { vi: 'Vừa', en: 'Medium' },
   lvSolid: { vi: 'Nền đơn sắc', en: 'Solid' },
   groupDisplay: { vi: 'Hiển thị & nghe', en: 'Display & sound' },
+  langAutoNote: { vi: 'Lần đầu mở, app tự chọn theo ngôn ngữ của thiết bị.', en: 'On first launch the app follows your device language.' },
+  autoNarrate: { vi: 'Tự phát thuyết minh', en: 'Auto-play narration' },
+  autoNarrateNote: { vi: 'Mở một điểm là nghe ngay, không cần bấm Nghe.', en: 'Narration starts as soon as you open a spot.' },
+  on: { vi: 'Bật', en: 'On' },
+  off: { vi: 'Tắt', en: 'Off' },
+  directions: { vi: 'Chỉ đường', en: 'Directions' },
+  directionsNote: {
+    vi: 'Mở dịch vụ bản đồ trực tuyến theo tọa độ di tích. Bản đồ trong app vẫn dùng được khi mất mạng.',
+    en: 'Opens an online map service at the site coordinates. The in-app map still works offline.',
+  },
+  directionsOffline: { vi: 'Cần có mạng để mở bản đồ trực tuyến.', en: 'Online maps need a connection.' },
+  statsTitle: { vi: 'Thống kê hành trình', en: 'Journey statistics' },
+  statsStamps: { vi: 'Dấu đã nhận', en: 'Stamps' },
+  statsSites: { vi: 'Khu hoàn thành', en: 'Sites completed' },
+  statsQuizSets: { vi: 'Bộ quiz đã làm', en: 'Quiz sets done' },
+  statsQuizRate: { vi: 'Tỉ lệ trả lời đúng', en: 'Correct answers' },
+  statsDays: { vi: 'Ngày khám phá', en: 'Days exploring' },
+  statsFirst: { vi: 'Dấu đầu tiên', en: 'First stamp' },
+  statsNote: { vi: 'Tính trên thiết bị này, không gửi dữ liệu ra ngoài.', en: 'Computed on this device; nothing is uploaded.' },
   groupJourney: { vi: 'Hành trình & dữ liệu', en: 'Journey & data' },
   groupHelp: { vi: 'Trợ giúp & thông tin', en: 'Help & info' },
   storedLocally: {

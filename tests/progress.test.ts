@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeStatuses, type Progress } from '../src/lib/progress';
+import { computeStatuses, journeyStats, type Progress } from '../src/lib/progress';
 import { SITES } from '../src/data/content';
 
 const p = (unlocked: string[]): Progress => ({
@@ -37,5 +37,36 @@ describe('trạng thái node hành trình', () => {
     const all = SITES.flatMap((s) => s.spots.map((sp) => `${s.entityId}/${sp.spotId}`));
     const s = computeStatuses(p(all));
     expect([...s.values()].every((v) => v === 'done')).toBe(true);
+  });
+});
+
+describe('thống kê hành trình', () => {
+  it('đếm dấu, khu xong, quiz và ngày từ tiến độ trên máy', () => {
+    const site = SITES[0];
+    const keys = site.spots.map((sp) => `${site.entityId}/${sp.spotId}`);
+    const qs = site.spots.find((sp) => sp.quiz?.length)!;
+    const qkey = `${site.entityId}/${qs.spotId}`;
+    const prog: Progress = {
+      schemaVersion: 2,
+      unlocked: Object.fromEntries(keys.map((k, i) => [k, Date.UTC(2026, 9, 1 + (i % 2), 8)])),
+      quizDone: { [qkey]: 1 },
+      xp: 42,
+      badges: [],
+    };
+    const st = journeyStats(prog);
+    expect(st.stamps).toBe(keys.length);
+    expect(st.sitesDone).toBe(1);
+    expect(st.quizSets).toBe(1);
+    expect(st.quizCorrect).toBe(1);
+    expect(st.quizAsked).toBe(qs.quiz!.length);
+    expect(st.activeDays).toBe(keys.length > 1 ? 2 : 1);
+    expect(st.firstStampAt).toBe(Date.UTC(2026, 9, 1, 8));
+    expect(st.xp).toBe(42);
+  });
+  it('chưa có gì: không chia cho 0', () => {
+    const st = journeyStats(p([]));
+    expect(st.stamps).toBe(0);
+    expect(st.quizAsked).toBe(0);
+    expect(st.firstStampAt).toBeNull();
   });
 });

@@ -666,6 +666,44 @@ export interface Achievement {
   unlocked: boolean;
 }
 
+export interface JourneyStats {
+  stamps: number;
+  stampsTotal: number;
+  sitesDone: number;
+  sitesTotal: number;
+  /** số bộ quiz đã làm / tổng bộ quiz có trong app */
+  quizSets: number;
+  quizSetsTotal: number;
+  /** câu đúng (điểm cao nhất mỗi bộ) / tổng câu của các bộ đã làm */
+  quizCorrect: number;
+  quizAsked: number;
+  /** số ngày khác nhau có nhận dấu */
+  activeDays: number;
+  firstStampAt: number | null;
+  xp: number;
+}
+
+/** Thống kê hành trình tính hoàn toàn từ tiến độ trên máy — không gửi dữ liệu đi đâu. */
+export function journeyStats(p: Progress = state): JourneyStats {
+  const times = Object.values(p.unlocked);
+  const days = new Set(times.map((t) => new Date(t).toDateString()));
+  const quizSpots = SITES.flatMap((s) => s.spots.filter((sp) => sp.quiz?.length).map((sp) => ({ key: `${s.entityId}/${sp.spotId}`, n: sp.quiz!.length })));
+  const done = quizSpots.filter((q) => (p.quizDone[q.key] ?? 0) > 0);
+  return {
+    stamps: times.length,
+    stampsTotal: SITES.reduce((n, s) => n + s.spots.length, 0),
+    sitesDone: SITES.filter((s) => siteUnlockedCount(s, p) === s.spots.length).length,
+    sitesTotal: SITES.length,
+    quizSets: done.length,
+    quizSetsTotal: quizSpots.length,
+    quizCorrect: done.reduce((n, q) => n + Math.min(p.quizDone[q.key], q.n), 0),
+    quizAsked: done.reduce((n, q) => n + q.n, 0),
+    activeDays: days.size,
+    firstStampAt: times.length ? Math.min(...times) : null,
+    xp: p.xp,
+  };
+}
+
 /**
  * 12 danh hiệu: 7 cột mốc hành trình (dấu → khu → quiz, tăng dần độ khó)
  * + 5 danh hiệu riêng của từng khu di sản (đủ hết điểm của khu mới được phong).

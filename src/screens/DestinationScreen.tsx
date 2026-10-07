@@ -11,7 +11,7 @@ import { siteEmoji } from '../lib/siteEmoji';
 import { asset } from '../lib/asset';
 import { getProgress, isSpotUnlocked, progressPersistFailed, unlockSpot, useProgress } from '../lib/progress';
 import { verifySignature } from '../lib/qr';
-import { SpeechPlayer, speechSupported, type SpeechStatus } from '../lib/speech';
+import { SpeechPlayer, canAutoPlay, getAutoNarrate, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
 import { useOnline } from '../lib/theme';
 import { IMAGE_CREDITS } from '../data/credits';
@@ -123,7 +123,15 @@ export function DestinationScreen({ siteId, spotId, query }: { siteId: string; s
         {spot.layoutSchema.map((card, i) => (
           // key theo spotId: đổi điểm cùng khu phải remount card — không thì gallery
           // giữ idx cũ -> vượt độ dài ảnh của điểm mới = khung trống, nền cũng cũ.
-          <CardView key={`${spot.spotId}:${i}`} card={card} lang={lang} site={site} initialAspect={query?.get('a')} onActiveImage={setBgSrc} />
+          <CardView
+            key={`${spot.spotId}:${i}`}
+            card={card}
+            lang={lang}
+            site={site}
+            initialAspect={query?.get('a')}
+            onActiveImage={setBgSrc}
+            autoPlay={i === spot.layoutSchema.findIndex((c) => c.type === 'audio')}
+          />
         ))}
       </div>
 
@@ -625,6 +633,7 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
             <span class="mdv-eyebrow">{t(site.province, lang)}</span>
             <h1>{siteEmoji(site)} {t(site.name, lang)}</h1>
             <p class="mdv-muted">{t(site.summary, lang)}</p>
+            <Directions site={site} lang={lang} />
 
             {ex ? (
               <>
@@ -683,7 +692,42 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
   );
 }
 
-function CardView({ card, lang, site, initialAspect, onActiveImage }: { card: Card; lang: Lang; site: Site; initialAspect?: string | null; onActiveImage?: (src: string) => void }) {
+/** Bản đồ trong app chạy offline; khi có mạng thì gọi thêm dịch vụ bản đồ trực tuyến theo tọa độ khu. */
+function Directions({ site, lang }: { site: Site; lang: Lang }) {
+  const online = useOnline();
+  const [lon, lat] = site.coords;
+  const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
+  const osm = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+  return (
+    <div class="dintro__dir">
+      <div class="dintro__dirbtns">
+        <a class={`mdv-btn mdv-btn--ghost mdv-btn--sm ${online ? '' : 'is-disabled'}`} href={online ? gmaps : undefined} target="_blank" rel="noopener" aria-disabled={!online}>
+          <Icon name="locate" size={15} /> {t(UI.directions, lang)} · Google Maps
+        </a>
+        <a class={`mdv-btn mdv-btn--ghost mdv-btn--sm ${online ? '' : 'is-disabled'}`} href={online ? osm : undefined} target="_blank" rel="noopener" aria-disabled={!online}>
+          OpenStreetMap
+        </a>
+      </div>
+      <small class="mdv-muted">{online ? t(UI.directionsNote, lang) : t(UI.directionsOffline, lang)}</small>
+    </div>
+  );
+}
+
+function CardView({
+  card,
+  lang,
+  site,
+  initialAspect,
+  onActiveImage,
+  autoPlay,
+}: {
+  card: Card;
+  lang: Lang;
+  site: Site;
+  initialAspect?: string | null;
+  onActiveImage?: (src: string) => void;
+  autoPlay?: boolean;
+}) {
   switch (card.type) {
     case 'hero':
     case 'image':
@@ -695,7 +739,7 @@ function CardView({ card, lang, site, initialAspect, onActiveImage }: { card: Ca
     case 'audio': {
       // Câu chúc mừng chỉ đọc khi khu thật sự hoàn thành — khách ghé lẻ không nghe "đã hoàn thành".
       const done = site.spots.every((sp) => isSpotUnlocked(site.entityId, sp.spotId));
-      return <AudioCardView card={card} lang={lang} extra={done ? card.scriptComplete?.[lang] : undefined} />;
+      return <AudioCardView card={card} lang={lang} extra={done ? card.scriptComplete?.[lang] : undefined} autoPlay={autoPlay} />;
     }
     case 'fact':
       return (
@@ -872,7 +916,7 @@ function VideoCardView({ card, lang }: { card: VideoCard; lang: Lang }) {
 
 
 /** Thẻ âm thanh: TTS theo câu với tô sáng + tốc độ + ambient preset. Fallback văn bản khi lỗi. */
-function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; extra?: string[] }) {
+function AudioCardView({ card, lang, extra, autoPlay }: { card: AudioCard; lang: Lang; extra?: string[]; autoPlay?: boolean }) {
   const playerRef = useRef<SpeechPlayer | null>(null);
   const [status, setStatus] = useState<SpeechStatus>('idle');
   const [sent, setSent] = useState(-1);
@@ -944,6 +988,17 @@ function AudioCardView({ card, lang, extra }: { card: AudioCard; lang: Lang; ext
     }, 10000);
     return () => clearTimeout(t);
   }, [fileSrc, fileErr]);
+
+  // Tùy chọn "Tự phát thuyết minh": chạm mở điểm là nghe luôn (chỉ thẻ audio đầu tiên của điểm).
+  useEffect(() => {
+    if (!autoPlay || !getAutoNarrate() || !canAutoPlay()) return;
+    const id = setTimeout(() => {
+      if (fileSrc) void fileAudioRef.current?.play().catch(() => undefined);
+      else if (speechSupported()) toggle();
+    }, 350);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (fileSrc) {
     return (

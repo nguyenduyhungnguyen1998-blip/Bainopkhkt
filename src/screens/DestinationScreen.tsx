@@ -14,6 +14,7 @@ import { verifySignature } from '../lib/qr';
 import { SpeechPlayer, canAutoPlay, getAutoNarrate, speechSupported, type SpeechStatus } from '../lib/speech';
 import { startAmbient, stopAmbient } from '../lib/ambient';
 import { useOnline } from '../lib/theme';
+import { TILE, TILE_PROVIDERS, lonLatToTile } from '../map/tiles';
 import { IMAGE_CREDITS } from '../data/credits';
 import { Icon } from '../components/Icon';
 import { HelpMenu } from '../components/Onboarding';
@@ -692,23 +693,89 @@ function SiteIntro({ site, query }: { site: Site; query?: URLSearchParams }) {
   );
 }
 
-/** Bản đồ trong app chạy offline; khi có mạng thì gọi thêm dịch vụ bản đồ trực tuyến theo tọa độ khu. */
+const TILE_TIMEOUT = 5000;
+const ZOOM = 16;
+
+/**
+ * Bản đồ trực tuyến của khu: gọi dịch vụ ô bản đồ theo thứ tự TILE_PROVIDERS;
+ * nguồn lỗi/quá hạn → nguồn kế; hết nguồn hoặc mất mạng → dùng bản đồ offline của app.
+ */
 function Directions({ site, lang }: { site: Site; lang: Lang }) {
   const online = useOnline();
   const [lon, lat] = site.coords;
+  const [idx, setIdx] = useState(0);
+  const [loaded, setLoaded] = useState(false);
+  const provider = TILE_PROVIDERS[idx];
+  const failed = !provider || (!online && !loaded);
+
+  useEffect(() => {
+    if (online) {
+      setIdx(0);
+      setLoaded(false);
+    }
+  }, [online, site.entityId]);
+
+  useEffect(() => {
+    if (!provider || loaded || !online) return;
+    const id = window.setTimeout(() => setIdx((i) => (i === idx ? i + 1 : i)), TILE_TIMEOUT);
+    return () => window.clearTimeout(id);
+  }, [idx, loaded, online, provider]);
+
+  const c = lonLatToTile(lon, lat, ZOOM);
+  const tx = Math.floor(c.x);
+  const ty = Math.floor(c.y);
+  const ox = TILE + (c.x - tx) * TILE;
+  const oy = TILE + (c.y - ty) * TILE;
   const gmaps = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`;
-  const osm = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`;
+
   return (
     <div class="dintro__dir">
+      {failed ? (
+        <div class="omap omap--off">
+          <Icon name="locate" size={18} />
+          <span>{t(UI.omapFallback, lang)}</span>
+          <a class="mdv-btn mdv-btn--ghost mdv-btn--sm" href={routeHref.map}>
+            {t(UI.omapOpenOffline, lang)}
+          </a>
+        </div>
+      ) : (
+        <div class="omap" aria-label={t(UI.omapTitle, lang)}>
+          <div class="omap__tiles" style={{ transform: `translate(${-ox}px, ${-oy}px)` }} key={provider.id}>
+            {[-1, 0, 1].flatMap((dy) =>
+              [-1, 0, 1].map((dx) => (
+                <img
+                  key={`${dx},${dy}`}
+                  src={provider.url(ZOOM, tx + dx, ty + dy)}
+                  alt=""
+                  width={TILE}
+                  height={TILE}
+                  style={{ left: `${(dx + 1) * TILE}px`, top: `${(dy + 1) * TILE}px` }}
+                  onLoad={() => setLoaded(true)}
+                  onError={() => !loaded && setIdx((i) => (i === idx ? i + 1 : i))}
+                />
+              ))
+            )}
+          </div>
+          <span class="omap__pin" aria-hidden="true" />
+          <small class="omap__attr">{provider.attribution}</small>
+        </div>
+      )}
+      <small class="mdv-muted">
+        {failed
+          ? t(UI.omapStatusOffline, lang)
+          : `${t(UI.omapSource, lang)}: ${provider.name}${idx > 0 ? ` (${t(UI.omapBackup, lang)})` : ''}${loaded ? '' : ' …'}`}
+      </small>
       <div class="dintro__dirbtns">
-        <a class={`mdv-btn mdv-btn--ghost mdv-btn--sm ${online ? '' : 'is-disabled'}`} href={online ? gmaps : undefined} target="_blank" rel="noopener" aria-disabled={!online}>
+        <a
+          class={`mdv-btn mdv-btn--ghost mdv-btn--sm ${online ? '' : 'is-disabled'}`}
+          href={online ? gmaps : undefined}
+          target="_blank"
+          rel="noopener"
+          aria-disabled={!online}
+        >
           <Icon name="locate" size={15} /> {t(UI.directions, lang)} · Google Maps
         </a>
-        <a class={`mdv-btn mdv-btn--ghost mdv-btn--sm ${online ? '' : 'is-disabled'}`} href={online ? osm : undefined} target="_blank" rel="noopener" aria-disabled={!online}>
-          OpenStreetMap
-        </a>
       </div>
-      <small class="mdv-muted">{online ? t(UI.directionsNote, lang) : t(UI.directionsOffline, lang)}</small>
     </div>
   );
 }

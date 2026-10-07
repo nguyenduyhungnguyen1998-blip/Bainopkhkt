@@ -256,3 +256,8 @@ details.steptext p {
   flex-wrap: wrap;
   margin-top: 14px;
 }
+
+.setrow__note {
+  font-size: var(--text-xs);
+  margin: -4px 0 10px;
+}

@@ -997,3 +997,18 @@ a.dest__crumb--link:active {
   border-radius: var(--radius-md, 12px);
   background: var(--color-bg-alt, transparent);
 }
+
+.dintro__dir {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 14px;
+}
+.dintro__dirbtns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dintro__dir .is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

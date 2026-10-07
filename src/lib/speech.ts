@@ -19,6 +19,28 @@ export interface SpeechCallbacks {
 
 const WATCHDOG_MS = 2000;
 
+const AUTO_KEY = 'mdv.autoNarrate';
+export function getAutoNarrate(): boolean {
+  try {
+    return localStorage.getItem(AUTO_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+export function setAutoNarrate(on: boolean) {
+  try {
+    if (on) localStorage.setItem(AUTO_KEY, '1');
+    else localStorage.removeItem(AUTO_KEY);
+  } catch {
+    /* private mode */
+  }
+}
+/** Trình duyệt chỉ cho phát tiếng sau khi người dùng đã chạm vào trang. */
+export function canAutoPlay(): boolean {
+  const ua = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation;
+  return ua ? ua.hasBeenActive : true;
+}
+
 let voiceCache: SpeechSynthesisVoice[] | null = null;
 
 export function speechSupported(): boolean {

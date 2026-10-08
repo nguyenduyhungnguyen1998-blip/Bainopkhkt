@@ -1,4 +1,4 @@
-# Mở Dấu Việt — Nền tảng du lịch thông minh định danh văn hóa Việt
+# TVN – Mở dấu Việt — Nền tảng du lịch thông minh định danh văn hóa Việt
 
 PWA (Progressive Web App) phục vụ hành trình di sản 5 khu – 10 điểm: **Văn Miếu – Quốc Tử Giám** (hành trình mẫu làm sâu, 6 điểm), **Dinh Độc Lập**, **Vịnh Hạ Long**, **Quần thể di tích cố đô Huế** và **Thánh địa Mỹ Sơn** (mỗi khu 1 điểm mở rộng). Du khách **quét mã QR tại từng điểm** để mở khóa nội dung, nghe thuyết minh, làm quiz, sưu tầm "dấu ấn" vào hộ chiếu số — **không cần cài app, hoạt động offline**.
 

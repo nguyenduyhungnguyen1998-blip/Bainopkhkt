@@ -15,7 +15,7 @@ import { createHash } from 'node:crypto';
  * cần build dist. Mọi nhánh fetch quan trọng được test assert trực tiếp vào đây.
  */
 export function buildSw({ version, precache, base }) {
-  return `// Du lịch Việt Nam service worker – sinh tự động bởi scripts/gen-sw.mjs, không sửa tay.
+  return `// TVN – Mở dấu Việt service worker – sinh tự động bởi scripts/gen-sw.mjs, không sửa tay.
 const VERSION = '${version}';
 const PRE = 'mdv-pre-' + VERSION;
 const RUNTIME = 'mdv-rt-' + VERSION;

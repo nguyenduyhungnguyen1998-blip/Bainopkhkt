@@ -1,4 +1,4 @@
-# Kịch bản trình diễn 3 phút — Mở Dấu Việt
+# Kịch bản trình diễn 3 phút — TVN – Mở dấu Việt
 
 Mục tiêu: hội đồng **phi kỹ thuật** thấy được "mượt + ấn tượng + không chết". Tập trung vào lợi ích, không phải công nghệ.
 

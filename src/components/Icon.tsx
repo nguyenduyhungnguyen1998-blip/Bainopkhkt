@@ -80,5 +80,5 @@ export function FlagVN({ size = 18, class: cls }: { size?: number; class?: strin
 
 /** Biểu tượng chính của app: bản đồ VN đỏ trong vòng tròn + chấm vàng (logo KHKT chính thức). */
 export function BrandMark({ size = 20, class: cls }: { size?: number; class?: string }) {
-  return <img class={cls} width={size} height={size} src={asset('img/brand/emblem-256.webp')} alt="Du lịch Việt Nam" />;
+  return <img class={cls} width={size} height={size} src={asset('img/brand/emblem-256.webp')} alt="TVN – Mở dấu Việt" />;
 }

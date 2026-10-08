@@ -267,12 +267,12 @@ function ShareJourney({ lang, done, total, xp }: { lang: Lang; done: number; tot
   const url = `${location.origin}${location.pathname}#/pp/${sharePassportPayload()}`;
   const text =
     lang === 'vi'
-      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong Du lịch Việt Nam`
-      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in Travel in Vietnam`;
+      ? `Mình đã mở ${done}/${total} điểm di sản – ${xp} XP trong TVN – Mở dấu Việt`
+      : `I've unlocked ${done}/${total} heritage spots – ${xp} XP in TVN – Mở dấu Việt`;
   const share = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: lang === 'vi' ? 'Du lịch Việt Nam' : 'Travel in Vietnam', text, url });
+        await navigator.share({ title: 'TVN – Mở dấu Việt', text, url });
         return;
       }
     } catch {
@@ -1178,8 +1178,8 @@ export function AboutScreen() {
         <h2 style="font-size:var(--text-md);margin:0 0 10px">{vi ? 'Sản phẩm này là gì?' : 'What is this?'}</h2>
         <p class="steptext">
           {vi
-            ? 'Đề tài khoa học kỹ thuật cấp thành phố của nhóm học sinh: biến mỗi điểm di sản thành một hướng dẫn viên số hai ngôn ngữ — quét tem QR là nghe được câu chuyện, nhận dấu vào hộ chiếu và tự kiểm tra bằng quiz. Chạy ngay trên web, không cần cài app, dùng được cả khi mất mạng.'
-            : 'A city-level science fair project by a student team: it turns every heritage stop into a bilingual digital guide — scan a tag to hear the story, collect a passport stamp and self-check with a quiz. Runs on the web, no install, works offline.'}
+            ? 'Đề tài khoa học kỹ thuật cấp thành phố của nhóm 11A1-Warrior — học sinh THPT Quảng Oai: biến mỗi điểm di sản thành một hướng dẫn viên số hai ngôn ngữ — quét tem QR là nghe được câu chuyện, nhận dấu vào hộ chiếu và tự kiểm tra bằng quiz. Chạy ngay trên web, không cần cài app, dùng được cả khi mất mạng.'
+            : 'A city-level science fair project by team 11A1-Warrior, Quang Oai High School: it turns every heritage stop into a bilingual digital guide — scan a tag to hear the story, collect a passport stamp and self-check with a quiz. Runs on the web, no install, works offline.'}
         </p>
       </section>
       <section class="mdv-card">

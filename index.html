@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#07111F" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)" />
+    <meta name="description" content="TVN – Mở dấu Việt: hành trình di sản qua mã QR, không cần cài ứng dụng." />
+    <meta name="author" content="Nhóm 11A1-Warrior – THPT Quảng Oai" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="img/icon-192.png" />
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="TVN – Mở dấu Việt" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>TVN – Mở dấu Việt</title>
+    <style>#splash{color:#e8d9a0;z-index:99;background:#07111f;place-items:center;font-family:system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif;display:grid;position:fixed;top:0;bottom:0;left:0;right:0}html[data-theme=light] #splash{color:#5a2320;background:#f4f1ea}#splash .brand{text-align:center;letter-spacing:.04em}#splash .brand .flag{margin:0 auto 12px;display:block}#splash .brand .logoimg{background:#fffdf8;border-radius:50%;width:92px;height:92px;margin:0 auto 14px;padding:10px;display:block;box-shadow:0 4px 18px #00000059}#splash .brand h1{margin:0 0 6px;font-size:26px;font-weight:800}#splash .brand p{opacity:.7;margin:0;font-size:13px}#splash .dot{border:3px solid;border-radius:50%;width:54px;height:54px;margin:0 auto 14px;animation:1.6s ease-out infinite splash-pulse;position:relative}#splash .track{background:#e8d9a038;border-radius:4px;width:min(240px,62vw);height:4px;margin:18px auto 0;position:relative}html[data-theme=light] #splash .track{background:#5a23202e}#splash .track .fill{width:calc(var(--bp,6) * 1%);background:currentColor;border-radius:4px;transition:width .45s cubic-bezier(.4,0,.2,1);position:absolute;top:0;bottom:0;left:0;right:auto}#splash .runner{left:calc(var(--bp,6) * 1%);pointer-events:none;filter:drop-shadow(0 2px 4px #00000059);width:44px;height:44px;transition:left .45s cubic-bezier(.4,0,.2,1);animation:.6s ease-in-out infinite splash-run;position:absolute;top:10px;transform:translate(-50%)}@keyframes splash-run{0%,to{transform:translate(-50%)translateY(0)rotate(-4deg)}50%{transform:translate(-50%)translateY(4px)rotate(4deg)}}#splash .dot:after{content:"";background:currentColor;border-radius:50%;position:absolute;top:14px;bottom:14px;left:14px;right:14px}@keyframes splash-pulse{0%{opacity:.9;transform:scale(.92)}60%,to{opacity:.55;transform:scale(1.06)}}@media (prefers-reduced-motion:reduce){#splash .dot,#splash .runner{animation:none}}</style>
+    <script>
+      // Áp theme trước khi vẽ để tránh nháy màu
+      (function () {
+        try {
+          // Mốc tiến độ thật: main.tsx gọi __bp(0-100) theo từng giai đoạn khởi động.
+          window.__bp = function (v) {
+            var s = document.getElementById('splash');
+            if (s) s.style.setProperty('--bp', Math.max(0, Math.min(100, v)));
+          };
+          var q = new URLSearchParams(location.search).get('theme'); // ?theme=dark|light cho demo/chụp ảnh
+          var t = q === 'dark' || q === 'light' ? q : localStorage.getItem('mdv.theme');
+          if (q) localStorage.setItem('mdv.theme', q);
+          if (!t) t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+          document.documentElement.dataset.theme = t;
+          // Cỡ chữ % + độ phẳng nền %; migrate một lần từ khoá mức rời cũ.
+          var pct = function (key, legacyKey, legacyMap, dflt) {
+            var v = localStorage.getItem(key);
+            if (v != null && isFinite(+v)) return +v;
+            var lv = localStorage.getItem(legacyKey);
+            if (lv != null && lv in legacyMap) {
+              localStorage.setItem(key, String(legacyMap[lv]));
+              localStorage.removeItem(legacyKey);
+              return legacyMap[lv];
+            }
+            return dflt;
+          };
+          var fp = pct('mdv.fontPct', 'mdv.font', { md: 100, lg: 112, xl: 125 }, 100);
+          if (fp !== 100) document.documentElement.style.fontSize = fp + '%';
+          var fl = pct('mdv.flatPct', 'mdv.contrast', { on: 100, off: 0 }, 0);
+          if (fl > 0) document.documentElement.style.setProperty('--flat', String(fl / 100));
+          if (fl >= 100) document.documentElement.dataset.contrast = 'on';
+        } catch (e) {}
+      })();
+    </script>
+    <script>
+      // Đổi hướng tem QR TRƯỚC khi tải bundle: khách quét ?q=/?d= được đưa sang
+      // hash route ngay trong khi JS còn tải — thấy "Đang kiểm tra mã QR…" thay vì
+      // splash thường, và tem hỏng báo lỗi sớm thay vì rơi về bản đồ im lặng.
+      // Bảng qrId→site/spot inline là tập con để đi nhanh; qrId không khớp để
+      // main.tsx quyết bằng bảng đầy đủ (regen: đồng bộ qrId trong src/data/sites).
+      (function () {
+        try {
+          var q = new URLSearchParams(location.search);
+          var hasQ = q.get('q') != null;
+          var hasD = q.get('d') != null;
+          // Đánh dấu splash sớm NHẤT có thể: observer gắn trong head bắt được phần
+          // tử ngay khi nó parse trong luồng — phủ cả nhịp streaming đầu (doc sau
+          // redirect không còn ?q= nên nhận diện lượt quét qua hash '#/d/…?s=' | '#/qrfail').
+          var h0 = location.hash;
+          var qrScan = hasQ || hasD || h0 === '#/qrfail' || (h0.indexOf('#/d/') === 0 && h0.indexOf('s=') !== -1);
+          if (qrScan && typeof MutationObserver !== 'undefined') {
+            var mo = new MutationObserver(function () {
+              var el = document.querySelector('#splash .brand p');
+              if (el) {
+                el.textContent = 'Đang kiểm tra mã QR…';
+                mo.disconnect();
+              }
+            });
+            mo.observe(document.documentElement, { childList: true, subtree: true });
+          }
+          if (!hasQ && !hasD) return;
+          var MAP = {
+            mdvq01: 'dinh-doc-lap/cong-chinh',
+            mdvq02: 'ha-long/hang-sung-sot',
+            mdvq03: 'hue/ngo-mon',
+            mdvq04: 'my-son/nhom-thap-b',
+            mdvq05: 'van-mieu/van-mieu-mon',
+            mdvq06: 'van-mieu/khue-van-cac',
+            mdvq07: 'van-mieu/bia-tien-si',
+            mdvq08: 'van-mieu/dai-thanh-mon',
+            mdvq09: 'van-mieu/nha-thai-hoc',
+            mdvq10: 'van-mieu/vuon-giam'
+          };
+          var to = null;
+          var c = (q.get('q') || '').match(/^(\d+)\.([0-9a-f]{16})$/i);
+          if (c) {
+            var id = 'mdvq' + ('0' + c[1]).slice(-2);
+            if (MAP[id]) to = '#/d/' + MAP[id] + '?s=' + c[2].toLowerCase();
+            // qrId không có trong bảng inline → để bundle quyết (bảng đầy đủ / '#/qrfail').
+          } else if (hasQ) {
+            to = '#/qrfail';
+          } else if (hasD) {
+            var d = q.get('d');
+            if (d && /^[\w-]+\/[\w-]+$/.test(d)) {
+              var s = q.get('s');
+              to = '#/d/' + d + (s ? '?s=' + encodeURIComponent(s) : '');
+            } else {
+              to = '#/qrfail';
+            }
+          }
+          if (to) location.replace(location.pathname + to);
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" crossorigin src="/Bainopkhkt/assets/index-Berqfefo.js"></script>
+    <link rel="stylesheet" crossorigin href="/Bainopkhkt/assets/index-C7cCuC73.css">
+  </head>
+  <body>
+    <div id="app">
+      <div id="splash" aria-hidden="true">
+        <div class="brand">
+          <img class="logoimg" src="img/brand/emblem-256.webp" alt="" width="92" height="92" />
+          <h1>TVN – Mở dấu Việt</h1>
+          <p>Hành trình di sản qua mã QR</p>
+          <div class="track">
+            <span class="fill"></span>
+            <img class="runner" src="img/mascot.webp" alt="" width="44" height="44" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Đổi chữ splash NGAY khi splash vừa parse — script đứng sau markup nên
+      // phần tử đã tồn tại, không chờ DOMContentLoaded. Cổng bằng URL (thứ duy
+      // nhất sống qua replace): '?q='/'?d=' còn sót trong search, hash '#/d/…?s='
+      // (redirect tem), hoặc '#/qrfail'. Link chia sẻ '#/d/…' không kèm s= giữ
+      // chữ splash thường — đúng, vì đó không phải lượt quét tem.
+      (function () {
+        try {
+          var h = location.hash;
+          var qr = /[?&](q|d)=/.test(location.search) || h === '#/qrfail' || (h.indexOf('#/d/') === 0 && h.indexOf('s=') !== -1);
+          if (!qr) return;
+          var el = document.querySelector('#splash .brand p');
+          if (el) el.textContent = 'Đang kiểm tra mã QR…';
+        } catch (e) {}
+      })();
+    </script>
+  </body>
+</html>
